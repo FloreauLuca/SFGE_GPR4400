@@ -28,7 +28,7 @@ SOFTWARE.
 #include <utility/json_utility.h>
 #include <gtest/gtest.h>
 #include <engine/component.h>
-
+/*
 TEST(System, TestPlanetPySystem)
 {
 	sfge::Engine engine;
@@ -49,13 +49,13 @@ TEST(System, TestPlanetPySystem)
 
 	engine.Start();
 }
-
+*/
 TEST(System, TestPlanetPySystemCpp)
 {
 	sfge::Engine engine;
 	std::unique_ptr<sfge::Configuration> initConfig = std::make_unique<sfge::Configuration>();
 	initConfig->gravity.SetZero();
-	initConfig->devMode = false;
+	initConfig->devMode = true;
 	initConfig->maxFramerate = 0;
 	engine.Init(std::move(initConfig));
 	json sceneJson = {
