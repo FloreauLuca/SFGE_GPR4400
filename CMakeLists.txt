@@ -84,7 +84,7 @@ set(SFML_BUILD_EXAMPLES FALSE)
 set(BUILD_SHARED_LIBS FALSE)
 set(SFML_STATIC_LIBRARIES TRUE)
 add_subdirectory(${SFML_DIR})
-include_directories(${SFML_DIR}/include ${SFML_DIR}/src)
+include_directories(${SFML_DIR}/include ${SFML_DIR}/src ${SFML_DIR}/extlibs/headers)
 
 message("SFML lib: ${SFML_LIBRARIES} ${SFML_DEPEDENCIES} ")
 

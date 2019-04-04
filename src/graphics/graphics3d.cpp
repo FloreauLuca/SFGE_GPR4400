@@ -37,12 +37,12 @@ namespace sfge
 
 void Shader::Init(std::string vertexShaderPath, std::string fragmentShaderPath)
 {
-	const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	const unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);//declare vertex shader
 	const auto vertexShaderProgram = LoadFile(vertexShaderPath);
 	const char* vertexShaderChar = vertexShaderProgram.c_str();
 
-	glShaderSource(vertexShader, 1, &vertexShaderChar, NULL);
-	glCompileShader(vertexShader);
+	glShaderSource(vertexShader, 1, &vertexShaderChar, NULL);//define vertex shader data
+	glCompileShader(vertexShader);//compile
 	//Check success status of shader compilation 
 	int  success;
 	char infoLog[512];
@@ -217,8 +217,8 @@ void DrawingProgram::OnEditorDraw()
 		for (int j = 0; j < count; j++)
 		{
 			glGetActiveAttrib(shader->GetProgram(), (GLuint)j, bufSize, &length, &size, &type, name);
-
-			ImGui::Text("Attribute #%d Type: %u Name: %s", j, type, name);
+			int loc = glGetAttribLocation(shader->GetProgram(), name);
+			ImGui::Text("Attribute #%d Type: %u Name: %s", loc, type, name);
 		}
 
 		glGetProgramiv(shader->GetProgram(), GL_ACTIVE_UNIFORMS, &count);
@@ -226,8 +226,8 @@ void DrawingProgram::OnEditorDraw()
 		for (int j = 0; j < count; j++)
 		{
 			glGetActiveUniform(shader->GetProgram(), (GLuint)j, bufSize, &length, &size, &type, name);
-
-			ImGui::Text("Uniform #%d Type: %u Name: %s", j, type, name);
+			int loc = glGetUniformLocation(shader->GetProgram(), name);
+			ImGui::Text("Uniform #%d Type: %u Name: %s", loc, type, name);
 		}
 	}
 }

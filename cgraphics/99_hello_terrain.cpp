@@ -38,8 +38,8 @@ private:
 	float terrainOriginY = -1.0f;
 	float terrainElevationFactor = 5.0f;
 
-	const size_t terrainWidth = 256l;
-	const size_t terrainHeight = 256l;
+	const size_t terrainWidth = 256;
+	const size_t terrainHeight = 256;
 	const float terrainResolution = 0.04f;
 
 	const size_t verticesCount = terrainWidth * terrainHeight;

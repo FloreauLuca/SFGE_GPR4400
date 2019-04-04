@@ -29,7 +29,7 @@ SOFTWARE.
 #include <graphics/graphics3d.h>
 #include "utility/log.h"
 
-//#define EBO_DOUBLE_TRIANGLE
+#define EBO_DOUBLE_TRIANGLE
 
 class HelloTriangleDrawingProgram : public sfge::DrawingProgram
 {
@@ -84,19 +84,20 @@ void HelloTriangleDrawingProgram::OnEngineInit()
 	programName = "HelloTriangle";
 	shaders.push_back(&shaderProgram);
 
-	glGenBuffers(2, &VBO[0]);
+	glGenBuffers(2, &VBO[0]); //declaration of vbo, one for position, one for color, no size yet
 #ifdef EBO_DOUBLE_TRIANGLE
 	glGenBuffers(1, &EBO);
 #endif
 	
-	shaderProgram.Init("data/shaders/01_hello_triangle/triangle.vert", "data/shaders/01_hello_triangle/triangle.frag");
+	shaderProgram.Init("data/shaders/01_hello_triangle/triangle.vert", 
+		"data/shaders/01_hello_triangle/triangle.frag");
 
-	glGenVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &VAO);//declaration of vao
 	// 1. bind Vertex Array Object
 	glBindVertexArray(VAO);
 	// 2. copy our vertices array in a buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);//buffer data 9*4 bytes
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// 2. copy our colors array in a buffer for OpenGL to use
@@ -105,18 +106,16 @@ void HelloTriangleDrawingProgram::OnEngineInit()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
 #ifdef EBO_DOUBLE_TRIANGLE
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 #endif
-	
+	glBindVertexArray(0);
 }
 
 void HelloTriangleDrawingProgram::OnDraw()
 {
 	shaderProgram.Bind();
 	const float timeValue = m_Engine.GetTimeSinceInit();
-
 	const float colorValue = (sin(timeValue) + 1.0f) / 2.0f;
 	if(shaderProgram.GetProgram() == 0)
 	{
@@ -144,6 +143,7 @@ void HelloTriangleDrawingProgram::Destroy()
 	glDeleteBuffers(2, &VBO[0]);
 	glDeleteBuffers(2, &EBO);
 #endif
+	glDeleteProgram(shaderProgram.GetProgram());
 }
 
 int main(int argc, char **argv)
@@ -166,7 +166,6 @@ int main(int argc, char **argv)
 
 		engine.Init(std::move(config));
 	}
-
 
 	engine.Start();
 

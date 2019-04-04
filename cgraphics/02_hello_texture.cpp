@@ -2,8 +2,16 @@
 #include <graphics/graphics3d.h>
 
 #include <SFML/Graphics/Texture.hpp>
+#include "utility/file_utility.h"
+#include "utility/log.h"
 
-//#define OTHER_TEXTURE
+
+#define OTHER_TEXTURE
+#define USE_STB_IMAGE
+
+#ifdef USE_STB_IMAGE
+#include "stb_image/stb_image.h"
+#endif
 
 class HelloTextureDrawingProgram : public sfge::DrawingProgram
 {
@@ -12,6 +20,9 @@ public:
 	void OnEngineInit() override;
 	void OnDraw() override;
 	void Destroy() override;
+#ifdef USE_STB_IMAGE
+	int LoadTexture(const std::string& filename);
+#endif
 private:
 
 	float vertices[12] = {
@@ -24,7 +35,7 @@ private:
 		1.0f, 1.0f,	  // top right
 		1.0f, 0.0f,   // bottom right
 		0.0f, 0.0f,   // bottom left
-		0.0f, 1.0f,   // bottom left
+		0.0f, 1.0f,   // top left
 	};
 	unsigned int indices[6] = {
 		// note that we start from 0!
@@ -36,10 +47,14 @@ private:
 	unsigned int VBO[2] = {}; //Vertex Buffer Object
 	unsigned int VAO = 0; //Vertex Array Object
 	unsigned int EBO = 0; // Element Buffer Object
-	sf::Texture sfTextureWall;
+#ifndef USE_STB_IMAGE
+	sf::Texture sfTextureWall{};
+#endif
 	GLuint textureWall;
 #ifdef OTHER_TEXTURE
-	sf::Texture sfTextureOtherPlay;
+#ifndef USE_STB_IMAGE
+	sf::Texture sfTextureOtherPlay{};
+#endif
 	GLuint textureOtherPlay;
 #endif
 };
@@ -57,16 +72,23 @@ void HelloTextureDrawingProgram::OnEngineInit()
 	shaderProgram.Init(
 		"data/shaders/02_hello_texture/texture.vert",
 #ifdef OTHER_TEXTURE
-		"data/shaders/02_hello_texture/texture_other_fragment.frag"
+		"data/shaders/02_hello_texture/texture_other.frag"
 #else
 		"data/shaders/02_hello_texture/texture.frag"
 #endif
 	);
+#ifndef USE_STB_IMAGE
 	sfTextureWall.loadFromFile("data/sprites/wall.jpg");
 	textureWall = sfTextureWall.getNativeHandle();
 #ifdef OTHER_TEXTURE
 	sfTextureOtherPlay.loadFromFile("data/sprites/other_play.png");
 	textureOtherPlay = sfTextureOtherPlay.getNativeHandle();
+#endif
+#else
+	textureWall = LoadTexture("data/sprites/wall.jpg");
+#ifdef OTHER_TEXTURE
+	textureOtherPlay = LoadTexture("data/sprites/other_play.png");
+#endif
 #endif
 	glGenVertexArrays(1, &VAO);
 	// 1. bind Vertex Array Object
@@ -113,6 +135,42 @@ void HelloTextureDrawingProgram::Destroy()
 
 }
 
+#ifdef USE_STB_IMAGE
+int HelloTextureDrawingProgram::LoadTexture(const std::string& filename)
+{
+	std::string extension = sfge::GetFilenameExtension(filename);
+	int width, height, nrChannels;
+	
+	unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+	if (data == nullptr)
+	{
+		std::ostringstream oss;
+		oss << "[Error] Texture: cannot load " << filename << "\n";
+		sfge::Log::GetInstance()->Error(oss.str());
+		return 0;
+	}
+	unsigned int texture;
+	glGenTextures(1, &texture);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if (extension == ".jpg")
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	}
+	else if(extension == ".png")
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	}
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(data);
+	return texture;
+}
+#endif
 
 int main(int argc, char** argv)
 {

@@ -6,8 +6,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "SFML/Graphics/Texture.hpp"
+#include "imgui.h"
 
-#define ROTATE_OVER_TIME
+//#define ROTATE_OVER_TIME
 
 class HelloTransformDrawingProgram : public sfge::DrawingProgram
 {
@@ -16,6 +17,7 @@ public:
     void OnEngineInit() override;
     void OnDraw() override;
     void Destroy() override;
+	void OnEditorDraw() override;
 private:
 
     float vertices[12] = {
@@ -42,6 +44,10 @@ private:
     unsigned VAO;
 	sf::Texture sfTextureWall;
     unsigned textureWall;
+
+	float angle = 45.0f;
+	float x = 0.0f, y = 0.0f, z = 0.0f;
+	float scale = 0.5f;
 };
 
 void HelloTransformDrawingProgram::OnEngineInit()
@@ -57,7 +63,7 @@ void HelloTransformDrawingProgram::OnEngineInit()
             "data/shaders/03_hello_transform/transform.vert",
             "data/shaders/03_hello_transform/transform.frag"
     );
-	sfTextureWall.loadFromFile("data/sprites/wall.dds");
+	sfTextureWall.loadFromFile("data/sprites/wall.jpg");
 	textureWall = sfTextureWall.getNativeHandle();
     glGenVertexArrays(1, &VAO); //like: new VAO()
     // 1. bind Vertex Array Object
@@ -83,8 +89,9 @@ void HelloTransformDrawingProgram::OnDraw()
 {
     glm::mat4 trans = glm::mat4(1.0f);
 #ifndef ROTATE_OVER_TIME
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+	trans = glm::translate(trans, glm::vec3(x, y, z));
+    trans = glm::rotate(trans, glm::radians(angle), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(scale, scale, scale));
 #else
     trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
     trans = glm::rotate(trans, m_Engine.GetTimeSinceInit(), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -92,8 +99,10 @@ void HelloTransformDrawingProgram::OnDraw()
 
     shaderProgram.Bind();
 
-    unsigned int transformLoc = glGetUniformLocation(shaderProgram.GetProgram(), "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    //unsigned int transformLoc = glGetUniformLocation(shaderProgram.GetProgram(), "transform");
+    //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+	shaderProgram.SetMat4("transform", trans);
 
     glBindTexture(GL_TEXTURE_2D, textureWall);
     glBindVertexArray(VAO);
@@ -107,6 +116,18 @@ void HelloTransformDrawingProgram::Destroy()
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(2, &VBO[0]);
 	glDeleteBuffers(2, &EBO);
+}
+
+void HelloTransformDrawingProgram::OnEditorDraw()
+{
+	sfge::DrawingProgram::OnEditorDraw();
+	ImGui::Separator();
+	ImGui::SliderFloat("X", &x, -2.0f, 2.0f, "x = %.3f");
+	ImGui::SliderFloat("Y", &y, -2.0f, 2.0f, "y = %.3f");
+	ImGui::SliderFloat("Z", &z, -2.0f, 2.0f, "z = %.3f");
+	ImGui::SliderFloat("Scale", &scale, 0.0f, 10.0f, "scale = %.3f");
+
+	ImGui::SliderFloat("Angle", &angle, -180.0f, 180.0f, "angle = %.3f");
 }
 
 int main(int argc, char** argv)

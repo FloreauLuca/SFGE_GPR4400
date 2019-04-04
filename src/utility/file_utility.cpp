@@ -22,6 +22,8 @@
  SOFTWARE.
  */
 #include <utility/file_utility.h>
+#include "utility/log.h"
+#include <sstream>
 
 #ifdef __APPLE__
 
@@ -90,4 +92,20 @@ const std::string LoadFile(std::string path)
 	return str;
 }
 
+std::string GetFilenameExtension(std::string path)
+{
+	std::string extension = "";
+	const auto folderLastIndex = path.find_last_of('/');
+	std::string filename = path.substr(folderLastIndex + 1, path.size());
+	const auto filenameExtensionIndex = filename.find_last_of('.');
+	if (filenameExtensionIndex > path.size())
+	{
+		std::ostringstream oss;
+		oss << "[Error] Path: " << path << " has not a correct extension";
+		Log::GetInstance()->Error(oss.str());
+		return extension;
+	}
+	extension = filename.substr(filenameExtensionIndex);
+	return extension;
+}
 }

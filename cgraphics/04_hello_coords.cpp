@@ -171,7 +171,7 @@ void HelloCoordsDrawingProgram::OnDraw()
 
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(45.0f), (float)config->screenResolution.x / config->screenResolution.y, 0.1f, 100.0f);
-
+	//projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f);
 	shaderProgram.Bind();
 	glBindTexture(GL_TEXTURE_2D, textureWall);
 	glBindVertexArray(VAO);
@@ -195,7 +195,7 @@ void HelloCoordsDrawingProgram::OnDraw()
 	}
 #else
 	glm::mat4 model = glm::mat4(1.0f); //model transform matrix
-	model = glm::rotate(model, glm::radians(engine->GetTimeSinceInit()*45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(m_Engine.GetTimeSinceInit()*45.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	int modelLoc = glGetUniformLocation(shaderProgram.GetProgram(), "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
