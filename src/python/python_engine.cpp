@@ -79,7 +79,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 		.def("init", &System::OnEngineInit)
 		.def("update", &System::OnUpdate)
 		.def("fixed_update", &System::OnFixedUpdate)
-		.def("draw", &System::OnDraw)
+		.def("on_draw", &System::OnDraw)
 		.def("on_contact", &System::OnContact);
 
 	py::class_<SceneManager> sceneManager(m, "SceneManager");
@@ -152,6 +152,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 	graphics2dManager
 	    .def(py::init<Engine&>(), py::return_value_policy::reference)
 	    .def("draw_line", &Graphics2dManager::DrawLine)
+	    .def("draw_vector", &Graphics2dManager::DrawVector)
 		.def_property_readonly("sprite_manager", &Graphics2dManager::GetSpriteManager, py::return_value_policy::reference)
 		.def_property_readonly("texture_manager", &Graphics2dManager::GetTextureManager, py::return_value_policy::reference)
 		.def_property_readonly("shape_manager", &Graphics2dManager::GetShapeManager, py::return_value_policy::reference);
@@ -297,10 +298,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
         .def_static("dot", &Vec2f::Dot)
         .def_static("angle_between", &Vec2f::AngleBetween)
         .def_static("lerp", &Vec2f::Lerp)
-        .def("rotate", [](Vec2f& v1, float angle){
-          float radianAngle = angle/180.0f*M_PI;
-          v1 = Vec2f(cos(radianAngle)*v1.x-sin(radianAngle)*v1.y,sin(radianAngle)*v1.x+cos(radianAngle)*v1.y);
-        })
+        .def("rotate", &Vec2f::Rotate)
         .def_property_readonly_static("down", [](py::object){ return Vec2f(0.0f,1.0f);})
         .def_property_readonly_static("up", [](py::object){ return Vec2f(0.0f,-1.0f);})
         .def_property_readonly_static("right", [](py::object){ return Vec2f(1.0f,0.0f);})
@@ -360,8 +358,8 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 			return oss.str();
 		});
 
-	py::class_<p2Vec2> b2vec2(m, "b2Vec2");
-	b2vec2
+	py::class_<p2Vec2> p2vec2(m, "p2Vec2");
+	p2vec2
 		.def(py::init<>())
 		.def(py::init<float, float>())
 		.def_readwrite("x", &p2Vec2::x)
@@ -369,16 +367,44 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 		.def(py::self += py::self)
 		.def(py::self -= py::self)
 		.def(py::self *= float())
-		.def_property_readonly("magnitude", [](const p2Vec2 & vec)
-		{
-			return sqrtf(vec.x*vec.x + vec.y*vec.y);
-		})
+		.def_static("dot", &p2Vec2::Dot)
+		.def_static("cross", &p2Vec2::Cross)
+		.def("rotate", &p2Vec2::Rotate)
+		.def_static("lerp", &p2Vec2::Lerp)
+		.def_static("angle_between", &p2Vec2::AngleBetween)
+		.def_property_readonly("magnitude", &p2Vec2::GetMagnitude)
+		.def("normalized", &p2Vec2::Normalized)
+		.def("normalize_self", &p2Vec2::NormalizeSelf)
 		.def("__repr__", [](const p2Vec2 &vec)
 		{
 			std::ostringstream oss;
-			oss << "b2Vec2(" << vec.x << ", " << vec.y << ")";
+			oss << "p2Vec2(" << vec.x << ", " << vec.y << ")";
 			return oss.str();
 		});
+	py::class_<p2Vec3> p2vec3(m, "p2Vec3");
+	p2vec3
+		.def(py::init<>())
+		.def(py::init<float, float, float>())
+		.def_readwrite("x", &p2Vec3::x)
+		.def_readwrite("y", &p2Vec3::y)
+		.def_readwrite("z", &p2Vec3::z)
+		.def(py::self += py::self)
+		.def(py::self -= py::self)
+		.def(py::self *= float())
+		.def_static("dot", &p2Vec3::Dot)
+		.def_static("cross", &p2Vec3::Cross)
+		.def("rotate", &p2Vec3::Rotate)
+		.def_static("lerp", &p2Vec3::Lerp)
+		.def_static("angle_between", &p2Vec3::AngleBetween)
+		.def_property_readonly("magnitude", &p2Vec3::GetMagnitude)
+		.def("normalized", &p2Vec3::Normalized)
+		.def("normalize_self", &p2Vec3::NormalizeSelf)
+		.def("__repr__", [](const p2Vec3 &vec)
+	{
+		std::ostringstream oss;
+		oss << "p2Vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+		return oss.str();
+	});
 
 	ext::ExtendPython(m);
 	

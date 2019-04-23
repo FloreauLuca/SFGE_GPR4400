@@ -1,5 +1,3 @@
-def auto_import():
-    from scripts import *
 
 
 class Color:
@@ -27,6 +25,19 @@ class Vec2f:
         self.y = 0.0
         self.magnitude = 0.0
 
+    @staticmethod
+    def dot(v1, v2):
+        pass
+
+    @staticmethod
+    def angle_between(v1, v2):
+        pass
+
+    @staticmethod
+    def lerp(v1, v2, t):
+        pass
+
+
 
 class Vector2i:
     """SFML and default SFGE Vector type when not working on the physic"""
@@ -36,12 +47,72 @@ class Vector2i:
         self.magnitude = 0.0
 
 
-class b2Vec2:
+class p2Vec2:
     """Box2d Vector type used for physics related"""
     def __init__(self):
         self.x = 0.0
         self.y = 0.0
         self.magnitude = 0.0
+
+    @staticmethod
+    def dot(v1, v2):
+        pass
+
+    @staticmethod
+    def cross(v1, v2):
+        pass
+
+    @staticmethod
+    def lerp(v1, v2, f):
+        pass
+
+    @staticmethod
+    def angle_between(v1, v2):
+        pass
+
+    def rotate(self, angle):
+        pass
+
+    def normalized(self):
+        pass
+
+    def normalized_self(self):
+        pass
+
+
+class p2Vec3:
+    """Box2d Vector type used for physics related"""
+
+    def __init__(self):
+        self.x = 0.0
+        self.y = 0.0
+        self.z = 0.0
+        self.magnitude = 0.0
+
+    @staticmethod
+    def dot(v1, v2):
+        pass
+
+    @staticmethod
+    def cross(v1, v2):
+        pass
+
+    @staticmethod
+    def lerp(v1, v2, f):
+        pass
+
+    @staticmethod
+    def angle_between(v1, v2):
+        pass
+
+    def rotate(self, angle):
+        pass
+
+    def normalized(self):
+        pass
+
+    def normalized_self(self):
+        pass
 
 
 class Sprite:
@@ -104,6 +175,9 @@ class System:
     def on_contact(self, c1:ColliderData, c2:ColliderData, enter:bool):
         pass
 
+    def on_draw(self):
+        pass
+
 class ComponentManager():
     def add_component(self, entity):
         pass
@@ -133,6 +207,11 @@ class Graphics2dManager(System):
         self.sprite_manager = SpriteManager()
         self.shape_manager = ShapeManager()
 
+    def draw_line(self, from_vec:Vec2f, to_vec:Vec2f, color:Color):
+        pass
+
+    def draw_vector(self, v:Vec2f, origin_pos:Vec2f, color:Color):
+        pass
 
 class SceneManager(System):
     def load_scene(self, scene_name):
@@ -206,13 +285,13 @@ class Sound:
 
 class Body2d:
     def __init__(self):
-        self.velocity = b2Vec2()
+        self.velocity = p2Vec2()
         self.magnitude = 0.0
 
-    def apply_force(self, force:b2Vec2):
+    def apply_force(self, force:p2Vec2):
         pass
 
-def Collider:
+class Collider:
     pass
 
 class KeyboardManager:

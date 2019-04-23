@@ -64,6 +64,10 @@ struct p2Vec2
 	*/
 	void NormalizeSelf();
 
+	p2Vec2 Rotate(float angle) const;
+	static p2Vec2 Lerp(const p2Vec2& v1, const p2Vec2& v2, float t);
+	static float AngleBetween(const p2Vec2& v1, const p2Vec2& v2);
+
 	/**
 	* \brief 
 	*/
@@ -78,6 +82,14 @@ struct p2Vec3
 {
 	p2Vec3();
 	p2Vec3(float x, float y, float z);
+
+	p2Vec3 operator+(p2Vec3 v);
+	p2Vec3 operator+=(p2Vec3 v);
+	p2Vec3 operator-(p2Vec3 v);
+	p2Vec3 operator-=(p2Vec3 v);
+	p2Vec3 operator*=(float f);
+	p2Vec3 operator /(float f);
+	p2Vec3 operator *(float f);
 	/**
 	* \brief Dot product of two vectors
 	*/
@@ -86,6 +98,21 @@ struct p2Vec3
 	* \brief Cross product of two vectors
 	*/
 	static p2Vec3 Cross(p2Vec3 v1, p2Vec3 v2);
+	p2Vec3 Rotate(float angle) const;
+	static p2Vec3 Lerp(const p2Vec3& v1, const p2Vec3& v2, float t);
+	static float AngleBetween(const p2Vec3& v1, const p2Vec3& v2);
+	/**
+	* \brief Calculate the magnitude of the p2Vec2
+	*/
+	float GetMagnitude();
+	/**
+	* \brief Calculate a normalized version of the p2Vec2
+	*/
+	p2Vec3 Normalized();
+	/**
+	* \brief Normalize the p2Vec2
+	*/
+	void NormalizeSelf();
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;

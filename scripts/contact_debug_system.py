@@ -1,5 +1,6 @@
 from SFGE import *
 from typing import List
+
 shape_manager = graphics2d_manager.shape_manager
 
 

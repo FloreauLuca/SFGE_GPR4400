@@ -51,6 +51,8 @@ bool CreateDirectory(const std::string& dirname);
 bool RemoveDirectory(const std::string& dirname, bool removeAll=true);
 
 const std::string LoadFile(std::string path);
+
+std::string GetFilenameExtension(std::string path);
 }
 
 #endif

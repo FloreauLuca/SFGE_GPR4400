@@ -36,7 +36,6 @@ SOFTWARE.
 #include <audio/sound.h>
 #include <audio/audio.h>
 #include <graphics/graphics2d.h>
-#include <graphics/graphics3d.h>
 #include <physics/physics2d.h>
 #include <python/python_engine.h>
 #include <engine/config.h>
@@ -108,22 +107,6 @@ void Editor::OnUpdate(float dt)
                 }
 			}
 
-			auto* graphics3dManager = m_Engine.GetGraphics3dManager();
-			auto& drawingPrograms = graphics3dManager->GetDrawingPrograms();
-			if (!drawingPrograms.empty())
-			{
-				ImGui::Separator();
-				ImGui::Text("Graphics 3d Programs");
-				ImGui::Separator();
-				for (int i = 0; i < drawingPrograms.size();i++)
-				{
-					auto* drawingProgram = drawingPrograms[i];
-					if(ImGui::Selectable(drawingProgram->GetProgramName().c_str(), selectedDrawingProgram == i))
-					{
-						selectedDrawingProgram = i;
-					}
-				}
-			}
 			ImGui::Separator();
 			ImGui::Text("Entities");
 			ImGui::Separator();
@@ -151,12 +134,7 @@ void Editor::OnUpdate(float dt)
 				systems[selectedPySystem]->OnEditorDraw();
 			}
 			ImGui::Separator();
-			if(selectedDrawingProgram != -1)
-			{
-				drawingPrograms[selectedDrawingProgram]->OnEditorDraw();
-			}
 
-			ImGui::Separator();
 
 			if(selectedEntity != INVALID_ENTITY)
 			{

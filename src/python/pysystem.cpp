@@ -91,7 +91,7 @@ void PySystem::OnDraw()
 		PYBIND11_OVERLOAD_NAME(
 			void,
 			System,
-			"draw",
+			"on_draw",
 			OnDraw,
 			);
 	}

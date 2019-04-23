@@ -104,7 +104,10 @@ TEST(Physics, TestBallFallingToGround)
 	};
 	json raycastDebugJson =
 	{
-		{ "script_path", "scripts/mouse_raycast_system.py" }
+		{ "script_path", 
+			//"scripts/mouse_raycast_system.py" 
+			"nothing"
+		}
 	};
 	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson });
 	sceneManager->LoadSceneFromJson(sceneJson);
@@ -191,7 +194,9 @@ TEST(Physics, TestShapeContact)
 			{ "script_path", "scripts/stay_onscreen_system.py" }
 		},
 		{
-			{ "script_path", "scripts/mouse_raycast_system.py" }
+			{ "script_path", 
+			//"scripts/mouse_raycast_system.py" 
+			"nothing" }
 		}
 	}
 	);

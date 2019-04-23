@@ -43,6 +43,7 @@ class Vec2f
 #endif
   float GetMagnitude();
   Vec2f Normalized();
+  Vec2f Rotate(float angle) const;
   static Vec2f Lerp(const Vec2f& v1, const Vec2f& v2, float t);
   static float AngleBetween(const Vec2f& v1, const Vec2f& v2);
   static float Dot(const Vec2f& v1, const Vec2f& v2);

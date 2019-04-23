@@ -15,7 +15,7 @@ class PlanetSystem(System):
     gravity_const = 1000.0
 
     def init(self):
-        self.entity_nmb = 10000
+        self.entity_nmb = 256
         self.screen_size = engine.config.screen_size
         entity_manager.resize(self.entity_nmb)
 
@@ -41,7 +41,7 @@ class PlanetSystem(System):
         # a = v^2 / r <=> v = sqrt(F / m * r)
         speed = math.sqrt(self.calculate_new_force(transform).magnitude / self.planet_mass * Physics2dManager.pixel2meter(
             delta_to_center.magnitude))
-        return b2Vec2(vel_dir.x * speed, vel_dir.y * speed)
+        return p2Vec2(vel_dir.x * speed, vel_dir.y * speed)
 
     def calculate_new_force(self, transform):
         delta_to_center = self.screen_size / 2.0 - transform.position
