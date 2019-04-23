@@ -79,7 +79,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 		.def("init", &System::OnEngineInit)
 		.def("update", &System::OnUpdate)
 		.def("fixed_update", &System::OnFixedUpdate)
-		.def("draw", &System::OnDraw)
+		.def("on_draw", &System::OnDraw)
 		.def("on_contact", &System::OnContact);
 
 	py::class_<SceneManager> sceneManager(m, "SceneManager");
@@ -151,6 +151,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
 	graphics2dManager
 	    .def(py::init<Engine&>(), py::return_value_policy::reference)
 	    .def("draw_line", &Graphics2dManager::DrawLine)
+	    .def("draw_vector", &Graphics2dManager::DrawVector)
 		.def_property_readonly("sprite_manager", &Graphics2dManager::GetSpriteManager, py::return_value_policy::reference)
 		.def_property_readonly("texture_manager", &Graphics2dManager::GetTextureManager, py::return_value_policy::reference)
 		.def_property_readonly("shape_manager", &Graphics2dManager::GetShapeManager, py::return_value_policy::reference);
@@ -296,10 +297,7 @@ PYBIND11_EMBEDDED_MODULE(SFGE, m)
         .def_static("dot", &Vec2f::Dot)
         .def_static("angle_between", &Vec2f::AngleBetween)
         .def_static("lerp", &Vec2f::Lerp)
-        .def("rotate", [](Vec2f& v1, float angle){
-          float radianAngle = angle/180.0f*M_PI;
-          v1 = Vec2f(cos(radianAngle)*v1.x-sin(radianAngle)*v1.y,sin(radianAngle)*v1.x+cos(radianAngle)*v1.y);
-        })
+        .def("rotate", &Vec2f::Rotate)
         .def_property_readonly_static("down", [](py::object){ return Vec2f(0.0f,1.0f);})
         .def_property_readonly_static("up", [](py::object){ return Vec2f(0.0f,-1.0f);})
         .def_property_readonly_static("right", [](py::object){ return Vec2f(1.0f,0.0f);})

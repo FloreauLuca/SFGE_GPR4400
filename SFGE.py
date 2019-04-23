@@ -1,5 +1,3 @@
-def auto_import():
-    from scripts import *
 
 
 class Color:
@@ -26,6 +24,19 @@ class Vec2f:
         self.x = 0.0
         self.y = 0.0
         self.magnitude = 0.0
+
+    @staticmethod
+    def dot(v1, v2):
+        pass
+
+    @staticmethod
+    def angle_between(v1, v2):
+        pass
+
+    @staticmethod
+    def lerp(v1, v2, t):
+        pass
+
 
 
 class Vector2i:
@@ -104,6 +115,9 @@ class System:
     def on_contact(self, c1:ColliderData, c2:ColliderData, enter:bool):
         pass
 
+    def on_draw(self):
+        pass
+
 class ComponentManager():
     def add_component(self, entity):
         pass
@@ -133,6 +147,11 @@ class Graphics2dManager(System):
         self.sprite_manager = SpriteManager()
         self.shape_manager = ShapeManager()
 
+    def draw_line(self, from_vec:Vec2f, to_vec:Vec2f, color:Color):
+        pass
+
+    def draw_vector(self, v:Vec2f, origin_pos:Vec2f, color:Color):
+        pass
 
 class SceneManager(System):
     def load_scene(self, scene_name):
@@ -212,7 +231,7 @@ class Body2d:
     def apply_force(self, force:b2Vec2):
         pass
 
-def Collider:
+class Collider:
     pass
 
 class KeyboardManager:

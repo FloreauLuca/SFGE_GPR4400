@@ -35,7 +35,6 @@ SOFTWARE.
 #include <utility/log.h>
 
 #include <graphics/graphics2d.h>
-#include <graphics/graphics3d.h>
 #include <audio/audio.h>
 #include <engine/scene.h>
 #include <input/input.h>
@@ -54,7 +53,6 @@ struct SystemsContainer
 public:
 	SystemsContainer(Engine &engine) :
 		graphics2dManager(engine),
-		graphics3dManager(engine),
 		audioManager(engine),
 		sceneManager(engine),
 		inputManager(engine),
@@ -69,7 +67,6 @@ public:
 	SystemsContainer(const SystemsContainer&) = delete;
 
 	Graphics2dManager graphics2dManager;
-	Graphics3dManager graphics3dManager;
 	AudioManager audioManager;
 	SceneManager sceneManager;
 	InputManager inputManager;
@@ -134,7 +131,6 @@ void Engine::InitModules()
 	m_SystemsContainer->entityManager.OnEngineInit();
 	m_SystemsContainer->transformManager.OnEngineInit();
 	m_SystemsContainer->graphics2dManager.OnEngineInit();
-	m_SystemsContainer->graphics3dManager.OnEngineInit();
 	m_SystemsContainer->audioManager.OnEngineInit();
 	m_SystemsContainer->sceneManager.OnEngineInit();
 	m_SystemsContainer->inputManager.OnEngineInit();
@@ -177,8 +173,8 @@ void Engine::Start()
 
 			if(event.type == sf::Event::Resized)
 			{
-				glViewport(0, 0, event.size.width, event.size.height);
 				m_Config->screenResolution = sf::Vector2i(event.size.width, event.size.height);
+
 			}
 			
 		}
@@ -208,15 +204,11 @@ void Engine::Start()
 		m_SystemsContainer->editor.OnUpdate(dt.asSeconds());
         m_SystemsContainer->transformManager.OnUpdate(dt.asSeconds());
 		m_SystemsContainer->graphics2dManager.OnUpdate(dt.asSeconds());
-		
-		glClear(GL_DEPTH_BUFFER_BIT);
+
 
 
 		graphicsUpdateClock.restart();
 
-		m_Window->popGLStates();
-		m_SystemsContainer->graphics3dManager.OnDraw();
-		m_Window->pushGLStates();
 		m_SystemsContainer->graphics2dManager.OnDraw();
 
 		m_SystemsContainer->pythonEngine.OnDraw();
@@ -244,7 +236,6 @@ void Engine::Destroy()
 	m_SystemsContainer->pythonEngine.Destroy();
 	m_SystemsContainer->entityManager.Destroy();
 	m_SystemsContainer->graphics2dManager.Destroy();
-	m_SystemsContainer->graphics3dManager.Destroy();
 	m_SystemsContainer->audioManager.Destroy();
 	m_SystemsContainer->sceneManager.Destroy();
 	m_SystemsContainer->inputManager.Destroy();
@@ -258,7 +249,6 @@ void Engine::Clear()
 {
 	m_SystemsContainer->entityManager.OnBeforeSceneLoad();
 	m_SystemsContainer->graphics2dManager.OnBeforeSceneLoad();
-	m_SystemsContainer->graphics3dManager.OnBeforeSceneLoad();
 	m_SystemsContainer->audioManager.OnBeforeSceneLoad();
 	m_SystemsContainer->sceneManager.OnBeforeSceneLoad();
 	m_SystemsContainer->inputManager.OnBeforeSceneLoad();
@@ -272,7 +262,6 @@ void Engine::Collect()
 
 	m_SystemsContainer->entityManager.OnAfterSceneLoad();
 	m_SystemsContainer->graphics2dManager.OnAfterSceneLoad();
-	m_SystemsContainer->graphics3dManager.OnAfterSceneLoad();
 	m_SystemsContainer->audioManager.OnAfterSceneLoad();
 	m_SystemsContainer->sceneManager.OnAfterSceneLoad();
 	m_SystemsContainer->inputManager.OnAfterSceneLoad();
@@ -292,10 +281,6 @@ Graphics2dManager* Engine::GetGraphics2dManager()
 	return m_SystemsContainer?&m_SystemsContainer->graphics2dManager:nullptr;
 }
 
-Graphics3dManager* Engine::GetGraphics3dManager()
-{
-	return m_SystemsContainer ? &m_SystemsContainer->graphics3dManager : nullptr;
-}
 
 AudioManager* Engine::GetAudioManager()
 {

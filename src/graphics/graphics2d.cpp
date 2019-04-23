@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 #include <sstream>
-#include <graphics/graphics3d.h>
 #include <graphics/graphics2d.h>
 #include <engine/engine.h>
 #include <utility/log.h>
@@ -59,11 +58,7 @@ void Graphics2dManager::OnEngineInit()
 				m_Window->setFramerateLimit(configPtr->maxFramerate);
 				CheckVersion();
 			}
-			GLenum err = glewInit();
-			if (GLEW_OK != err)
-			{
-				std::cerr << "Error loading GLEW: " << glewGetErrorString(err) << "\n";
-			}
+
 		}
 	}
 	else
@@ -171,6 +166,19 @@ void Graphics2dManager::OnAfterSceneLoad()
 
 	m_TextureManager.OnAfterSceneLoad();
 	m_SpriteManager.OnAfterSceneLoad();
+}
+
+void Graphics2dManager::DrawVector(Vec2f drawingVector, Vec2f originPos, sf::Color color)
+{
+
+    const Vec2f destination = originPos+drawingVector*debugVectorPixelResolution;
+    //Draw length line
+    DrawLine(originPos, destination, color);
+    const Vec2f dir = drawingVector.Normalized();
+    const float length = (drawingVector*debugVectorPixelResolution).GetMagnitude();
+    DrawLine(destination, destination+dir.Rotate(135.0f)*length/5,color);
+    DrawLine(destination, destination+dir.Rotate(-135.0f)*length/5,color);
+
 }
 
 }

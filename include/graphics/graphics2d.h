@@ -64,7 +64,7 @@ public:
 
 
 	void DrawLine(Vec2f from, Vec2f to, sf::Color color=sf::Color::Red);
-
+    void DrawVector(Vec2f drawingVector, Vec2f originPos, sf::Color color=sf::Color::Red);
 	/**
 	* \brief Getter of the window created in GraphicsManager
 	* \return The SFML window
@@ -85,6 +85,8 @@ protected:
 	SpriteManager m_SpriteManager{m_Engine};
 	ShapeManager m_ShapeManager{m_Engine};
 	std::unique_ptr<sf::RenderWindow> m_Window;
+
+	const float debugVectorPixelResolution = 20.f;
 };
 
 }

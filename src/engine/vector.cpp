@@ -117,4 +117,11 @@ Vec2f &Vec2f::operator-=(const Vec2f &rhs)
   this->y -= rhs.y;
   return *this;
 }
+
+Vec2f Vec2f::Rotate(float angle) const
+{
+    float radianAngle = angle/180.0f*M_PI;
+    return Vec2f(cosf(radianAngle)*x-sinf(radianAngle)*y,
+            sinf(radianAngle)*x+cosf(radianAngle)*y);
+}
 }

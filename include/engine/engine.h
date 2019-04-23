@@ -51,7 +51,6 @@ namespace sfge
 
 struct Configuration;
 class Graphics2dManager;
-class Graphics3dManager;
 class AudioManager;
 class SceneManager;
 class InputManager;
@@ -98,7 +97,6 @@ public:
 	Configuration * GetConfig() const;
 
 	Graphics2dManager* GetGraphics2dManager();
-	Graphics3dManager* GetGraphics3dManager();
 	AudioManager* GetAudioManager();
 	SceneManager* GetSceneManager();
 	InputManager* GetInputManager();
