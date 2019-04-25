@@ -36,13 +36,15 @@ struct p2Vec2
 
 	p2Vec2(float x, float y);
 
-	p2Vec2 operator+(p2Vec2 v);
+	p2Vec2 operator+(p2Vec2 v) const;
 	p2Vec2 operator+=(p2Vec2 v);
-	p2Vec2 operator-(p2Vec2 v);
+	p2Vec2 operator-(p2Vec2 v) const;
 	p2Vec2 operator-=(p2Vec2 v);
 	p2Vec2 operator*=(float f);
-	p2Vec2 operator /(float f);
-	p2Vec2 operator *(float f);
+	p2Vec2 operator /(float f) const;
+	p2Vec2 operator/=(float f);
+	p2Vec2 operator *(float f) const;
+	p2Vec2 Mult(float f);
 	/**
 	* \brief Dot product of two vectors
 	*/
@@ -54,11 +56,11 @@ struct p2Vec2
 	/**
 	* \brief Calculate the magnitude of the p2Vec2
 	*/
-	float GetMagnitude();
+	float GetMagnitude() const;
 	/**
 	* \brief Calculate a normalized version of the p2Vec2
 	*/
-	p2Vec2 Normalized();
+	p2Vec2 Normalized() const;
 	/**
 	* \brief Normalize the p2Vec2
 	*/

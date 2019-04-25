@@ -21,30 +21,55 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef SFGE_EXT_PLANET_SYSTEM_H
+#define SFGE_EXT_PLANET_SYSTEM_H
 
-#include <engine/engine.h>
-#include <engine/config.h>
-#include <engine/scene.h>
-#include <utility/json_utility.h>
-#include <gtest/gtest.h>
-#include "SFML/Graphics/CircleShape.hpp"
+#include <engine/system.h>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <graphics/graphics2d.h>
 
-TEST(Physics, TestVector)
+
+namespace sfge
 {
-    sfge::Engine engine;
-    std::unique_ptr<sfge::Configuration> initConfig = std::make_unique<sfge::Configuration>();
-    initConfig->gravity = p2Vec2(0,0);
-    initConfig->devMode = false;
-    initConfig->maxFramerate = 0;
-    engine.Init(std::move(initConfig));
-    json sceneJson = {
-            { "name", "Test Vector" }
-    };
-    json systemJson = {
-            {"script_path", "scripts/vector_system.py"}
-    };
-    sceneJson["systems"] = json::array({ systemJson });
-    auto* sceneManager = engine.GetSceneManager();
-    sceneManager->LoadSceneFromJson(sceneJson);
-    engine.Start();
+	struct Transform2d;
+	class Transform2dManager;
+	class Body2dManager;
+	class TextureManager;
+	class SpriteManager;
 }
+
+namespace sfge::ext
+{
+
+
+	//#define WITH_PHYSICS
+#define WITH_VERTEXARRAY
+//#define MULTI_THREAD
+
+	class ContactDebugSystem : public System
+	{
+	public:
+		ContactDebugSystem(Engine& engine);
+
+		void OnEngineInit() override;
+
+		void OnUpdate(float dt) override;
+
+		void OnFixedUpdate() override;
+
+		void OnDraw() override;
+
+
+
+
+	private:
+
+
+
+
+	};
+
+
+}
+
+#endif

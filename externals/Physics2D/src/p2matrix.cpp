@@ -30,36 +30,38 @@ p2Mat22::p2Mat22()
 
 p2Mat22::p2Mat22(p2Vec2 r1, p2Vec2 r2)
 {
+	this->rows[0] = r1;
+	this->rows[1] = r2;
 }
 
 p2Mat22 p2Mat22::operator+(p2Mat22 m1)
 {
-	return p2Mat22();
+	return p2Mat22(rows[0]+m1.rows[0], rows[1]+m1.rows[1]);
 }
 
 p2Mat22 p2Mat22::operator-(p2Mat22 m1)
 {
-	return p2Mat22();
+	return p2Mat22(rows[0] - m1.rows[0], rows[1] - m1.rows[1]);
 }
 
 p2Mat22 p2Mat22::operator*(p2Mat22 m1)
 {
-	return p2Mat22();
+	return p2Mat22(p2Vec2(rows[0].x*m1.rows[0].x+rows[1].x*m1.rows[0].y, rows[0].y*m1.rows[0].x + rows[1].y*m1.rows[0].y), p2Vec2(rows[0].x*m1.rows[1].x + rows[1].x*m1.rows[1].y, rows[0].y*m1.rows[1].x + rows[1].y*m1.rows[1].y));
 }
 
 p2Vec2 p2Mat22::operator*(p2Vec2 v)
 {
-	return p2Vec2();
+	return p2Vec2(rows[0].x*v.x + rows[1].x*v.y, rows[0].y*v.x + rows[1].y*v.y);
 }
 
 p2Mat22 p2Mat22::operator*(float f)
 {
-	return p2Mat22();
+	return p2Mat22(rows[0] * f, rows[1] * f);
 }
 
 p2Mat22 p2Mat22::operator/(float f)
 {
-	return p2Mat22();
+	return p2Mat22(rows[0] / f, rows[1] / f);
 }
 
 p2Mat22 p2Mat22::Invert()
