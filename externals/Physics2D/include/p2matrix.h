@@ -55,7 +55,7 @@ struct p2Mat33
 	p2Mat33 operator+(p2Mat33 m1);
 	p2Mat33 operator-(p2Mat33 m1);
 	p2Mat33 operator*(p2Mat33 m1);
-	p2Vec3 operator*(p2Vec3);
+	p2Vec3 operator*(p2Vec3 v);
 	p2Mat33 operator*(float f);
 	p2Mat33 operator/(float f);
 	/**
