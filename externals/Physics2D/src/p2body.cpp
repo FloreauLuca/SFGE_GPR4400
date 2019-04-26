@@ -22,10 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <p2body.h>
+#include <iostream>
 
 void p2Body::Init(p2BodyDef* bodyDef)
 {
 	m_Colliders.resize(MAX_COLLIDER_LEN);
+	position = bodyDef->position;
+	linearVelocity = bodyDef->linearVelocity;
+	bodyType = bodyDef->type;
+	mass = bodyDef->mass;
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const
@@ -56,14 +61,22 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {
+	linearVelocity += force/mass;
 }
 
 p2BodyType p2Body::GetType() const
 {
-	return p2BodyType::STATIC;
+	return bodyType;
 }
 
 float p2Body::GetMass() const
 {
-	return 0.0f;
+	return mass;
+}
+
+void p2Body::Move()
+{
+	position += linearVelocity;
+	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) << std::endl; //Debug
+
 }

@@ -31,6 +31,14 @@ p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
 
 void p2World::Step(float dt)
 {
+	for (p2Body &body : m_Bodies)
+	{
+		if (body.GetType() == p2BodyType::DYNAMIC)
+		{
+			body.ApplyForceToCenter(m_Gravity);
+			body.Move();
+		}
+	}
 }
 
 p2Body * p2World::CreateBody(p2BodyDef* bodyDef)
@@ -43,4 +51,5 @@ p2Body * p2World::CreateBody(p2BodyDef* bodyDef)
 
 void p2World::SetContactListener(p2ContactListener * contactListener)
 {
+
 }
