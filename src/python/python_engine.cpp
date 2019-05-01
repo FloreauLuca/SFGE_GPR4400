@@ -224,7 +224,7 @@ namespace sfge
 			.def_property("velocity", &Body2d::GetLinearVelocity, &Body2d::SetLinearVelocity)
 			.def("apply_force", &Body2d::ApplyForce)
 			.def_property_readonly("body_type", &Body2d::GetType)
-			.def_property_readonly("body", &Body2d::Getp2Body)
+			//.def_property_readonly("body", &Body2d::Getp2Body)
 			.def_property_readonly("mass", &Body2d::GetMass);
 
 		py::class_<p2Body, std::unique_ptr<p2Body, py::nodelete>> body(m, "Body");
