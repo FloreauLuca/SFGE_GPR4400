@@ -1,4 +1,5 @@
 #include "..\include\p2collider.h"
+#include <iostream>
 
 void p2Collider::Init(p2ColliderDef* colliderDef)
 {
@@ -6,6 +7,21 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	isSensor = colliderDef->isSensor;
 	shape = *colliderDef->shape;
 	colliderType = colliderDef->colliderType;
+	switch (colliderType) {
+	case p2ColliderType::NONE:
+		std::cout << "none" << std::endl;
+		break;
+	case p2ColliderType::CIRCLE:
+		std::cout << "circle" << std::endl; 
+		break;
+	case p2ColliderType::BOX:
+		std::cout << "box" << std::endl; 
+		break;
+	case p2ColliderType::POLYGON:
+		std::cout << "polygon" << std::endl; 
+		break;
+	default: ;
+	}
 }
 
 
@@ -36,17 +52,22 @@ p2AABB p2Collider::GetAABB(p2Vec2 position)
 	switch (colliderType) {
 	case p2ColliderType::NONE:
 	{
+		//std::cout << "none " << std::endl; //Debug
+
 		extend = p2Vec2(0, 0);
 		break;
 	}
 	case p2ColliderType::CIRCLE:
 	{
+		std::cout << "circle" << std::endl; //Debug
+
 		p2CircleShape* circle_shape = static_cast<p2CircleShape*>(&shape);
 		extend = p2Vec2(circle_shape->GetRadius(), circle_shape->GetRadius());
 		break;
 	}
 	case p2ColliderType::BOX:
 	{
+		std::cout << "box" << std::endl; //Debug
 		p2RectShape* rect_shape = static_cast<p2RectShape*>(&shape);
 		extend = rect_shape->GetSize();
 		break;

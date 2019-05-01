@@ -23,7 +23,6 @@ SOFTWARE.
 */
 #include <p2body.h>
 #include <iostream>
-#include "graphics/graphics2d.h"
 
 void p2Body::Init(p2BodyDef* bodyDef)
 {
@@ -32,6 +31,7 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	linearVelocity = bodyDef->linearVelocity;
 	bodyType = bodyDef->type;
 	mass = bodyDef->mass;
+	
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const
@@ -90,16 +90,12 @@ void p2Body::SetPosition(float dt)
 {
 	position += linearVelocity * dt * 1/2;
 	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
-	std::cout << "FUCK" << std::endl; //Debug
 }
 
 void p2Body::BuildAABB()
 {
-	std::cout << "FUCK " << std::endl;
-
 	p2AABB p2_aabb;
 	p2_aabb.SetAABB(position, p2Vec2(0, 0));
-	
 	for (p2Collider m_collider : m_Colliders)
 	{
 		if (m_collider.GetAABB(position).bottomLeft < p2_aabb.bottomLeft)
@@ -108,8 +104,10 @@ void p2Body::BuildAABB()
 		}
 		if (m_collider.GetAABB(position).topRight > p2_aabb.topRight)
 		{
-			p2_aabb.bottomLeft = m_collider.GetAABB(position).topRight;
+			p2_aabb.topRight = m_collider.GetAABB(position).topRight;
 		}
+		std::cout << "top : " + std::to_string(m_collider.GetAABB(position).topRight.y) + " bottom : " + std::to_string(m_collider.GetAABB(position).bottomLeft.y) + " right : " + std::to_string(m_collider.GetAABB(position).topRight.x) + " left : " + std::to_string(m_collider.GetAABB(position).bottomLeft.x) << std::endl; // Debug
+
 	}
 	aabb = p2_aabb;
 	std::cout << "top : " + std::to_string(aabb.topRight.y) + " bottom : " + std::to_string(aabb.bottomLeft.y) + " right : " + std::to_string(aabb.topRight.x) + " left : " + std::to_string(aabb.bottomLeft.x) << std::endl; // Debug

@@ -37,13 +37,6 @@ enum class p2ColliderType
 	POLYGON
 };
 
-enum class p2ColliderType
-{
-	NONE,
-	CIRCLE,
-	BOX,
-	POLYGON
-};
 
 /**
 * \brief Struct defining a p2Collider when creating one

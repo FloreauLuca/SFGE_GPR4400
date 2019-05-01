@@ -15,13 +15,11 @@ class GizmoCollider(System):
         self.bodies_entites = entity_manager.get_entities_with_type(System.Body)
         for entity in self.bodies_entites:
             body = body2d_manager.get_component(entity)
-            shape = body.shape
-            shape.set_fill_color(Color.Red)
 
-        self.right = 0
-        self.top = 0
-        self.left = 0
-        self.bottom = 0
+        self.right = 0.0
+        self.top = 0.0
+        self.left = 0.0
+        self.bottom = 0.0
 
 
 def fixed_update(self):
@@ -32,7 +30,7 @@ def fixed_update(self):
         self.top = body_entities.aabb_topright.y
         self.left = body_entities.aabb_bottomleft.x
         self.bottom = body_entities.aabb_bottomleft.y
-
+    print("Python : right : " + self.right + "; top : " + self.top)
 
 
 def on_draw(self):
