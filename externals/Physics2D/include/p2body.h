@@ -47,7 +47,7 @@ struct p2BodyDef
 	p2BodyType type;
 	p2Vec2 position;
 	p2Vec2 linearVelocity;
-	float gravityScale; // influence de la gravité
+	float gravityScale; // influence de la gravity
 	float mass;
 };
 
@@ -61,11 +61,11 @@ class p2Body
 public:
 	void Init(p2BodyDef* bodyDef);
 	p2Vec2 GetLinearVelocity() const;
-	
+
 	void SetLinearVelocity(p2Vec2 velocity);
 
 	float GetAngularVelocity();
-	
+
 	p2Vec2 GetPosition();
 	/**
 	* \brief Factory method creating a p2Collider

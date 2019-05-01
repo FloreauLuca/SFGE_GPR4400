@@ -26,12 +26,12 @@ SOFTWARE.
 
 p2Vec2 p2AABB::GetCenter()
 {
-	return (bottomLeft+topRight)/2;
+	return (bottomLeft + topRight) / 2;
 }
 
 p2Vec2 p2AABB::GetExtends()
 {
-	return (bottomLeft-topRight)/2;
+	return (bottomLeft - topRight) / 2;
 }
 
 void p2AABB::SetAABB(p2Vec2 center, p2Vec2 extends)

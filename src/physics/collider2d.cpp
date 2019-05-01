@@ -93,9 +93,10 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 				shape = std::make_unique<p2CircleShape>();
 				if (CheckJsonNumber(componentJson, "radius"))
 				{
-					/*p2CircleShape circle_shape;
+					//shape->m_radius = pixel2meter(static_cast<float>(componentJson["radius"]));
+					p2CircleShape circle_shape;
 					circle_shape.SetRadius(pixel2meter(static_cast<float>(componentJson["radius"])));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(circle_shape));*/
+					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(circle_shape));
 				}
 				break;
 			case ColliderType::BOX:
@@ -112,9 +113,10 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 						Log::GetInstance()->Msg(oss.str());
 					}
 					//boxShape->SetAsBox(size.x / 2.0f, size.y / 2.0f);
-					/*p2RectShape rect_shape;
-					rect_shape.SetSize(p2Vec2 (size.x / 2.0f, size.y / 2.0f));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(rect_shape));*/
+					p2RectShape rect_shape;
+					rect_shape.SetSize(p2Vec2(size.x / 2.0f, size.y / 2.0f));
+					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(rect_shape));
+
 				}
 				shape = std::move(boxShape);
 			}	

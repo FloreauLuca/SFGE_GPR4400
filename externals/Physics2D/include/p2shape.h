@@ -50,7 +50,7 @@ private:
 	float m_Radius;
 };
 
-/** 
+/**
 * \brief Representation of a rectangle
 */
 class p2RectShape : public p2Shape
@@ -64,7 +64,7 @@ private:
 
 class p2PolygonShape : public p2Shape
 {
-	
+
 };
 
 #endif

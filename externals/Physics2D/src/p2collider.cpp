@@ -35,20 +35,25 @@ p2AABB p2Collider::GetAABB(p2Vec2 position)
 	p2Vec2 extend;
 	switch (colliderType) {
 	case p2ColliderType::NONE:
+	{
 		extend = p2Vec2(0, 0);
 		break;
+	}
 	case p2ColliderType::CIRCLE:
+	{
 		p2CircleShape* circle_shape = static_cast<p2CircleShape*>(&shape);
 		extend = p2Vec2(circle_shape->GetRadius(), circle_shape->GetRadius());
 		break;
+	}
 	case p2ColliderType::BOX:
+	{
 		p2RectShape* rect_shape = static_cast<p2RectShape*>(&shape);
 		extend = rect_shape->GetSize();
 		break;
+	}
 	case p2ColliderType::POLYGON:
 		extend = p2Vec2(0, 0);
-		break;
-	default: ;
+		break;;
 	}
 	aabb.SetAABB(position, extend);
 	return  aabb;

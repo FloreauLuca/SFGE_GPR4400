@@ -29,7 +29,13 @@ SOFTWARE.
 #include <p2shape.h>
 #include "engine/entity.h"
 #include "p2aabb.h"
-#include "physics/collider2d.h"
+enum class p2ColliderType
+{
+	NONE,
+	CIRCLE,
+	BOX,
+	POLYGON
+};
 
 enum class p2ColliderType
 {
@@ -76,7 +82,7 @@ private:
 	bool isSensor;
 	p2Shape shape;
 	p2ColliderType colliderType;
-	
+
 };
 
 

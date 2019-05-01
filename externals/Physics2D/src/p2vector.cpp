@@ -104,7 +104,7 @@ p2Vec2 p2Vec2::Normalized()
 void p2Vec2::NormalizeSelf()
 {
 	// DONE
-	if (GetMagnitude()==0) return;
+	if (GetMagnitude() == 0) return;
 	x /= GetMagnitude();
 	y /= GetMagnitude();
 }
@@ -124,8 +124,8 @@ p2Vec2 p2Vec2::Rotate(float angle) const
 p2Vec2 p2Vec2::Lerp(const p2Vec2& v1, const p2Vec2& v2, float t)
 {
 	// DONE
-	
-	return v1 + (v2-v1)*t;
+
+	return v1 + (v2 - v1)*t;
 }
 
 float p2Vec2::AngleBetween(const p2Vec2& v1, const p2Vec2& v2)
@@ -215,13 +215,13 @@ p2Vec3 p2Vec3::operator*(float f) const
 float p2Vec3::Dot(p2Vec3 v1, p2Vec3 v2)
 {
 	//DONE
-	return v1.x*v2.x+ v1.y*v2.y + v1.z*v2.z;
+	return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z;
 }
 
 p2Vec3 p2Vec3::Cross(p2Vec3 v1, p2Vec3 v2)
 {
 	//DONE
-	return p2Vec3(v1.y*v2.z-v1.z*v2.y, v1.z*v2.x-v1.x*v2.z, v1.x*v2.y-v1.y*v2.x);
+	return p2Vec3(v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x);
 }
 
 p2Vec3 p2Vec3::Rotate(float angle) const
@@ -243,12 +243,12 @@ float p2Vec3::AngleBetween(const p2Vec3& v1, const p2Vec3& v2)
 
 float p2Vec3::GetMagnitude()
 {
-	return sqrt(x*x + y * y + z*z);
+	return sqrt(x*x + y * y + z * z);
 }
 
 p2Vec3 p2Vec3::Normalized()
 {
-	return p2Vec3(x / GetMagnitude(), y / GetMagnitude(), z/GetMagnitude());
+	return p2Vec3(x / GetMagnitude(), y / GetMagnitude(), z / GetMagnitude());
 }
 
 void p2Vec3::NormalizeSelf()

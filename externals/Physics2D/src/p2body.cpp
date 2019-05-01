@@ -88,10 +88,9 @@ float p2Body::GetMass() const
 
 void p2Body::SetPosition(float dt)
 {
-	position += linearVelocity * dt;
-	//std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
-	std::cout << "FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK" << std::endl;
-	BuildAABB();
+	position += linearVelocity * dt * 1/2;
+	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
+	std::cout << "FUCK" << std::endl; //Debug
 }
 
 void p2Body::BuildAABB()
@@ -99,7 +98,8 @@ void p2Body::BuildAABB()
 	std::cout << "FUCK " << std::endl;
 
 	p2AABB p2_aabb;
-	p2_aabb.SetAABB(position, p2Vec2(0,0));
+	p2_aabb.SetAABB(position, p2Vec2(0, 0));
+	
 	for (p2Collider m_collider : m_Colliders)
 	{
 		if (m_collider.GetAABB(position).bottomLeft < p2_aabb.bottomLeft)

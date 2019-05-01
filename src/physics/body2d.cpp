@@ -100,6 +100,22 @@ p2Body * Body2d::GetBody() const
 }
 
 
+
+p2Vec2 Body2d::GetAABBTopRight()
+{
+	if (m_Body != nullptr)
+		return m_Body->GetAABB().topRight;
+	return p2Vec2(0, 0);
+}
+
+p2Vec2 Body2d::GetAABBBottomLeft()
+{
+	if (m_Body != nullptr)
+		return m_Body->GetAABB().bottomLeft;
+	return p2Vec2(0, 0);
+}
+
+
 void editor::Body2dInfo::DrawOnInspector()
 {
 	const auto& body = bodyManager->GetComponentRef(m_Entity);

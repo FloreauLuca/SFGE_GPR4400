@@ -24,7 +24,7 @@ SOFTWARE.
 #include <p2world.h>
 
 
-p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
+p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 {
 	m_Bodies.resize(MAX_BODY_LEN);
 }
