@@ -88,7 +88,7 @@ float p2Body::GetMass() const
 
 void p2Body::SetPosition(float dt)
 {
-	position += linearVelocity * dt * 1/2;
+	position += linearVelocity * dt;
 	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }
 
