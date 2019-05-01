@@ -45,24 +45,26 @@ public:
 	* \brief Setter for the radius
 	*/
 	void SetRadius(float radius);
+	float GetRadius();
 private:
 	float m_Radius;
 };
 
-/** 
+/**
 * \brief Representation of a rectangle
 */
 class p2RectShape : public p2Shape
 {
 public:
 	void SetSize(p2Vec2 size);
+	p2Vec2 GetSize();
 private:
 	p2Vec2 m_Size;
 };
 
 class p2PolygonShape : public p2Shape
 {
-	
+
 };
 
 #endif

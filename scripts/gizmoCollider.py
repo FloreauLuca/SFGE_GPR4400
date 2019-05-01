@@ -5,8 +5,11 @@ body2d_manager = physics2d_manager.body2d_manager
 
 
 class GizmoCollider(System):
-
     bodies_entites: list
+    top = float
+    right = float
+    left = float
+    bottom = float
 
     def init(self):
         self.bodies_entites = entity_manager.get_entities_with_type(System.Body)
@@ -15,21 +18,30 @@ class GizmoCollider(System):
             shape = body.shape
             shape.set_fill_color(Color.Red)
 
-    def fixed_update(self):
-        for entity in self.bodies_entites:
-            body_entities: Body2d = physics2d_manager.body2d_manager.get_component(entity)
-            #print("Ray fraction: " + str(body_entities.body.shape))
-            #body_entities.body.shape.set_fill_color(Color.Red)
+        self.right = 0
+        self.top = 0
+        self.left = 0
+        self.bottom = 0
 
-            
-    """
-    def on_contact(self, c1, c2, enter):
-        # print("Contact between {0} and {1} with enter: {2}".format(str(c1), str(c2), str(enter)))
-        if enter:
-            self.contact_count[self.entities.index(c1.entity)] += 1
-            self.contact_count[self.entities.index(c2.entity)] += 1
 
-        else:
-            self.contact_count[self.entities.index(c1.entity)] -= 1
-            self.contact_count[self.entities.index(c2.entity)] -= 1
-    """
+def fixed_update(self):
+
+    for entity in self.bodies_entites:
+        body_entities: Body2d = physics2d_manager.body2d_manager.get_component(entity)
+        self.right = body_entities.aabb_topright.x
+        self.top = body_entities.aabb_topright.y
+        self.left = body_entities.aabb_bottomleft.x
+        self.bottom = body_entities.aabb_bottomleft.y
+
+
+
+def on_draw(self):
+    # rotating vector
+    graphics2d_manager.draw_line(Physics2dManager.meter2pixel(p2Vec2(self.left, self.top)),
+                                 Physics2dManager.meter2pixel(p2Vec2(self.right, self.top)), Color.red)
+    graphics2d_manager.draw_line(Physics2dManager.meter2pixel(p2Vec2(self.right, self.top)),
+                                 Physics2dManager.meter2pixel(p2Vec2(self.right, self.bottom)), Color.red)
+    graphics2d_manager.draw_line(Physics2dManager.meter2pixel(p2Vec2(self.right, self.top)),
+                                 Physics2dManager.meter2pixel(p2Vec2(self.left, self.top)), Color.red)
+    graphics2d_manager.draw_line(Physics2dManager.meter2pixel(p2Vec2(self.right, self.bottom)),
+                                 Physics2dManager.meter2pixel(p2Vec2(self.left, self.bottom)), Color.red)

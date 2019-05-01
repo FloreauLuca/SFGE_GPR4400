@@ -28,6 +28,14 @@ SOFTWARE.
 
 #include <p2shape.h>
 #include "engine/entity.h"
+#include "p2aabb.h"
+enum class p2ColliderType
+{
+	NONE,
+	CIRCLE,
+	BOX,
+	POLYGON
+};
 
 /**
 * \brief Struct defining a p2Collider when creating one
@@ -38,6 +46,7 @@ struct p2ColliderDef
 	p2Shape* shape;
 	float restitution;
 	bool isSensor;
+	p2ColliderType colliderType;
 };
 
 /**
@@ -58,11 +67,13 @@ public:
 	*/
 	void* GetUserData();
 	p2Shape GetShape();
+	p2AABB GetAABB(p2Vec2 position);
 	void SetUserData(void* colliderData);
 private:
 	void* userData = nullptr;
 	bool isSensor;
 	p2Shape shape;
+	p2ColliderType colliderType;
 
 };
 

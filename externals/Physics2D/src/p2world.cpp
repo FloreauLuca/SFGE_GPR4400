@@ -24,7 +24,7 @@ SOFTWARE.
 #include <p2world.h>
 
 
-p2World::p2World(p2Vec2 gravity): m_Gravity(gravity)
+p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 {
 	m_Bodies.resize(MAX_BODY_LEN);
 }
@@ -35,8 +35,9 @@ void p2World::Step(float dt)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.ApplyForceToCenter(m_Gravity * dt);
-			body.Move(dt);
+			body.ApplyForceToCenter(m_Gravity*dt);
+			body.SetPosition(dt);
+			body.BuildAABB();
 		}
 	}
 }

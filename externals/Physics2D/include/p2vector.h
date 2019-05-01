@@ -75,6 +75,8 @@ struct p2Vec2
 	* \brief
 	*/
 	p2Vec3 to3();
+	bool operator<(const p2Vec2& v) const;
+	bool operator>(const p2Vec2& v) const;
 
 	float x = 0.0f;
 	float y = 0.0f;
