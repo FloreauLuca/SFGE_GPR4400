@@ -57,7 +57,7 @@ public:
 	* \brief Return the userData
 	*/
 	void* GetUserData();
-	void GetShape();
+	p2Shape GetShape();
 	void SetUserData(void* colliderData);
 private:
 	void* userData = nullptr;

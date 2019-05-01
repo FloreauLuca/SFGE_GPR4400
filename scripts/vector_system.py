@@ -10,7 +10,6 @@ class VectorSystem(System):
     pu = p2Vec2()
     pv = p2Vec2()
 
-
     """
     tsec = 0.0
     tmin = 0.0
@@ -33,8 +32,8 @@ class VectorSystem(System):
         self.t = self.thour * 3600 + self.tmin * 60 + self.tsec
         """
         self.t = 0;
-        self.rotation_speed = 1
-        #self.ftest = 0.0
+        self.rotation_speed = 100
+        # self.ftest = 0.0
 
     def update(self, dt):
         self.t += dt
@@ -81,33 +80,30 @@ class VectorSystem(System):
         
         """
 
-        #"""
+        # """
         # Rotation and angle test
         self.v = Vec2f(10, -10)
         self.u = Vec2f(10, 10)
         self.pv = Physics2dManager.pixel2meter(self.v)
         self.pu = Physics2dManager.pixel2meter(self.u)
-        if self.t > p2Vec2.angle_between(self.pu, self.pv) :
+        if self.t > p2Vec2.angle_between(self.pu, self.pv):
             self.t = 0
 
         self.pv = self.pv.rotate(self.t)
         self.result = Physics2dManager.meter2pixel(self.pv)
 
-        #"""
-
+        # """
 
     def on_draw(self):
         # rotating vector
 
-        graphics2d_manager.draw_vector(self.v, Vec2f(750,300), Color.Green)
-        graphics2d_manager.draw_vector(self.u, Vec2f(750,300), Color.Green)
-        graphics2d_manager.draw_vector(self.result,Vec2f(750, 300), Color.Red)
+        graphics2d_manager.draw_vector(self.v, Vec2f(750, 300), Color.Green)
+        graphics2d_manager.draw_vector(self.u, Vec2f(750, 300), Color.Green)
+        graphics2d_manager.draw_vector(self.result, Vec2f(750, 300), Color.Red)
 
-
-        #graphics2d_manager.draw_vector(self.test,Vec2f(750, 400), Color.Cyan)
+        # graphics2d_manager.draw_vector(self.test,Vec2f(750, 400), Color.Cyan)
         """
         graphics2d_manager.draw_vector(self.second, Vec2f(750,400), Color.Green)
         graphics2d_manager.draw_vector(self.minute,Vec2f(750, 400), Color.Cyan)
         graphics2d_manager.draw_vector(self.hour,Vec2f(750, 400), Color.Red)
         """
-

@@ -13,7 +13,7 @@ bool p2Collider::IsSensor()
 	return isSensor;
 }
 
-void * p2Collider::GetUserData()
+void* p2Collider::GetUserData()
 {
 	return userData;
 }
@@ -22,3 +22,9 @@ void p2Collider::SetUserData(void* colliderData)
 {
 	userData = colliderData;
 }
+
+p2Shape p2Collider::GetShape()
+{
+	return shape;
+}
+

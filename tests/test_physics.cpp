@@ -100,7 +100,9 @@ TEST(Physics, TestBallFallingToGround)
 
 	sceneJson["entities"] = { entityBody1, entityBody2 };
 	json contactDebugSystem = {
-		{ "script_path", "scripts/contact_debug_system.py" }
+		{ "script_path", 
+			//"scripts/contact_debug_system.py"
+			"nothing"}
 	};
 	json raycastDebugJson =
 	{
@@ -109,7 +111,14 @@ TEST(Physics, TestBallFallingToGround)
 			"nothing"
 		}
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson });
+	json gizmoCollider =
+	{
+		{
+			"script_path",
+			"scripts/gizmoCollider.py"
+		}
+	};
+	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider });
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 

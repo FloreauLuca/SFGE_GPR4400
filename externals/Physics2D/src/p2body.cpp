@@ -56,7 +56,16 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 {
 	p2Collider& collider = m_Colliders[m_ColliderIndex];
 	m_ColliderIndex++;
+	p2Collider collider2;
+	collider2.Init(colliderDef);
+	m_Colliders[m_ColliderIndex] = collider2;
+	collider = m_Colliders[m_ColliderIndex];
 	return &collider;
+}
+
+p2Shape p2Body::GetShape()
+{
+	return m_Colliders[0].GetShape();
 }
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
@@ -77,5 +86,5 @@ float p2Body::GetMass() const
 void p2Body::Move(float dt)
 {
 	position += linearVelocity * dt * dt;
-	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) << std::endl; //Debug
+	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }

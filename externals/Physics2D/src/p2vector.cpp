@@ -111,6 +111,13 @@ p2Vec2 p2Vec2::Rotate(float angle) const
 	return p2Mat22(p2Vec2(cos(angle), sin(angle)), p2Vec2(-sin(angle), cos(angle))) *p2Vec2(x, y);
 }
 
+/**
+ * \brief Lerp
+ * \param v1 start vector
+ * \param v2 end vector
+ * \param t lerp percent
+ * \return p2Vec2 Lerp
+ */
 p2Vec2 p2Vec2::Lerp(const p2Vec2& v1, const p2Vec2& v2, float t)
 {
 	// DONE

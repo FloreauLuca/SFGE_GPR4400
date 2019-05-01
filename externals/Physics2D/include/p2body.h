@@ -73,6 +73,7 @@ public:
 	* \return p2Collider collider attached to the p2Body
 	*/
 	p2Collider* CreateCollider(p2ColliderDef* colliderDef);
+	p2Shape GetShape();
 	void ApplyForceToCenter(const p2Vec2& force);
 	p2BodyType GetType() const;
 	float GetMass() const;

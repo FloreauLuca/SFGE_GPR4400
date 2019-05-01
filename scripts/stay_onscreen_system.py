@@ -17,8 +17,8 @@ class StayOnscreenSystem(System):
 
             position = transform.position
             if (position.x < 0 and body.velocity.x < 0) or (position.x > screen_size.x and body.velocity.x > 0):
-                body.velocity = b2Vec2(-body.velocity.x, body.velocity.y)
+                body.velocity = p2Vec2(-body.velocity.x, body.velocity.y)
             if (position.y < 0 and body.velocity.y < 0) or (position.y > screen_size.y and body.velocity.y > 0):
-                body.velocity = b2Vec2(body.velocity.x, -body.velocity.y)
+                body.velocity = p2Vec2(body.velocity.x, -body.velocity.y)
 
 
