@@ -31,6 +31,14 @@ SOFTWARE.
 #include "p2aabb.h"
 #include "physics/collider2d.h"
 
+enum class p2ColliderType
+{
+	NONE,
+	CIRCLE,
+	BOX,
+	POLYGON
+};
+
 /**
 * \brief Struct defining a p2Collider when creating one
 */
@@ -40,7 +48,7 @@ struct p2ColliderDef
 	p2Shape* shape;
 	float restitution;
 	bool isSensor;
-	sfge::ColliderType colliderType;
+	p2ColliderType colliderType;
 };
 
 /**
@@ -67,7 +75,7 @@ private:
 	void* userData = nullptr;
 	bool isSensor;
 	p2Shape shape;
-	sfge::ColliderType colliderType;
+	p2ColliderType colliderType;
 	
 };
 

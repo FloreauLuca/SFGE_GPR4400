@@ -68,6 +68,20 @@ p2BodyType Body2d::GetType()
 	return p2BodyType::STATIC;
 }
 
+p2Vec2 Body2d::GetAABBTopRight()
+{
+	if (m_Body != nullptr)
+		return m_Body->GetAABB().topRight;
+	return p2Vec2(0,0);
+}
+
+p2Vec2 Body2d::GetAABBBottomLeft()
+{
+	if (m_Body != nullptr)
+		return m_Body->GetAABB().bottomLeft;
+	return p2Vec2(0, 0);
+}
+
 float Body2d::GetMass()
 {
 	if (m_Body)
@@ -85,10 +99,6 @@ p2Body * Body2d::GetBody() const
 	return m_Body;
 }
 
-p2Body Body2d::Getp2Body() const
-{
-	return *m_Body;
-}
 
 void editor::Body2dInfo::DrawOnInspector()
 {

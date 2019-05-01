@@ -86,20 +86,22 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		if (CheckJsonExists(componentJson, "collider_type"))
 		{
 			ColliderType colliderType = static_cast<ColliderType>(componentJson["collider_type"]);
-			fixtureDef.colliderType = colliderType;
 			switch (colliderType)
 			{
 			case ColliderType::CIRCLE:
+				fixtureDef.colliderType = p2ColliderType::CIRCLE;
 				shape = std::make_unique<p2CircleShape>();
 				if (CheckJsonNumber(componentJson, "radius"))
 				{
-					p2CircleShape circle_shape;
+					/*p2CircleShape circle_shape;
 					circle_shape.SetRadius(pixel2meter(static_cast<float>(componentJson["radius"])));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(circle_shape));
+					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(circle_shape));*/
 				}
 				break;
 			case ColliderType::BOX:
 			{
+				fixtureDef.colliderType = p2ColliderType::BOX;
+
 				auto boxShape = std::make_unique<p2RectShape>();
 				if (CheckJsonExists(componentJson, "size"))
 				{
@@ -110,15 +112,16 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 						Log::GetInstance()->Msg(oss.str());
 					}
 					//boxShape->SetAsBox(size.x / 2.0f, size.y / 2.0f);
-					p2RectShape rect_shape;
+					/*p2RectShape rect_shape;
 					rect_shape.SetSize(p2Vec2 (size.x / 2.0f, size.y / 2.0f));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(rect_shape));
+					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(rect_shape));*/
 				}
 				shape = std::move(boxShape);
 			}	
 			break;
 			default:
 			{
+				fixtureDef.colliderType = p2ColliderType::NONE;
 				std::ostringstream oss;
 				oss << "[Error] Collider of type: " << static_cast<int>(colliderType) << " could not be loaded from json: " << componentJson;
 				Log::GetInstance()->Error(oss.str());

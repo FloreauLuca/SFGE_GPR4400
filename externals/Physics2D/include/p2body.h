@@ -79,6 +79,7 @@ public:
 	float GetMass() const;
 	void SetPosition(float dt);
 	void BuildAABB();
+	p2AABB GetAABB();
 private:
 	p2AABB aabb;
 	p2Vec2 position;
