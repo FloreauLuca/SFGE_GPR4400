@@ -28,6 +28,8 @@ SOFTWARE.
 
 #include <p2shape.h>
 #include "engine/entity.h"
+#include "p2aabb.h"
+#include "physics/collider2d.h"
 
 /**
 * \brief Struct defining a p2Collider when creating one
@@ -38,6 +40,7 @@ struct p2ColliderDef
 	p2Shape* shape;
 	float restitution;
 	bool isSensor;
+	sfge::ColliderType colliderType;
 };
 
 /**
@@ -58,12 +61,14 @@ public:
 	*/
 	void* GetUserData();
 	p2Shape GetShape();
+	p2AABB GetAABB(p2Vec2 position);
 	void SetUserData(void* colliderData);
 private:
 	void* userData = nullptr;
 	bool isSensor;
 	p2Shape shape;
-
+	sfge::ColliderType colliderType;
+	
 };
 
 

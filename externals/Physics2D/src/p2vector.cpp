@@ -69,6 +69,7 @@ p2Vec2& p2Vec2::operator*=(float f)
 
 p2Vec2 p2Vec2::operator/(float f) const
 {
+	if (f == 0) f = 1;
 	return p2Vec2(x / f, y / f);
 }
 
@@ -96,12 +97,14 @@ float p2Vec2::GetMagnitude() const
 p2Vec2 p2Vec2::Normalized()
 {
 	// DONE
+	if (GetMagnitude() == 0) return *this;
 	return p2Vec2(x / GetMagnitude(), y / GetMagnitude());
 }
 
 void p2Vec2::NormalizeSelf()
 {
 	// DONE
+	if (GetMagnitude()==0) return;
 	x /= GetMagnitude();
 	y /= GetMagnitude();
 }
@@ -128,6 +131,7 @@ p2Vec2 p2Vec2::Lerp(const p2Vec2& v1, const p2Vec2& v2, float t)
 float p2Vec2::AngleBetween(const p2Vec2& v1, const p2Vec2& v2)
 {
 	// DONE
+	if ((v1.GetMagnitude()*v2.GetMagnitude()) == 0) return 0;
 	return acos(Dot(v1, v2) / (v1.GetMagnitude()*v2.GetMagnitude()));
 }
 
@@ -135,6 +139,22 @@ float p2Vec2::AngleBetween(const p2Vec2& v1, const p2Vec2& v2)
 p2Vec3 p2Vec2::to3()
 {
 	return p2Vec3(x, y, 0.0f);
+}
+
+/**
+ * \brief if x AND y inferior
+ */
+bool p2Vec2::operator<(const p2Vec2& v) const
+{
+	return  (x < v.x && y < v.y);
+}
+
+/**
+ * \brief if x AND y superior
+ */
+bool p2Vec2::operator>(const p2Vec2& v) const
+{
+	return (x > v.x && y > v.y);
 }
 
 p2Vec3::p2Vec3()

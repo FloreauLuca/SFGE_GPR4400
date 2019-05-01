@@ -70,6 +70,7 @@ p2Shape p2Body::GetShape()
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {
+	if (mass == 0) mass = 1;
 	linearVelocity += force/mass;
 }
 
@@ -83,8 +84,26 @@ float p2Body::GetMass() const
 	return mass;
 }
 
-void p2Body::Move(float dt)
+void p2Body::SetPosition(float dt)
 {
-	position += linearVelocity * dt * dt;
+	position += linearVelocity * dt;
 	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
+}
+
+void p2Body::BuildAABB()
+{
+	p2AABB p2_aabb;
+	p2_aabb.SetAABB(position, p2Vec2(0,0));
+	for (p2Collider m_collider : m_Colliders)
+	{
+		if (m_collider.GetAABB(position).bottomLeft < p2_aabb.bottomLeft)
+		{
+			p2_aabb.bottomLeft = m_collider.GetAABB(position).bottomLeft;
+		}
+		if (m_collider.GetAABB(position).topRight > p2_aabb.topRight)
+		{
+			p2_aabb.bottomLeft = m_collider.GetAABB(position).topRight;
+		}
+	}
+	aabb = p2_aabb;
 }

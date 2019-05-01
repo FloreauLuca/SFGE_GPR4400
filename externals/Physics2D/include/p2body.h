@@ -47,7 +47,7 @@ struct p2BodyDef
 	p2BodyType type;
 	p2Vec2 position;
 	p2Vec2 linearVelocity;
-	float gravityScale;
+	float gravityScale; // influence de la gravité
 	float mass;
 };
 
@@ -77,7 +77,8 @@ public:
 	void ApplyForceToCenter(const p2Vec2& force);
 	p2BodyType GetType() const;
 	float GetMass() const;
-	void Move(float dt);
+	void SetPosition(float dt);
+	void BuildAABB();
 private:
 	p2AABB aabb;
 	p2Vec2 position;

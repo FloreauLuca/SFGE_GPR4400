@@ -43,5 +43,6 @@ struct p2AABB
 	* \brief Calculate the extends and return it
 	*/
 	p2Vec2 GetExtends();
+	void SetAABB(p2Vec2 center, p2Vec2 extends);
 };
 #endif // !SFGE_P2AABB:H
