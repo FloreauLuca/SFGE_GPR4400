@@ -18,8 +18,8 @@ class GizmoCollider(System):
     def fixed_update(self):
         for entity in self.bodies_entites:
             body_entities: Body2d = physics2d_manager.body2d_manager.get_component(entity)
-            print("Ray fraction: " + str(body_entities.body.shape))
-            body_entities.body.shape.set_fill_color(Color.Red)
+            #print("Ray fraction: " + str(body_entities.body.shape))
+            #body_entities.body.shape.set_fill_color(Color.Red)
 
             
     """
