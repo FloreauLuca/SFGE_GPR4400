@@ -7,21 +7,7 @@ void p2Collider::Init(p2ColliderDef* colliderDef)
 	isSensor = colliderDef->isSensor;
 	shape = *colliderDef->shape;
 	colliderType = colliderDef->colliderType;
-	switch (colliderType) {
-	case p2ColliderType::NONE:
-		std::cout << "none" << std::endl;
-		break;
-	case p2ColliderType::CIRCLE:
-		std::cout << "circle" << std::endl; 
-		break;
-	case p2ColliderType::BOX:
-		std::cout << "box" << std::endl; 
-		break;
-	case p2ColliderType::POLYGON:
-		std::cout << "polygon" << std::endl; 
-		break;
-	default: ;
-	}
+	
 }
 
 
@@ -52,7 +38,7 @@ p2AABB p2Collider::GetAABB(p2Vec2 position)
 	switch (colliderType) {
 	case p2ColliderType::NONE:
 	{
-		//std::cout << "none " << std::endl; //Debug
+		std::cout << "none " << std::endl; //Debug
 
 		extend = p2Vec2(0, 0);
 		break;

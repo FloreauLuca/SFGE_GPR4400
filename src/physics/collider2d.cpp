@@ -68,7 +68,7 @@ void ColliderManager::OnEngineInit()
 
 void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 {
-	Log::GetInstance()->Msg("Create component Collider Luca");
+	Log::GetInstance()->Msg("Create component Collider");
 	if (m_EntityManager->HasComponent(entity, ComponentType::BODY2D))
 	{
 		auto & body = m_BodyManager->GetComponentRef(entity);
@@ -85,13 +85,11 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		if (CheckJsonExists(componentJson, "collider_type"))
 		{
 
-			Log::GetInstance()->Msg("Collider"); // debug
 			ColliderType colliderType = static_cast<ColliderType>(componentJson["collider_type"]);
 			switch (colliderType)
 			{
 			case ColliderType::CIRCLE:
 
-				Log::GetInstance()->Msg("Circle"); // debug
 				fixtureDef.colliderType = p2ColliderType::CIRCLE;
 				shape = std::make_unique<p2CircleShape>();
 				if (CheckJsonNumber(componentJson, "radius"))
@@ -106,7 +104,6 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 			{
 				fixtureDef.colliderType = p2ColliderType::BOX;
 
-				Log::GetInstance()->Msg("Box"); // debug
 				auto boxShape = std::make_unique<p2RectShape>();
 				if (CheckJsonExists(componentJson, "size"))
 				{
@@ -128,8 +125,7 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 			default:
 			{
 
-				Log::GetInstance()->Msg("None"); // debug
-				fixtureDef.colliderType = p2ColliderType::CIRCLE;
+				fixtureDef.colliderType = p2ColliderType::NONE;
 				std::ostringstream oss;
 				oss << "[Error] Collider of type: " << static_cast<int>(colliderType) << " could not be loaded from json: " << componentJson;
 				Log::GetInstance()->Error(oss.str());

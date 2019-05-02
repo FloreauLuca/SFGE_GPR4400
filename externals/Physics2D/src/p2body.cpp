@@ -88,7 +88,7 @@ float p2Body::GetMass() const
 
 void p2Body::SetPosition(float dt)
 {
-	position += linearVelocity * dt;
+	position += linearVelocity * dt*1/2;
 	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }
 
@@ -98,15 +98,24 @@ void p2Body::BuildAABB()
 	p2_aabb.SetAABB(position, p2Vec2(0, 0));
 	for (p2Collider m_collider : m_Colliders)
 	{
-		if (m_collider.GetAABB(position).bottomLeft < p2_aabb.bottomLeft)
+		if (m_collider.GetUserData() == nullptr) continue;
+		p2AABB colliderAABB = m_collider.GetAABB(position);
+		if (colliderAABB.bottomLeft.x < p2_aabb.bottomLeft.x)
 		{
-			p2_aabb.bottomLeft = m_collider.GetAABB(position).bottomLeft;
+			p2_aabb.bottomLeft.x = colliderAABB.bottomLeft.x;
 		}
-		if (m_collider.GetAABB(position).topRight > p2_aabb.topRight)
+		if (colliderAABB.bottomLeft.y < p2_aabb.bottomLeft.y)
 		{
-			p2_aabb.topRight = m_collider.GetAABB(position).topRight;
+			p2_aabb.bottomLeft.y = colliderAABB.bottomLeft.y;
 		}
-		std::cout << "top : " + std::to_string(m_collider.GetAABB(position).topRight.y) + " bottom : " + std::to_string(m_collider.GetAABB(position).bottomLeft.y) + " right : " + std::to_string(m_collider.GetAABB(position).topRight.x) + " left : " + std::to_string(m_collider.GetAABB(position).bottomLeft.x) << std::endl; // Debug
+		if (colliderAABB.topRight.x > p2_aabb.topRight.x)
+		{
+			p2_aabb.topRight.x = colliderAABB.topRight.x;
+		}
+		if (colliderAABB.topRight.y > p2_aabb.topRight.y)
+		{
+			p2_aabb.topRight.y = colliderAABB.topRight.y;
+		}
 
 	}
 	aabb = p2_aabb;
