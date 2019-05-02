@@ -115,10 +115,10 @@ TEST(Physics, TestBallFallingToGround)
 	{
 		{
 			"script_path",
-			"scripts/gizmoCollider.py"
+			"scripts/gizmo_collider.py"
 		}
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider });
+	sceneJson["systems"] = json::array({ gizmoCollider });// , contactDebugSystem, raycastDebugJson});
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 

@@ -69,7 +69,7 @@ void ColliderManager::OnEngineInit()
 
 void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 {
-	Log::GetInstance()->Msg("Create component Collider");
+	//Log::GetInstance()->Msg("Create component Collider Luca");
 	if (m_EntityManager->HasComponent(entity, ComponentType::BODY2D))
 	{
 		auto & body = m_BodyManager->GetComponentRef(entity);
