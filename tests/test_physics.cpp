@@ -115,7 +115,8 @@ TEST(Physics, TestBallFallingToGround)
 	{
 		{
 			"script_path",
-			"scripts/gizmoCollider.py"
+			"scripts/gizmo_collider.py"
+			//"nothing"
 		}
 	};
 	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider });
