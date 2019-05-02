@@ -61,10 +61,6 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 	return &collider;
 }
 
-void p2Body::DisplayShape()
-{
-	return m_Colliders[0].DisplayShape();
-}
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {

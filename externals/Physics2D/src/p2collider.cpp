@@ -4,7 +4,6 @@
 void p2Collider::Init(p2ColliderDef colliderDef)
 {
 	m_colliderDef = colliderDef;
-	DisplayShape();
 }
 
 
@@ -28,14 +27,6 @@ p2Shape* p2Collider::GetShape()
 	return m_colliderDef.shape;
 }
 
-void p2Collider::DisplayShape()
-{
-	p2CircleShape* circle_shape = static_cast<p2CircleShape*>(m_colliderDef.shape);
-	if (circle_shape)
-	{
-		std::cout << "Shape Radius : " + std::to_string(circle_shape->GetRadius()) << std::endl; //Debug
-	}
-}
 
 p2AABB p2Collider::GetAABB(p2Vec2 position)
 {
