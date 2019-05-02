@@ -57,7 +57,7 @@ struct p2ColliderDef
 class p2Collider
 {
 public:
-	void Init(p2ColliderDef* colliderDef);
+	void Init(p2ColliderDef colliderDef);
 
 	/**
 	* \brief Check if the p2Collider is a sensor
@@ -67,14 +67,12 @@ public:
 	* \brief Return the userData
 	*/
 	void* GetUserData();
-	p2Shape GetShape();
+	p2Shape* GetShape();
+	void DisplayShape();
 	p2AABB GetAABB(p2Vec2 position);
 	void SetUserData(void* colliderData);
 private:
-	void* userData = nullptr;
-	bool isSensor;
-	p2Shape shape;
-	p2ColliderType colliderType;
+	p2ColliderDef m_colliderDef;
 
 };
 

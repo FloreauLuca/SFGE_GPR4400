@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <p2aabb.h>
+#include <iostream>
 
 p2Vec2 p2AABB::GetCenter()
 {

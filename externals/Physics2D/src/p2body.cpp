@@ -57,16 +57,13 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 {
 	p2Collider& collider = m_Colliders[m_ColliderIndex];
 	m_ColliderIndex++;
-	p2Collider collider2;
-	collider2.Init(colliderDef);
-	m_Colliders[m_ColliderIndex] = collider2;
-	collider = m_Colliders[m_ColliderIndex];
+	collider.Init(*colliderDef);
 	return &collider;
 }
 
-p2Shape p2Body::GetShape()
+void p2Body::DisplayShape()
 {
-	return m_Colliders[0].GetShape();
+	return m_Colliders[0].DisplayShape();
 }
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)

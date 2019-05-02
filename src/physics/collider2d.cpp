@@ -89,16 +89,15 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 			switch (colliderType)
 			{
 			case ColliderType::CIRCLE:
-
+			{
 				fixtureDef.colliderType = p2ColliderType::CIRCLE;
-				shape = std::make_unique<p2CircleShape>();
+				auto circleShape = std::make_unique<p2CircleShape>();
 				if (CheckJsonNumber(componentJson, "radius"))
 				{
-					//shape->m_radius = pixel2meter(static_cast<float>(componentJson["radius"]));
-					p2CircleShape circle_shape;
-					circle_shape.SetRadius(pixel2meter(static_cast<float>(componentJson["radius"])));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(circle_shape));
+					circleShape->SetRadius(pixel2meter(static_cast<float>(componentJson["radius"])));
 				}
+				shape = std::move(circleShape);
+			}
 				break;
 			case ColliderType::BOX:
 			{
@@ -113,15 +112,11 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 						oss << "Box physics size: " << size.x << ", " << size.y;
 						Log::GetInstance()->Msg(oss.str());
 					}
-					//boxShape->SetAsBox(size.x / 2.0f, size.y / 2.0f);
-					p2RectShape rect_shape;
-					rect_shape.SetSize(p2Vec2(size.x / 2.0f, size.y / 2.0f));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(rect_shape));
-
+					boxShape->SetSize(p2Vec2(size.x / 2.0f, size.y / 2.0f));
 				}
-				//shape = std::move(boxShape);
+				shape = std::move(boxShape);
 			}	
-			break;
+				break;
 			default:
 			{
 
@@ -139,7 +134,7 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		}
 		if (shape != nullptr)
 		{
-			fixtureDef.shape = shape.get();
+			fixtureDef.shape = shape.release();
 			auto index = GetFreeComponentIndex();
 			if(index != -1)
 			{

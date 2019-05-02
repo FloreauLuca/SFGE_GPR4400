@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <p2shape.h>
+#include <iostream>
 
 void p2CircleShape::SetRadius(float radius)
 {

@@ -231,7 +231,6 @@ namespace sfge
 			.def_property("velocity", &p2Body::GetLinearVelocity, &p2Body::SetLinearVelocity)
 			.def("apply_force", &p2Body::ApplyForceToCenter)
 			.def_property_readonly("body_type", &p2Body::GetType)
-			.def_property_readonly("shape", &p2Body::GetShape)
 			.def_property_readonly("mass", &p2Body::GetMass);
 
 		py::enum_<p2BodyType>(body, "BodyType")
