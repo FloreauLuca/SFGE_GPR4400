@@ -27,6 +27,10 @@ p2Shape* p2Collider::GetShape()
 	return m_colliderDef.shape;
 }
 
+p2ColliderType p2Collider::GetColliderType()
+{
+	return m_colliderDef.colliderType;
+}
 
 p2AABB p2Collider::GetAABB(p2Vec2 position)
 {
@@ -63,3 +67,5 @@ p2AABB p2Collider::GetAABB(p2Vec2 position)
 	aabb.SetAABB(position, extend);
 	return aabb;
 }
+
+

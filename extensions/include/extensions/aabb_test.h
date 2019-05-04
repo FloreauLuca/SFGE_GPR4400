@@ -21,31 +21,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef SFGE_EXT_AABB_TEST_H
+#define SFGE_EXT_AABB_TEST_H
 
-#include <p2aabb.h>
-#include <iostream>
+#include <engine/system.h>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <graphics/graphics2d.h>
+#include "p2body.h"
 
-p2Vec2 p2AABB::GetCenter()
+
+namespace sfge
 {
-	return (bottomLeft + topRight) / 2;
+	struct Transform2d;
+	class Transform2dManager;
+	class Body2dManager;
+	class TextureManager;
+	class SpriteManager;
 }
 
-p2Vec2 p2AABB::GetExtends()
+namespace sfge::ext
 {
-	return (bottomLeft - topRight) / 2;
+
+
+	class AabbTest : public System
+	{
+	public:
+		AabbTest(Engine& engine);
+
+		void OnEngineInit() override;
+
+		void OnUpdate(float dt) override;
+
+		void OnFixedUpdate() override;
+
+		void OnDraw() override;
+
+	private:
+
+
+		Transform2dManager* m_Transform2DManager;
+		Body2dManager* m_Body2DManager;
+		TextureManager* m_TextureManager;
+		SpriteManager* m_SpriteManager;
+		Graphics2dManager* m_Graphics2DManager;
+
+
+		void DrawAABB(p2AABB aabb);
+
+		float fixedDeltaTime = 0.0f;
+		const size_t entitiesNmb = 10'000;
+
+		sf::Vector2f screenSize;
+		std::vector<p2Body*> bodies;
+
+	};
+
+
 }
 
-void p2AABB::SetAABB(p2Vec2 center, p2Vec2 extends)
-{
-	bottomLeft = center - extends;
-	topRight = center + extends;
-	this->extends = extends;
-	this->center = center;
-}
-
-void p2AABB::SetAABB(p2Vec2 center)
-{
-	this->center = center;
-	bottomLeft = center - extends;
-	topRight = center + extends;
-}
+#endif

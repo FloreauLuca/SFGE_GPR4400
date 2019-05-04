@@ -30,6 +30,7 @@ SOFTWARE.
 
 #include <extensions/python_extensions.h>
 #include <extensions/planet_system.h>
+#include "extensions/aabb_test.h"
 
 #include <tools/tools_pch.h>
 
@@ -43,7 +44,9 @@ void ExtendPython(py::module& m)
 	py::class_<PlanetSystem, System> planetSystem(m, "PlanetSystem");
 	planetSystem
 		.def(py::init<Engine&>());
-	
+	py::class_<AabbTest, System> aabbTest(m, "AabbTest");
+	aabbTest
+		.def(py::init<Engine&>());
 
 	tools::ExtendPythonTools(m);
 }

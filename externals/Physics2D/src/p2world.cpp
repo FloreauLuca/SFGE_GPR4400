@@ -31,14 +31,19 @@ p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 
 void p2World::Step(float dt)
 {
+	//m_ContactManager.CheckContact(m_Bodies);
+
 	for (p2Body &body : m_Bodies)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
 			body.ApplyForceToCenter(m_Gravity*dt);
-			body.SetPosition(dt);
-			body.BuildAABB();
 		}
+		if (body.GetType() != p2BodyType::STATIC)
+		{
+			body.SetPosition(dt);
+		}
+		body.BuildAABB();
 	}
 }
 
@@ -46,11 +51,13 @@ p2Body * p2World::CreateBody(p2BodyDef* bodyDef)
 {
 	p2Body& body = m_Bodies[m_BodyIndex];
 	body.Init(bodyDef);
+	body.BuildAABB();
 	m_BodyIndex++;
 	return &body;
 }
 
 void p2World::SetContactListener(p2ContactListener * contactListener)
 {
-
+	m_ContactListener = contactListener;
+	m_ContactManager.Init(m_ContactListener);
 }

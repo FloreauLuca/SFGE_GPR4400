@@ -58,6 +58,7 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 	p2Collider& collider = m_Colliders[m_ColliderIndex];
 	m_ColliderIndex++;
 	collider.Init(*colliderDef);
+	BuildAABB();
 	return &collider;
 }
 
@@ -109,7 +110,6 @@ void p2Body::BuildAABB()
 		{
 			p2_aabb.topRight.y = colliderAABB.topRight.y;
 		}
-
 	}
 	aabb = p2_aabb;
 	std::cout << "top : " + std::to_string(aabb.topRight.y) + " bottom : " + std::to_string(aabb.bottomLeft.y) + " right : " + std::to_string(aabb.topRight.x) + " left : " + std::to_string(aabb.bottomLeft.x) << std::endl; // Debug
@@ -117,6 +117,10 @@ void p2Body::BuildAABB()
 
 p2AABB p2Body::GetAABB()
 {
-	BuildAABB();
 	return aabb;
+}
+
+std::vector<p2Collider> p2Body::GetCollider()
+{
+	return m_Colliders;
 }

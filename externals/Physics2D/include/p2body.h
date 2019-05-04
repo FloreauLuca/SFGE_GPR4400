@@ -80,10 +80,11 @@ public:
 	void SetPosition(float dt);
 	void BuildAABB();
 	p2AABB GetAABB();
+	std::vector<p2Collider> GetCollider();
 private:
 	p2AABB aabb;
-	p2Vec2 position;
-	p2Vec2 linearVelocity;
+	p2Vec2 position = p2Vec2(0,0);
+	p2Vec2 linearVelocity = p2Vec2(0, 0);
 	float angularVelocity;
 	p2BodyType bodyType;
 	/**

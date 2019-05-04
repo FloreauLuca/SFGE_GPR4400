@@ -68,6 +68,7 @@ public:
 	*/
 	void* GetUserData();
 	p2Shape* GetShape();
+	p2ColliderType GetColliderType();
 	void DisplayShape();
 	p2AABB GetAABB(p2Vec2 position);
 	void SetUserData(void* colliderData);
