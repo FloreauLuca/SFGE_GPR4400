@@ -50,11 +50,11 @@ void p2ContactManager::CheckContact(std::vector<p2Body> & bodies)
 {
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		if (bodies[i].GetCollider().size() <= 0)continue;
+		if (bodies[i].GetCollider()->size() <= 0)continue;
 		
 		for (int j = i; j < bodies.size(); j++)
 		{
-			if (bodies[j].GetCollider().size() <= 0)continue;
+			if (bodies[j].GetCollider()->size() <= 0)continue;
 
 			CheckAABBContact(&bodies[i], &bodies[j]);
 		}
@@ -63,7 +63,7 @@ void p2ContactManager::CheckContact(std::vector<p2Body> & bodies)
 
 void p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 {
-	p2Contact contact = p2Contact(&bodyA->GetCollider().at(0), &bodyB->GetCollider().at(0));
+	p2Contact contact = p2Contact(&bodyA->GetCollider()->at(0), &bodyB->GetCollider()->at(0));
 	p2AABB aabbA = bodyA->GetAABB();
 	p2AABB aabbB = bodyB->GetAABB();
 	if (aabbA.GetBottom()> aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())

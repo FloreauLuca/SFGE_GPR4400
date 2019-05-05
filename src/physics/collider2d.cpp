@@ -132,7 +132,7 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		{
 			fixtureDef.restitution = componentJson["bouncing"];
 		}
-		if (shape != nullptr)
+		if (shape)
 		{
 			fixtureDef.shape = shape.release();
 			auto index = GetFreeComponentIndex();

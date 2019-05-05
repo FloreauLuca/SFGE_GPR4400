@@ -5,7 +5,6 @@ shape_manager = graphics2d_manager.shape_manager
 
 
 class ContactDebugSystem(System):
-
     entities: List[int]
     contact_count: List[int]
 
@@ -19,7 +18,6 @@ class ContactDebugSystem(System):
     def fixed_update(self):
         for i in range(len(self.entities)):
             shape: Shape = shape_manager.get_component(self.entities[i])
-			
             count = self.contact_count[i]
             if count > 0:
                 shape.set_fill_color(Color.Green)

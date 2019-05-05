@@ -53,12 +53,12 @@ p2Vec2 p2Body::GetPosition()
 	return position;
 }
 
-p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
+p2Collider * p2Body::CreateCollider(const p2ColliderDef * colliderDef)
 {
 	p2Collider& collider = m_Colliders[m_ColliderIndex];
-	m_ColliderIndex++;
-	collider.Init(*colliderDef);
+	collider.Init(colliderDef);
 	BuildAABB();
+	m_ColliderIndex++;
 	return &collider;
 }
 
@@ -122,7 +122,7 @@ p2AABB p2Body::GetAABB()
 	return aabb;
 }
 
-std::vector<p2Collider> p2Body::GetCollider()
+std::vector<p2Collider>* p2Body::GetCollider()
 {
-	return m_Colliders;
+	return &m_Colliders;
 }
