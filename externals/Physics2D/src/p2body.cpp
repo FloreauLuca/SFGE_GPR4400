@@ -80,39 +80,41 @@ float p2Body::GetMass() const
 	return mass;
 }
 
-void p2Body::SetPosition(float dt)
+void p2Body::Move(float dt)
 {
 	position += linearVelocity * dt*1/2;
-	std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
+	//std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }
 
 void p2Body::BuildAABB()
 {
-	p2AABB p2_aabb;
-	p2_aabb.SetAABB(position, p2Vec2(0, 0));
+	float bottom = m_Colliders[0].GetAABB(position).GetBottom();
+	float top = m_Colliders[0].GetAABB(position).GetTop();
+	float right = m_Colliders[0].GetAABB(position).GetRight();
+	float left = m_Colliders[0].GetAABB(position).GetLeft();
 	for (p2Collider m_collider : m_Colliders)
 	{
 		if (m_collider.GetUserData() == nullptr) continue;
 		p2AABB colliderAABB = m_collider.GetAABB(position);
-		if (colliderAABB.bottomLeft.x < p2_aabb.bottomLeft.x)
+		if (colliderAABB.GetBottom() < bottom)
 		{
-			p2_aabb.bottomLeft.x = colliderAABB.bottomLeft.x;
+			bottom = colliderAABB.GetBottom();
 		}
-		if (colliderAABB.bottomLeft.y < p2_aabb.bottomLeft.y)
+		if (colliderAABB.GetTop() > top)
 		{
-			p2_aabb.bottomLeft.y = colliderAABB.bottomLeft.y;
+			top = colliderAABB.GetTop();
 		}
-		if (colliderAABB.topRight.x > p2_aabb.topRight.x)
+		if (colliderAABB.GetLeft() < left)
 		{
-			p2_aabb.topRight.x = colliderAABB.topRight.x;
+			left = colliderAABB.GetLeft();
 		}
-		if (colliderAABB.topRight.y > p2_aabb.topRight.y)
+		if (colliderAABB.GetRight() > right)
 		{
-			p2_aabb.topRight.y = colliderAABB.topRight.y;
+			right = colliderAABB.GetRight();
 		}
 	}
-	aabb = p2_aabb;
-	std::cout << "top : " + std::to_string(aabb.topRight.y) + " bottom : " + std::to_string(aabb.bottomLeft.y) + " right : " + std::to_string(aabb.topRight.x) + " left : " + std::to_string(aabb.bottomLeft.x) << std::endl; // Debug
+	aabb.SetCorner(top, bottom, right, left);
+	std::cout << "top : " + std::to_string(aabb.GetTop()) + " bottom : " + std::to_string(aabb.GetBottom()) + " right : " + std::to_string(aabb.GetRight()) + " left : " + std::to_string(aabb.GetLeft()) << std::endl; // Debug
 }
 
 p2AABB p2Body::GetAABB()

@@ -199,7 +199,11 @@ TEST(Physics, TestShapeContact)
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
 			{
-				{"script_path", "scripts/contact_debug_system.py"}
+				{
+					"script_path",
+					"scripts/contact_debug_system.py"
+					//"nothing"
+				}
 			},
 			{
 				{"script_path", "scripts/stay_onscreen_system.py"}

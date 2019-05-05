@@ -77,7 +77,7 @@ public:
 	void ApplyForceToCenter(const p2Vec2& force);
 	p2BodyType GetType() const;
 	float GetMass() const;
-	void SetPosition(float dt);
+	void Move(float dt);
 	void BuildAABB();
 	p2AABB GetAABB();
 	std::vector<p2Collider> GetCollider();

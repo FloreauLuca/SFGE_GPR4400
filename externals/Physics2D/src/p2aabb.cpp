@@ -27,25 +27,51 @@ SOFTWARE.
 
 p2Vec2 p2AABB::GetCenter()
 {
-	return (bottomLeft + topRight) / 2;
+	return Center;
 }
 
 p2Vec2 p2AABB::GetExtends()
 {
-	return (bottomLeft - topRight) / 2;
+	return Extends;
 }
 
-void p2AABB::SetAABB(p2Vec2 center, p2Vec2 extends)
+float p2AABB::GetBottom()
 {
-	bottomLeft = center - extends;
-	topRight = center + extends;
-	this->extends = extends;
-	this->center = center;
+	return Bottom;
 }
 
-void p2AABB::SetAABB(p2Vec2 center)
+float p2AABB::GetTop()
 {
-	this->center = center;
-	bottomLeft = center - extends;
-	topRight = center + extends;
+	return Top;
 }
+
+float p2AABB::GetRight()
+{
+	return Right;
+}
+
+float p2AABB::GetLeft()
+{
+	return Left;
+}
+
+void p2AABB::SetCorner(float top, float bottom, float right, float left)
+{
+	Top = top;
+	Bottom = bottom;
+	Left = left;
+	Right = right;
+	Extends = p2Vec2(top - bottom, right - left);
+}
+
+void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
+{
+	Center = center;
+	Extends = extends;
+	Top = Center.y + Extends.y;
+	Bottom = Center.y - Extends.y;
+	Right = Center.x + Extends.x;
+	Left = Center.x - Extends.x;
+}
+
+

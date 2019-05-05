@@ -32,10 +32,6 @@ SOFTWARE.
 */
 struct p2AABB
 {
-	p2Vec2 bottomLeft;
-	p2Vec2 topRight;
-	p2Vec2 extends;
-	p2Vec2 center;
 
 	/**
 	* \brief Calculate the center and return it
@@ -45,7 +41,23 @@ struct p2AABB
 	* \brief Calculate the extends and return it
 	*/
 	p2Vec2 GetExtends();
-	void SetAABB(p2Vec2 center, p2Vec2 extends);
-	void SetAABB(p2Vec2 center);
+
+	float GetBottom();
+	float GetTop();
+	float GetRight();
+	float GetLeft();
+
+	void SetCorner(float top, float bottom, float right, float left);
+	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
+	void SetCenter(p2Vec2 center);
+
+private:
+	float Bottom;
+	float Top;
+	float Left;
+	float Right;
+
+	p2Vec2 Extends;
+	p2Vec2 Center;
 };
 #endif // !SFGE_P2AABB:H

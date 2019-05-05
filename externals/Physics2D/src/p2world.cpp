@@ -31,8 +31,6 @@ p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 
 void p2World::Step(float dt)
 {
-	//m_ContactManager.CheckContact(m_Bodies);
-
 	for (p2Body &body : m_Bodies)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
@@ -41,10 +39,12 @@ void p2World::Step(float dt)
 		}
 		if (body.GetType() != p2BodyType::STATIC)
 		{
-			body.SetPosition(dt);
+			body.Move(dt);
+			body.BuildAABB();
 		}
-		body.BuildAABB();
 	}
+	m_ContactManager.CheckContact(m_Bodies);
+
 }
 
 p2Body * p2World::CreateBody(p2BodyDef* bodyDef)

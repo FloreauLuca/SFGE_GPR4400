@@ -85,10 +85,10 @@ namespace sfge::ext
 
 	void AabbTest::DrawAABB(p2AABB aabb)
 	{
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetRight(), aabb.GetTop())), meter2pixel(p2Vec2(aabb.GetLeft(), aabb.GetTop())), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetRight(), aabb.GetTop())), meter2pixel(p2Vec2(aabb.GetRight(), aabb.GetBottom())), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetLeft(), aabb.GetBottom())), meter2pixel(p2Vec2(aabb.GetLeft(), aabb.GetTop())), sf::Color::Red);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.GetLeft(), aabb.GetBottom())), meter2pixel(p2Vec2(aabb.GetRight(), aabb.GetBottom())), sf::Color::Red);
 	}
 	
 }

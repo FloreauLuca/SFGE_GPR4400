@@ -33,12 +33,12 @@ p2Contact::p2Contact(p2Collider* colliderA, p2Collider* colliderB)
 
 p2Collider * p2Contact::GetColliderA()
 {
-	return nullptr;
+	return m_colliderA;
 }
 
 p2Collider * p2Contact::GetColliderB()
 {
-	return nullptr;
+	return m_colliderB;
 }
 
 void p2ContactManager::Init(p2ContactListener* contactListener)
@@ -50,8 +50,12 @@ void p2ContactManager::CheckContact(std::vector<p2Body> & bodies)
 {
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		for (int j = i; j < bodies.size(); i++)
+		if (bodies[i].GetCollider().size() <= 0)continue;
+		
+		for (int j = i; j < bodies.size(); j++)
 		{
+			if (bodies[j].GetCollider().size() <= 0)continue;
+
 			CheckAABBContact(&bodies[i], &bodies[j]);
 		}
 	}
@@ -62,24 +66,24 @@ void p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 	p2Contact contact = p2Contact(&bodyA->GetCollider().at(0), &bodyB->GetCollider().at(0));
 	p2AABB aabbA = bodyA->GetAABB();
 	p2AABB aabbB = bodyB->GetAABB();
-	if (aabbA.bottomLeft.x > aabbB.bottomLeft.x && aabbA.bottomLeft.x < aabbB.topRight.x)
+	if (aabbA.GetBottom()> aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())
 	{
-		if (aabbA.bottomLeft.y > aabbB.bottomLeft.y && aabbA.bottomLeft.y < aabbB.topRight.y)
+		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
 		{
 			m_ContactListener->BeginContact(&contact);
 		}
-		if (aabbA.topRight.y > aabbB.bottomLeft.y && aabbA.topRight.y < aabbB.topRight.y)
+		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
 		{
 			m_ContactListener->BeginContact(&contact);
 		}
 	}
-	if (aabbA.topRight.x > aabbB.bottomLeft.x && aabbA.topRight.x < aabbB.topRight.x)
+	if (aabbA.GetTop() > aabbB.GetBottom() && aabbA.GetTop() < aabbB.GetTop())
 	{
-		if (aabbA.bottomLeft.y > aabbB.bottomLeft.y && aabbA.bottomLeft.y < aabbB.topRight.y)
+		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
 		{
 			m_ContactListener->BeginContact(&contact);
 		}
-		if (aabbA.topRight.y > aabbB.bottomLeft.y && aabbA.topRight.y < aabbB.topRight.y)
+		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
 		{
 			m_ContactListener->BeginContact(&contact);
 		}
