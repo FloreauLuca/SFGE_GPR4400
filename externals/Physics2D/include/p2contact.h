@@ -28,18 +28,22 @@ SOFTWARE.
 #include <p2collider.h>
 #include "p2body.h"
 
+const size_t MAX_CONTACT_LEN = 100;
+
 /**
 * \brief Representation of a contact given as argument in a p2ContactListener
 */
 class p2Contact
 {
 public:
-	p2Contact(p2Collider* colliderA, p2Collider* colliderB);
+	void Init(p2Collider * colliderA, p2Collider * colliderB);
 	p2Collider* GetColliderA();
 	p2Collider* GetColliderB();
+	bool CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB);
 private :
 	p2Collider* m_colliderA;
 	p2Collider* m_colliderB;
+	int m_ContactIndex;
 };
 
 /**
@@ -59,11 +63,15 @@ class p2ContactManager
 {
 public:
 	void Init(p2ContactListener* contactListener);
+	p2Contact* CreateContact(p2Collider* colliderA, p2Collider* colliderB);
+	void RemoveContact(p2Collider* colliderA, p2Collider* colliderB);
 	void CheckContact(std::vector<p2Body> & m_Bodies);
 private:
-	void CheckAABBContact(p2Body* bodyA, p2Body* bodyB);
+	bool CheckAABBContact(p2Body* bodyA, p2Body* bodyB);
+	p2Contact* ContainContact(p2Body* bodyA, p2Body* bodyB);
 	p2ContactListener* m_ContactListener;
-	std::vector<p2Contact> m_ContactList;
+	std::vector<p2Contact> m_Contacts;
+	int m_ContactIndex = 0;
 
 };
 #endif

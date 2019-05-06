@@ -25,70 +25,149 @@ SOFTWARE.
 #include <p2contact.h>
 #include "p2body.h"
 
-p2Contact::p2Contact(p2Collider* colliderA, p2Collider* colliderB)
+void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
 	m_colliderA = colliderA;
 	m_colliderB = colliderB;
 }
 
-p2Collider * p2Contact::GetColliderA()
+p2Collider* p2Contact::GetColliderA()
 {
 	return m_colliderA;
 }
 
-p2Collider * p2Contact::GetColliderB()
+p2Collider* p2Contact::GetColliderB()
 {
 	return m_colliderB;
+}
+
+bool p2Contact::CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB)
+{
+	return ((colliderA == GetColliderA() && colliderB == GetColliderB()) || (colliderA == GetColliderB() && colliderB ==
+		GetColliderA()));
 }
 
 void p2ContactManager::Init(p2ContactListener* contactListener)
 {
 	m_ContactListener = contactListener;
+	m_Contacts.resize(MAX_CONTACT_LEN);
 }
 
-void p2ContactManager::CheckContact(std::vector<p2Body> & bodies)
+p2Contact* p2ContactManager::CreateContact(p2Collider* colliderA, p2Collider* colliderB)
 {
-	for (int i = 0; i < bodies.size(); i++)
-	{
-		if (bodies[i].GetCollider()->size() <= 0)continue;
-		
-		for (int j = i; j < bodies.size(); j++)
-		{
-			if (bodies[j].GetCollider()->size() <= 0)continue;
+	p2Contact& contact = m_Contacts[m_ContactIndex];
+	contact.Init(colliderA, colliderB);
+	m_ContactIndex++;
+	return &contact;
+}
 
-			CheckAABBContact(&bodies[i], &bodies[j]);
+void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* colliderB)
+{
+	for (int i = 0; i < m_Contacts.size(); i++)
+	{
+		if (m_Contacts[i].CheckSameCollider(colliderA, colliderB))
+		{
+			m_Contacts.erase(m_Contacts.begin() + i);
+			m_ContactIndex--;
+			m_Contacts.resize(MAX_CONTACT_LEN);
 		}
 	}
 }
 
-void p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
+
+void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 {
-	p2Contact contact = p2Contact(&bodyA->GetCollider()->at(0), &bodyB->GetCollider()->at(0));
+	for (int i = 0; i < bodies.size(); i++)
+	{
+		if (bodies[i].GetCollider()->empty())continue;
+
+		for (int j = i; j < bodies.size(); j++)
+		{
+			if (bodies[j].GetCollider()->empty())continue;
+			p2Contact* containedContact = ContainContact(&bodies[i], &bodies[j]);
+			if (containedContact)
+			{
+				if (!CheckAABBContact(&bodies[i], &bodies[j]))
+				{
+					m_ContactListener->EndContact(containedContact);
+					RemoveContact(&bodies[i].GetCollider()->at(0), &bodies[j].GetCollider()->at(0));
+				}
+			}
+			else
+			{
+				if (CheckAABBContact(&bodies[i], &bodies[j]))
+				{
+					p2Contact* contact = CreateContact(&bodies[i].GetCollider()->at(0), &bodies[j].GetCollider()->at(0));
+					m_ContactListener->BeginContact(contact);
+				}
+			}
+		}
+	}
+}
+
+bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
+{
 	p2AABB aabbA = bodyA->GetAABB();
 	p2AABB aabbB = bodyB->GetAABB();
-	if (aabbA.GetBottom()> aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())
+	if (aabbA.GetBottom() > aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())
 	{
 		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
 		{
-			m_ContactListener->BeginContact(&contact);
+			return true;
 		}
 		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
 		{
-			m_ContactListener->BeginContact(&contact);
+			return true;
 		}
 	}
 	if (aabbA.GetTop() > aabbB.GetBottom() && aabbA.GetTop() < aabbB.GetTop())
 	{
 		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
 		{
-			m_ContactListener->BeginContact(&contact);
+			return true;
 		}
 		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
 		{
-			m_ContactListener->BeginContact(&contact);
+			return true;
 		}
 	}
-	//m_ContactListener->EndContact(&contact);
+	aabbA = bodyB->GetAABB();
+	aabbB = bodyA->GetAABB();
+	if (aabbA.GetBottom() > aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())
+	{
+		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
+		{
+			return true;
+		}
+		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
+		{
+			return true;
+		}
+	}
+	if (aabbA.GetTop() > aabbB.GetBottom() && aabbA.GetTop() < aabbB.GetTop())
+	{
+		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
+		{
+			return true;
+		}
+		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+p2Contact* p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
+{
+	for (p2Contact& m_contact : m_Contacts)
+	{
+		if (m_contact.CheckSameCollider(&bodyA->GetCollider()->at(0), &bodyB->GetCollider()->at(0)))
+		{
+			return &m_contact;
+		}
+	}
+	return nullptr;
 }
 
 

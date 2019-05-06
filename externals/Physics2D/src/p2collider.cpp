@@ -50,8 +50,8 @@ p2AABB p2Collider::GetAABB(p2Vec2 position)
 		}
 	case p2ColliderType::CIRCLE:
 		{
-			p2CircleShape* circle_shape = static_cast<p2CircleShape*>(m_Shape);
-			extend = p2Vec2(circle_shape->GetRadius(), circle_shape->GetRadius());
+			p2CircleShape* circleshape = static_cast<p2CircleShape*>(m_Shape);
+			extend = p2Vec2(circleshape->GetRadius(), circleshape->GetRadius());
 			//std::cout << "circle " + std::to_string(circle_shape->GetRadius()) << std::endl; //Debug
 			break;
 		}
