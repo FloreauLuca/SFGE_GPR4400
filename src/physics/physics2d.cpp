@@ -114,13 +114,13 @@ void ContactListener::BeginContact(p2Contact* contact)
 	auto* pythonEngine = m_Engine.GetPythonEngine();
 	const auto colliderA = static_cast<ColliderData*>(contact->GetColliderA()->GetUserData());
 	const auto colliderB = static_cast<ColliderData*>(contact->GetColliderB()->GetUserData());
-
-	/*{
+	/*
+	{
 		std::ostringstream oss;
 		oss << "Begin Contact between: " << colliderA->entity << " and: " << colliderB->entity;
 		Log::GetInstance()->Msg(oss.str());
-	}*/
-
+	}
+	*/
 	auto& pySystems = pythonEngine->GetPySystemManager().GetPySystems();
 	for(size_t i = 0;i < pySystems.size();i++)
 	{

@@ -397,7 +397,7 @@ private:
 /// class MyEntity
 /// {
 /// public:
-///     void SetPosition(const MyVector& v)
+///     void Move(const MyVector& v)
 ///     {
 ///         myTransform.setPosition(v.x(), v.y());
 ///     }

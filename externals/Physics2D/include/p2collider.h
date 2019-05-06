@@ -37,11 +37,21 @@ enum class p2ColliderType
 	POLYGON
 };
 
+
 /**
 * \brief Struct defining a p2Collider when creating one
 */
 struct p2ColliderDef
 {
+	
+	p2ColliderDef()
+	{
+		shape = nullptr;
+		userData = nullptr;
+		restitution = 0.0f;
+		isSensor = false;
+	}
+	
 	void* userData;
 	p2Shape* shape;
 	float restitution;
@@ -56,7 +66,7 @@ struct p2ColliderDef
 class p2Collider
 {
 public:
-	void Init(p2ColliderDef* colliderDef);
+	void Init(const p2ColliderDef* colliderDef);
 
 	/**
 	* \brief Check if the p2Collider is a sensor
@@ -66,14 +76,17 @@ public:
 	* \brief Return the userData
 	*/
 	void* GetUserData();
-	p2Shape GetShape();
+	p2Shape* GetShape();
+	p2ColliderType GetColliderType();
+	void DisplayShape();
 	p2AABB GetAABB(p2Vec2 position);
 	void SetUserData(void* colliderData);
 private:
-	void* userData = nullptr;
-	bool isSensor;
-	p2Shape shape;
-	p2ColliderType colliderType;
+	void* m_UserData;
+	p2Shape* m_Shape;
+	float m_Restitution;
+	bool m_IsSensor;
+	p2ColliderType m_ColliderType;
 
 };
 

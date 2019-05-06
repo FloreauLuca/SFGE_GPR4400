@@ -1,61 +1,74 @@
 #include "..\include\p2collider.h"
+#include <iostream>
 
-void p2Collider::Init(p2ColliderDef* colliderDef)
+void p2Collider::Init(const p2ColliderDef* colliderDef)
 {
-	userData = colliderDef->userData;
-	isSensor = colliderDef->isSensor;
-	shape = *colliderDef->shape;
-	colliderType = colliderDef->colliderType;
+	m_UserData = colliderDef->userData;
+	m_ColliderType = colliderDef->colliderType;
+	m_IsSensor = colliderDef->isSensor;
+	m_Shape = colliderDef->shape;
+	m_Restitution = colliderDef->restitution;
 }
 
 
 bool p2Collider::IsSensor()
 {
-	return isSensor;
+	return m_IsSensor;
 }
 
 void* p2Collider::GetUserData()
 {
-	return userData;
+	return m_UserData;
 }
 
 void p2Collider::SetUserData(void* colliderData)
 {
-	userData = colliderData;
+	m_UserData = colliderData;
 }
 
-p2Shape p2Collider::GetShape()
+p2Shape* p2Collider::GetShape()
 {
-	return shape;
+	return m_Shape;
+}
+
+p2ColliderType p2Collider::GetColliderType()
+{
+	return m_ColliderType;
 }
 
 p2AABB p2Collider::GetAABB(p2Vec2 position)
 {
 	p2AABB aabb;
 	p2Vec2 extend;
-	switch (colliderType) {
+	switch (m_ColliderType)
+	{
 	case p2ColliderType::NONE:
-	{
-		extend = p2Vec2(0, 0);
-		break;
-	}
+		{
+			extend = p2Vec2(0, 0);
+			//std::cout << "none " + std::to_string(extend.x) << std::endl; //Debug
+			break;
+		}
 	case p2ColliderType::CIRCLE:
-	{
-		p2CircleShape* circle_shape = static_cast<p2CircleShape*>(&shape);
-		extend = p2Vec2(circle_shape->GetRadius(), circle_shape->GetRadius());
-		break;
-	}
+		{
+			p2CircleShape* circleshape = static_cast<p2CircleShape*>(m_Shape);
+			extend = p2Vec2(circleshape->GetRadius(), circleshape->GetRadius());
+			//std::cout << "circle " + std::to_string(circle_shape->GetRadius()) << std::endl; //Debug
+			break;
+		}
 	case p2ColliderType::BOX:
-	{
-		p2RectShape* rect_shape = static_cast<p2RectShape*>(&shape);
-		extend = rect_shape->GetSize();
-		break;
-	}
+		{
+			p2RectShape* rect_shape = static_cast<p2RectShape*>(m_Shape);
+			extend = rect_shape->GetSize();
+			//std::cout << "box " + std::to_string(extend.x) << std::endl; //Debug
+			break;
+		}
 	case p2ColliderType::POLYGON:
 		extend = p2Vec2(0, 0);
 		break;;
 	}
-	aabb.SetAABB(position, extend);
-	return  aabb;
+
+	aabb.SetCenterExtend(position, extend);
+	return aabb;
 }
+
 

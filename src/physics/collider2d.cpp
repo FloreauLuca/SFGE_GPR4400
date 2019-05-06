@@ -26,7 +26,6 @@ SOFTWARE.
 #include <engine/globals.h>
 #include <engine/component.h>
 #include <physics/physics2d.h>
-#include <engine/engine.h>
 namespace sfge
 {
 void editor::ColliderInfo::DrawOnInspector()
@@ -85,21 +84,25 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 
 		if (CheckJsonExists(componentJson, "collider_type"))
 		{
+
 			ColliderType colliderType = static_cast<ColliderType>(componentJson["collider_type"]);
 			switch (colliderType)
 			{
 			case ColliderType::CIRCLE:
-				shape = std::make_unique<p2CircleShape>();
+			{
+				fixtureDef.colliderType = p2ColliderType::CIRCLE;
+				auto circleShape = std::make_unique<p2CircleShape>();
 				if (CheckJsonNumber(componentJson, "radius"))
 				{
-					//shape->m_radius = pixel2meter(static_cast<float>(componentJson["radius"]));
-					p2CircleShape circle_shape;
-					circle_shape.SetRadius(pixel2meter(static_cast<float>(componentJson["radius"])));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(circle_shape));
+					circleShape->SetRadius(pixel2meter(static_cast<float>(componentJson["radius"])));
 				}
+				shape = std::move(circleShape);
+			}
 				break;
 			case ColliderType::BOX:
 			{
+				fixtureDef.colliderType = p2ColliderType::BOX;
+
 				auto boxShape = std::make_unique<p2RectShape>();
 				if (CheckJsonExists(componentJson, "size"))
 				{
@@ -109,17 +112,15 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 						oss << "Box physics size: " << size.x << ", " << size.y;
 						Log::GetInstance()->Msg(oss.str());
 					}
-					//boxShape->SetAsBox(size.x / 2.0f, size.y / 2.0f);
-					p2RectShape rect_shape;
-					rect_shape.SetSize(p2Vec2(size.x / 2.0f, size.y / 2.0f));
-					shape = std::make_unique<p2Shape>(static_cast<p2Shape>(rect_shape));
-
+					boxShape->SetSize(p2Vec2(size.x / 2.0f, size.y / 2.0f));
 				}
 				shape = std::move(boxShape);
 			}	
-			break;
+				break;
 			default:
 			{
+
+				fixtureDef.colliderType = p2ColliderType::NONE;
 				std::ostringstream oss;
 				oss << "[Error] Collider of type: " << static_cast<int>(colliderType) << " could not be loaded from json: " << componentJson;
 				Log::GetInstance()->Error(oss.str());
@@ -131,10 +132,9 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		{
 			fixtureDef.restitution = componentJson["bouncing"];
 		}
-		if (shape != nullptr)
+		if (shape)
 		{
-			fixtureDef.shape = shape.get();
-
+			fixtureDef.shape = shape.release();
 			auto index = GetFreeComponentIndex();
 			if(index != -1)
 			{

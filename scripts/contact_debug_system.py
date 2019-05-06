@@ -5,7 +5,6 @@ shape_manager = graphics2d_manager.shape_manager
 
 
 class ContactDebugSystem(System):
-
     entities: List[int]
     contact_count: List[int]
 
