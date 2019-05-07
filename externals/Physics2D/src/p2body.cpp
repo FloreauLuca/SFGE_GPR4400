@@ -31,6 +31,7 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	linearVelocity = bodyDef->linearVelocity;
 	bodyType = bodyDef->type;
 	mass = bodyDef->mass;
+	angle = bodyDef->angle;
 	
 }
 
@@ -88,14 +89,18 @@ void p2Body::Move(float dt)
 
 void p2Body::BuildAABB()
 {
-	float bottom = m_Colliders[0].GetAABB(position).GetBottom();
-	float top = m_Colliders[0].GetAABB(position).GetTop();
-	float right = m_Colliders[0].GetAABB(position).GetRight();
-	float left = m_Colliders[0].GetAABB(position).GetLeft();
+	p2AABB colliderAABB = m_Colliders[0].GetAABB(position);
+	colliderAABB.Rotate(angle);
+	float bottom = colliderAABB.GetBottom();
+	float top = colliderAABB.GetTop();
+	float right = colliderAABB.GetRight();
+	float left = colliderAABB.GetLeft();
 	for (p2Collider m_collider : m_Colliders)
 	{
 		if (m_collider.GetUserData() == nullptr) continue;
 		p2AABB colliderAABB = m_collider.GetAABB(position);
+		colliderAABB.Rotate(angle);
+
 		if (colliderAABB.GetBottom() < bottom)
 		{
 			bottom = colliderAABB.GetBottom();
@@ -113,7 +118,7 @@ void p2Body::BuildAABB()
 			right = colliderAABB.GetRight();
 		}
 	}
-	aabb.SetCorner(top, bottom, right, left);
+	aabb.SetSide(top, bottom, right, left);
 	std::cout << "top : " + std::to_string(aabb.GetTop()) + " bottom : " + std::to_string(aabb.GetBottom()) + " right : " + std::to_string(aabb.GetRight()) + " left : " + std::to_string(aabb.GetLeft()) << std::endl; // Debug
 }
 

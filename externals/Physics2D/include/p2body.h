@@ -47,6 +47,8 @@ struct p2BodyDef
 	p2BodyType type;
 	p2Vec2 position;
 	p2Vec2 linearVelocity;
+	p2Vec2 angularVelocity;
+	float angle;
 	float gravityScale; // influence de la gravity
 	float mass;
 };
@@ -91,6 +93,7 @@ private:
 	 * \brief in KG
 	 */
 	float mass;
+	float angle;
 
 	int m_ColliderIndex = 0;
 	std::vector<p2Collider> m_Colliders;

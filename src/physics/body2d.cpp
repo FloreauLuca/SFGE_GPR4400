@@ -218,6 +218,7 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position + offset;
 		bodyDef.position = pixel2meter(pos);
+		bodyDef.angle = transform->EulerAngle;
 		bodyDef.mass = 1.0f;
 		
 		auto* body = world->CreateBody(&bodyDef);

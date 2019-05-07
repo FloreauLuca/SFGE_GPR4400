@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <p2aabb.h>
 #include <iostream>
+#include <corecrt_math_defines.h>
 
 p2Vec2 p2AABB::GetCenter()
 {
@@ -55,7 +56,7 @@ float p2AABB::GetLeft()
 	return Left;
 }
 
-void p2AABB::SetCorner(float top, float bottom, float right, float left)
+void p2AABB::SetSide(float top, float bottom, float right, float left)
 {
 	Top = top;
 	Bottom = bottom;
@@ -72,6 +73,12 @@ void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
 	Bottom = Center.y - Extends.y;
 	Right = Center.x + Extends.x;
 	Left = Center.x - Extends.x;
+}
+
+void p2AABB::Rotate(float angle)
+{
+	float newAngle = angle / 180 * M_PI;
+	SetCenterExtend(GetCenter(), p2Vec2(p2Vec2(Extends.x, 0).Rotate(newAngle).x, p2Vec2(0, Extends.y).Rotate(newAngle).y));
 }
 
 

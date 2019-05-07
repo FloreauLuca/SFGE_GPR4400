@@ -86,9 +86,6 @@ class VectorSystem(System):
         self.u = Vec2f(10, 10)
         self.pv = Physics2dManager.pixel2meter(self.v)
         self.pu = Physics2dManager.pixel2meter(self.u)
-        if self.t > p2Vec2.angle_between(self.pu, self.pv):
-            self.t = 0
-
         self.pv = self.pv.rotate(self.t)
         self.result = Physics2dManager.meter2pixel(self.pv)
 

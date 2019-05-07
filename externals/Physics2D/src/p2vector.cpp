@@ -109,6 +109,9 @@ void p2Vec2::NormalizeSelf()
 	y /= GetMagnitude();
 }
 
+/**
+ * \param angle in radius
+ */
 p2Vec2 p2Vec2::Rotate(float angle) const
 {
 	return p2Mat22(p2Vec2(cos(angle), sin(angle)), p2Vec2(-sin(angle), cos(angle))) *p2Vec2(x, y);

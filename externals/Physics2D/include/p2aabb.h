@@ -47,8 +47,9 @@ struct p2AABB
 	float GetRight();
 	float GetLeft();
 
-	void SetCorner(float top, float bottom, float right, float left);
+	void SetSide(float top, float bottom, float right, float left);
 	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
+	void Rotate(float angle);
 	void SetCenter(p2Vec2 center);
 
 private:
