@@ -35,13 +35,17 @@ void p2World::Step(float doriantan)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.ApplyForceToCenter(m_Gravity*doriantan);
+			//body.ApplyForceToCenter(m_Gravity*doriantan);
 		}
 		if (body.GetType() != p2BodyType::STATIC)
 		{
 			body.Move(doriantan);
+		}
+		if (body.GetCollider()[0].size()>0)
+		{
 			body.BuildAABB();
 		}
+		body.SetAngle(body.GetAngle() + 100 * doriantan);
 	}
 	m_ContactManager.CheckContact(m_Bodies);
 

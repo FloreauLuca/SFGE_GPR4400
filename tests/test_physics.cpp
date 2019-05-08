@@ -354,13 +354,13 @@ TEST(Physics, TestAABBRotation)
 	transformJson1["type"] = sfge::ComponentType::TRANSFORM2D;
 	transformJson1["position"] = { 700, 300 };
 	transformJson1["scale"] = { 1.0, 1.0 };
-	transformJson1["angle"] = 45;
+	transformJson1["angle"] = 0;
 
 	json rectShapeJson;
 	rectShapeJson["name"] = "Circle Shape Component";
 	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
 	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson["size"] = { 100, 100 };
+	rectShapeJson["size"] = { 200, 100 };
 
 	json rigidBodyJson1;
 	rigidBodyJson1["name"] = "Rigidbody";
@@ -371,7 +371,7 @@ TEST(Physics, TestAABBRotation)
 	rectColliderJson["name"] = "Circle Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = { 100, 100 };
+	rectColliderJson["size"] = { 200, 100 };
 	rectColliderJson["bouncing"] = 0.5;
 	rectColliderJson["sensor"] = false;
 

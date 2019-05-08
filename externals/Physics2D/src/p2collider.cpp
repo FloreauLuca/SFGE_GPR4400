@@ -36,38 +36,11 @@ p2ColliderType p2Collider::GetColliderType()
 	return m_ColliderType;
 }
 
-p2AABB p2Collider::GetAABB(p2Vec2 position)
+p2AABB p2Collider::GetAABB(p2Vec2 position, float angle)
 {
-	p2AABB aabb;
-	p2Vec2 extend;
-	switch (m_ColliderType)
-	{
-	case p2ColliderType::NONE:
-		{
-			extend = p2Vec2(0, 0);
-			//std::cout << "none " + std::to_string(extend.x) << std::endl; //Debug
-			break;
-		}
-	case p2ColliderType::CIRCLE:
-		{
-			p2CircleShape* circleshape = static_cast<p2CircleShape*>(m_Shape);
-			extend = p2Vec2(circleshape->GetRadius(), circleshape->GetRadius());
-			//std::cout << "circle " + std::to_string(circle_shape->GetRadius()) << std::endl; //Debug
-			break;
-		}
-	case p2ColliderType::BOX:
-		{
-			p2RectShape* rect_shape = static_cast<p2RectShape*>(m_Shape);
-			extend = rect_shape->GetSize();
-			//std::cout << "box " + std::to_string(extend.x) << std::endl; //Debug
-			break;
-		}
-	case p2ColliderType::POLYGON:
-		extend = p2Vec2(0, 0);
-		break;;
-	}
-
-	aabb.SetCenterExtend(position, extend);
+	if (m_Shape) m_Shape->Rotate(angle);
+	aabb.SetCenter(position);
+	aabb.SetShape(m_Shape);
 	return aabb;
 }
 

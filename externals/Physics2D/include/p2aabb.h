@@ -26,6 +26,7 @@ SOFTWARE.
 #define SFGE_P2AABB_H
 
 #include <p2vector.h>
+#include "p2shape.h"
 
 /**
 * \brief Struct representing a Axis Aligned Bounding Box
@@ -48,6 +49,8 @@ struct p2AABB
 	float GetLeft();
 
 	void SetSide(float top, float bottom, float right, float left);
+	void SetShape(p2Shape* shape);
+	void SetExtends(p2Vec2 extends);
 	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
 	void Rotate(float angle);
 	void SetCenter(p2Vec2 center);

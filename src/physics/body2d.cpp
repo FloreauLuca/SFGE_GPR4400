@@ -86,6 +86,7 @@ p2Body * Body2d::GetBody() const
 	return m_Body;
 }
 
+// TOOL draw on Inspector
 void editor::Body2dInfo::DrawOnInspector()
 {
 	const auto& body = bodyManager->GetComponentRef(m_Entity);
@@ -166,6 +167,7 @@ void Body2dManager::OnFixedUpdate()
 			auto & body2d = GetComponentRef(entity);
 			m_ComponentsInfo[i].AddVelocity(body2d.GetLinearVelocity());
 			transform.Position = meter2pixel(body2d.GetBody()->GetPosition()) - static_cast<sf::Vector2f>(body2d.GetOffset());
+			transform.EulerAngle = body2d.GetBody()->GetAngle();
 		}
 	}
 }

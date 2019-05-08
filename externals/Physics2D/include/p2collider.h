@@ -79,7 +79,7 @@ public:
 	p2Shape* GetShape();
 	p2ColliderType GetColliderType();
 	void DisplayShape();
-	p2AABB GetAABB(p2Vec2 position);
+	p2AABB GetAABB(p2Vec2 position, float angle);
 	void SetUserData(void* colliderData);
 private:
 	void* m_UserData;
@@ -87,6 +87,8 @@ private:
 	float m_Restitution;
 	bool m_IsSensor;
 	p2ColliderType m_ColliderType;
+	p2AABB aabb;
+
 
 };
 

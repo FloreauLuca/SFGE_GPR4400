@@ -25,6 +25,9 @@ SOFTWARE.
 #include <p2aabb.h>
 #include <iostream>
 #include <corecrt_math_defines.h>
+#include <vector>
+#include <algorithm>
+#include "p2shape.h"
 
 p2Vec2 p2AABB::GetCenter()
 {
@@ -58,16 +61,88 @@ float p2AABB::GetLeft()
 
 void p2AABB::SetSide(float top, float bottom, float right, float left)
 {
-	Top = top;
-	Bottom = bottom;
-	Left = left;
-	Right = right;
+	if (top<bottom)
+	{
+		Top = bottom;
+		Bottom = top;
+	} else
+	{
+		Top = top;
+		Bottom = bottom;
+	}
+	if (left < right)
+	{
+		Left = left;
+		Right = right;
+	} else
+	{
+		Left = right;
+		Right = left;
+	}
 	Extends = p2Vec2(top - bottom, right - left);
 }
+
+
+void p2AABB::SetShape(p2Shape* shape)
+{
+	if (p2CircleShape* circleshape = dynamic_cast<p2CircleShape*>(shape))
+	{
+		SetExtends(p2Vec2(circleshape->GetRadius(), circleshape->GetRadius()));
+	}
+	else if (p2RectShape* rectshape = dynamic_cast<p2RectShape*>(shape))
+	{
+		Top= 0;
+		Bottom = 0;
+		Left = 0;
+		Right = 0;
+		for (p2Vec2 corner : rectshape->GetCorner())
+		{
+			if (corner.x > Right)
+			{
+				Right = corner.x;
+			}
+			if (corner.x < Left)
+			{
+				Left = corner.x;
+			}
+			if (corner.y > Top)
+			{
+				Top = corner.y;
+			}
+			if (corner.y < Bottom)
+			{
+				Bottom = corner.y;
+			}
+		}
+		SetSide(Top + Center.y, Bottom + Center.y, Right + Center.x, Left + Center.x);
+	}
+	else {
+		SetExtends(p2Vec2(0, 0));
+	}
+}
+
+void p2AABB::SetExtends(p2Vec2 extends)
+{
+	
+	Extends = extends;
+	Top = Center.y + Extends.y;
+	Bottom = Center.y - Extends.y;
+	Right = Center.x + Extends.x;
+	Left = Center.x - Extends.x;
+	
+}
+
+void p2AABB::SetCenter(p2Vec2 center)
+{
+	Center = center;
+}
+
 
 void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
 {
 	Center = center;
+	if (extends.x < 0) extends.x -= extends.x;
+	if (extends.y < 0) extends.y -= extends.y;
 	Extends = extends;
 	Top = Center.y + Extends.y;
 	Bottom = Center.y - Extends.y;
@@ -75,10 +150,5 @@ void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
 	Left = Center.x - Extends.x;
 }
 
-void p2AABB::Rotate(float angle)
-{
-	float newAngle = angle / 180 * M_PI;
-	SetCenterExtend(GetCenter(), p2Vec2(p2Vec2(Extends.x, 0).Rotate(newAngle).x, p2Vec2(0, Extends.y).Rotate(newAngle).y));
-}
 
 

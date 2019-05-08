@@ -54,7 +54,7 @@ namespace sfge::ext
 		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
 		auto* entityManager = m_Engine.GetEntityManager();
 
-		const auto entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
+		entities = entityManager->GetEntitiesWithType(ComponentType::BODY2D);
 		for (auto i = 0u; i < entities.size(); i++)
 		{
 			auto body = m_Body2DManager->GetComponentPtr(entities[i]);
@@ -65,6 +65,13 @@ namespace sfge::ext
 	void AabbTest::OnUpdate(float dt)
 	{
 		(void)dt;
+		/*
+		for (auto i = 0u; i < entities.size(); i++)
+		{
+			auto transform = m_Transform2DManager->GetComponentPtr(entities[i]);
+			transform->EulerAngle += 5*dt;
+		}
+		*/
 	}
 
 
