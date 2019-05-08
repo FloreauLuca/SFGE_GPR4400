@@ -47,6 +47,8 @@ struct p2BodyDef
 	p2BodyType type;
 	p2Vec2 position;
 	p2Vec2 linearVelocity;
+	p2Vec2 angularVelocity;
+	float angle;
 	float gravityScale; // influence de la gravity
 	float mass;
 };
@@ -63,6 +65,8 @@ public:
 	p2Vec2 GetLinearVelocity() const;
 
 	void SetLinearVelocity(p2Vec2 velocity);
+	void SetAngle(float angle);
+	float GetAngle();
 
 	float GetAngularVelocity();
 
@@ -72,7 +76,7 @@ public:
 	* \param colliderDef p2ColliderDef definition of the collider
 	* \return p2Collider collider attached to the p2Body
 	*/
-	p2Collider* CreateCollider(const p2ColliderDef* colliderDef);
+	p2Collider* CreateCollider(p2ColliderDef* colliderDef);
 	void DisplayShape();
 	void ApplyForceToCenter(const p2Vec2& force);
 	p2BodyType GetType() const;
@@ -90,7 +94,8 @@ private:
 	/**
 	 * \brief in KG
 	 */
-	float mass;
+	float m_Mass;
+	float m_Angle;
 
 	int m_ColliderIndex = 0;
 	std::vector<p2Collider> m_Colliders;

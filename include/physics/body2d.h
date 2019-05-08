@@ -48,7 +48,6 @@ public:
 	float GetMass();
 	void SetBody(p2Body* body);
 	p2Body* GetBody() const;
-	p2Body Getp2Body() const;
 private:
 	p2Body * m_Body = nullptr;
 };

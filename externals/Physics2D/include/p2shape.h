@@ -26,13 +26,15 @@ SOFTWARE.
 #define SFGE_P2SHAPE_H
 
 #include <p2vector.h>
+#include <vector>
 
 /**
 * \brief Abstract representation of a shape
 */
 class p2Shape
 {
-
+public :
+	virtual void Rotate(float angle);
 };
 
 /**
@@ -46,6 +48,7 @@ public:
 	*/
 	void SetRadius(float radius);
 	float GetRadius();
+	void Rotate(float angle) override;
 private:
 	float m_Radius;
 };
@@ -58,8 +61,15 @@ class p2RectShape : public p2Shape
 public:
 	void SetSize(p2Vec2 size);
 	p2Vec2 GetSize();
+	std::vector<p2Vec2> GetCorner();
+	std::vector<p2Vec2> GetAxis();
+	void Rotate(float angle) override;
 private:
+	const size_t MAX_CORNER = 4;
+
 	p2Vec2 m_Size;
+	std::vector<p2Vec2> axis;
+	std::vector<p2Vec2> corners;
 };
 
 class p2PolygonShape : public p2Shape

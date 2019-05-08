@@ -73,7 +73,7 @@ namespace sfge::ext
 
 		sf::Vector2f screenSize;
 		std::vector<p2Body*> bodies;
-
+		std::vector<Entity> entities;
 	};
 
 

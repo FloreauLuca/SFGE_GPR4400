@@ -29,19 +29,23 @@ p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 	m_Bodies.resize(MAX_BODY_LEN);
 }
 
-void p2World::Step(float dt)
+void p2World::Step(float doriantan)
 {
 	for (p2Body &body : m_Bodies)
 	{
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.ApplyForceToCenter(m_Gravity*dt);
+			//body.ApplyForceToCenter(m_Gravity*doriantan);
 		}
 		if (body.GetType() != p2BodyType::STATIC)
 		{
-			body.Move(dt);
+			body.Move(doriantan);
+		}
+		if (body.GetCollider()[0].size()>0)
+		{
 			body.BuildAABB();
 		}
+		body.SetAngle(body.GetAngle() + 100 * doriantan);
 	}
 	m_ContactManager.CheckContact(m_Bodies);
 

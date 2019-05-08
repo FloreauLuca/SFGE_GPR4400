@@ -24,6 +24,11 @@ SOFTWARE.
 
 #include <p2shape.h>
 #include <iostream>
+#include <corecrt_math_defines.h>
+
+void p2Shape::Rotate(float angle)
+{
+}
 
 void p2CircleShape::SetRadius(float radius)
 {
@@ -36,11 +41,48 @@ float p2CircleShape::GetRadius()
 
 }
 
+void p2CircleShape::Rotate(float angle)
+{
+	SetRadius(m_Radius);
+}
+
 void p2RectShape::SetSize(p2Vec2 size)
 {
 	m_Size = size;
+	corners.resize(MAX_CORNER);
+	axis.resize(MAX_CORNER);
+	corners[0] = p2Vec2(m_Size.x, m_Size.y);
+	corners[1] = p2Vec2(-m_Size.x, m_Size.y);
+	corners[2] = p2Vec2(m_Size.x, -m_Size.y);
+	corners[3] = p2Vec2(-m_Size.x, -m_Size.y);
+	axis[0] = p2Vec2(m_Size.x * 2, 0);
+	axis[1] = p2Vec2(0, m_Size.y * 2);
 }
+
 p2Vec2 p2RectShape::GetSize()
 {
 	return m_Size;
+}
+
+std::vector<p2Vec2> p2RectShape::GetCorner()
+{
+	return corners;
+}
+
+
+std::vector<p2Vec2> p2RectShape::GetAxis()
+{
+	return axis;
+}
+
+void p2RectShape::Rotate(float angle)
+{
+	float newAngle = angle / 180 * M_PI;
+	SetSize(m_Size);
+	for (p2Vec2& corner : corners)
+	{
+		corner = corner.Rotate(newAngle);
+	}
+	axis[0] = corners[0] - corners[1];
+	axis[1] = corners[0] - corners[2];
 }
