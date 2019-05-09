@@ -213,6 +213,10 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		{
 			bodyDef.gravityScale = componentJson["gravity_scale"];
 		}
+		if (CheckJsonNumber(componentJson, "mass"))
+		{
+			bodyDef.mass = componentJson["mass"];
+		}
 
 		const auto offset = GetVectorFromJson(componentJson, "offset");
 		const auto velocity = GetVectorFromJson(componentJson, "velocity");
@@ -221,7 +225,6 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		const auto pos = transform->Position + offset;
 		bodyDef.position = pixel2meter(pos);
 		bodyDef.angle = transform->EulerAngle;
-		bodyDef.mass = 1.0f;
 		
 		auto* body = world->CreateBody(&bodyDef);
 		body->SetLinearVelocity(pixel2meter(velocity));
