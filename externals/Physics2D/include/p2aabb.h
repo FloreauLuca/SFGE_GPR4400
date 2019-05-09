@@ -52,16 +52,13 @@ struct p2AABB
 	void SetShape(p2Shape* shape);
 	void SetExtends(p2Vec2 extends);
 	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
+	bool ContainsPoint(p2Vec2 point);
+	bool ContainsAABB(p2AABB aabb);
 	void Rotate(float angle);
 	void SetCenter(p2Vec2 center);
+	
+	p2Vec2 topRight;
+	p2Vec2 bottomLeft;
 
-private:
-	float Bottom;
-	float Top;
-	float Left;
-	float Right;
-
-	p2Vec2 Extends;
-	p2Vec2 Center;
 };
 #endif // !SFGE_P2AABB:H

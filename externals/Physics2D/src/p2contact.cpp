@@ -109,51 +109,13 @@ bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 {
 	p2AABB aabbA = bodyA->GetAABB();
 	p2AABB aabbB = bodyB->GetAABB();
-	if (aabbA.GetBottom() > aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())
+	if (aabbA.ContainsPoint(aabbB.topRight)|| aabbA.ContainsPoint(aabbB.bottomLeft) || aabbA.ContainsPoint(p2Vec2(aabbB.bottomLeft.x, aabbB.topRight.y)) || aabbA.ContainsPoint(p2Vec2(aabbB.topRight.x, aabbB.bottomLeft.y)))
 	{
-		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
-		{
-			return true;
-		}
-		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
-		{
-			return true;
-		}
+		return true;
 	}
-	if (aabbA.GetTop() > aabbB.GetBottom() && aabbA.GetTop() < aabbB.GetTop())
+	if (aabbB.ContainsPoint(aabbA.topRight) || aabbB.ContainsPoint(aabbA.bottomLeft) || aabbB.ContainsPoint(p2Vec2(aabbA.bottomLeft.x, aabbA.topRight.y)) || aabbB.ContainsPoint(p2Vec2(aabbA.topRight.x, aabbA.bottomLeft.y)))
 	{
-		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
-		{
-			return true;
-		}
-		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
-		{
-			return true;
-		}
-	}
-	aabbA = bodyB->GetAABB();
-	aabbB = bodyA->GetAABB();
-	if (aabbA.GetBottom() > aabbB.GetBottom() && aabbA.GetBottom() < aabbB.GetTop())
-	{
-		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
-		{
-			return true;
-		}
-		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
-		{
-			return true;
-		}
-	}
-	if (aabbA.GetTop() > aabbB.GetBottom() && aabbA.GetTop() < aabbB.GetTop())
-	{
-		if (aabbA.GetRight() > aabbB.GetLeft() && aabbA.GetRight() < aabbB.GetRight())
-		{
-			return true;
-		}
-		if (aabbA.GetLeft() > aabbB.GetLeft() && aabbA.GetLeft() < aabbB.GetRight())
-		{
-			return true;
-		}
+		return true;
 	}
 	return false;
 }

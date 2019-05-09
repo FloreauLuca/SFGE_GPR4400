@@ -116,25 +116,23 @@ void p2Body::BuildAABB()
 		if (m_collider.GetUserData() == nullptr) continue;
 		p2AABB colliderAABB = m_collider.GetAABB(position, m_Angle);
 
-		if (colliderAABB.GetBottom() < bottom)
+		if (colliderAABB.bottomLeft.y < bottom)
 		{
-			bottom = colliderAABB.GetBottom();
+			aabb.bottomLeft.y = colliderAABB.bottomLeft.y;
 		}
-		if (colliderAABB.GetTop() > top)
+		if (colliderAABB.topRight.y > top)
 		{
-			top = colliderAABB.GetTop();
+			aabb.topRight.y = colliderAABB.topRight.y;
 		}
-		if (colliderAABB.GetLeft() < left)
+		if (colliderAABB.bottomLeft.x < left)
 		{
-			left = colliderAABB.GetLeft();
+			aabb.bottomLeft.x = colliderAABB.bottomLeft.x;
 		}
-		if (colliderAABB.GetRight() > right)
+		if (colliderAABB.topRight.x > right)
 		{
-			right = colliderAABB.GetRight();
+			aabb.topRight.x = colliderAABB.topRight.x;
 		}
 	}
-	aabb.SetSide(top, bottom, right, left);
-	std::cout << "top : " + std::to_string(aabb.GetTop()) + " bottom : " + std::to_string(aabb.GetBottom()) + " right : " + std::to_string(aabb.GetRight()) + " left : " + std::to_string(aabb.GetLeft()) << std::endl; // Debug
 }
 
 p2AABB p2Body::GetAABB()

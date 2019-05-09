@@ -31,57 +31,13 @@ SOFTWARE.
 
 p2Vec2 p2AABB::GetCenter()
 {
-	return Center;
+	return (topRight+bottomLeft)/2;
 }
 
 p2Vec2 p2AABB::GetExtends()
 {
-	return Extends;
+	return (topRight - bottomLeft)/2;
 }
-
-float p2AABB::GetBottom()
-{
-	return Bottom;
-}
-
-float p2AABB::GetTop()
-{
-	return Top;
-}
-
-float p2AABB::GetRight()
-{
-	return Right;
-}
-
-float p2AABB::GetLeft()
-{
-	return Left;
-}
-
-void p2AABB::SetSide(float top, float bottom, float right, float left)
-{
-	if (top<bottom)
-	{
-		Top = bottom;
-		Bottom = top;
-	} else
-	{
-		Top = top;
-		Bottom = bottom;
-	}
-	if (left < right)
-	{
-		Left = left;
-		Right = right;
-	} else
-	{
-		Left = right;
-		Right = left;
-	}
-	Extends = p2Vec2(top - bottom, right - left);
-}
-
 
 void p2AABB::SetShape(p2Shape* shape)
 {
@@ -91,63 +47,71 @@ void p2AABB::SetShape(p2Shape* shape)
 	}
 	else if (p2RectShape* rectshape = dynamic_cast<p2RectShape*>(shape))
 	{
-		Top= 0;
-		Bottom = 0;
-		Left = 0;
-		Right = 0;
+		p2Vec2 center = GetCenter();
+		topRight = center;
+		bottomLeft = center;
 		for (p2Vec2 corner : rectshape->GetCorner())
 		{
-			if (corner.x > Right)
+			corner += center;
+			if (corner.x > topRight.x)
 			{
-				Right = corner.x;
+				topRight.x = corner.x;
 			}
-			if (corner.x < Left)
+			if (corner.x < bottomLeft.x)
 			{
-				Left = corner.x;
+				bottomLeft.x = corner.x;
 			}
-			if (corner.y > Top)
+			if (corner.y > topRight.y)
 			{
-				Top = corner.y;
+				topRight.y = corner.y;
 			}
-			if (corner.y < Bottom)
+			if (corner.y < bottomLeft.y)
 			{
-				Bottom = corner.y;
+				bottomLeft.y = corner.y;
 			}
 		}
-		SetSide(Top + Center.y, Bottom + Center.y, Right + Center.x, Left + Center.x);
 	}
-	else {
+	else
+	{
 		SetExtends(p2Vec2(0, 0));
 	}
 }
 
+
 void p2AABB::SetExtends(p2Vec2 extends)
 {
-	
-	Extends = extends;
-	Top = Center.y + Extends.y;
-	Bottom = Center.y - Extends.y;
-	Right = Center.x + Extends.x;
-	Left = Center.x - Extends.x;
+	p2Vec2 center = GetCenter();
+	topRight = center + extends;
+	bottomLeft = center - extends;
 	
 }
 
 void p2AABB::SetCenter(p2Vec2 center)
 {
-	Center = center;
+	p2Vec2 extends = GetExtends();
+	topRight = center + extends;
+	bottomLeft = center - extends;
 }
 
 
 void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
 {
-	Center = center;
-	if (extends.x < 0) extends.x -= extends.x;
-	if (extends.y < 0) extends.y -= extends.y;
-	Extends = extends;
-	Top = Center.y + Extends.y;
-	Bottom = Center.y - Extends.y;
-	Right = Center.x + Extends.x;
-	Left = Center.x - Extends.x;
+	p2Vec2 Extend = extends;
+	if (Extend.x < 0) Extend.x -= Extend.x;
+	if (Extend.y < 0) Extend.y -= Extend.y;
+	topRight = center + Extend;
+	bottomLeft = center - Extend;
+
+}
+
+bool p2AABB::ContainsPoint(p2Vec2 point)
+{
+	return  (point<topRight && point>bottomLeft);
+}
+
+bool p2AABB::ContainsAABB(p2AABB aabb)
+{
+	return (ContainsPoint(aabb.topRight) && ContainsPoint(aabb.bottomLeft));
 }
 
 
