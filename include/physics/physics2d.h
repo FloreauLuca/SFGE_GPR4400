@@ -102,6 +102,7 @@ public:
 
 	Body2dManager* GetBodyManager();
 	ColliderManager* GetColliderManager();
+	p2World* Getp2World();
 
 	//float Raycast(Vec2f startPoint, Vec2f direction, float rayLength);
 

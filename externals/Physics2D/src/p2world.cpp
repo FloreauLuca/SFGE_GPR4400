@@ -65,3 +65,8 @@ void p2World::SetContactListener(p2ContactListener * contactListener)
 	m_ContactListener = contactListener;
 	m_ContactManager.Init(m_ContactListener);
 }
+
+p2QuadTree* p2World::GetQuadtree()
+{
+	return m_ContactManager.GetQuadtree();
+}

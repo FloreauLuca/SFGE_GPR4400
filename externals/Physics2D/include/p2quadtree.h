@@ -40,7 +40,7 @@ class p2QuadTree
 {
 public:
 	p2QuadTree();
-	p2QuadTree(int nodeLevel, p2AABB bounds, p2ContactManager contactManager);
+	p2QuadTree(int nodeLevel, p2AABB bounds);
 	~p2QuadTree();
 
 	/**
@@ -55,30 +55,31 @@ public:
 	/**
 	* Get the index of the child trees of the p2Body
 	*/
-	int GetIndex(p2Body* rect);
+	int GetLevel();
 	p2AABB GetBounds();
-	void GetChild(std::vector<p2QuadTree>& node);
+	p2QuadTree** GetChild();
+	int GetIndex(p2AABB aabb);
 	/**
 	* Insert a new p2Body in the tree
 	*/
 	void Insert(p2Body* obj);
+	std::list<p2Body*> GetObjects();
+	std::list<p2Body*> GetChildObjects();
 	/**
 	* Return a list of all the p2Body that might collide
 	*/
-	void Retrieve();
-	
+	void Retrieve(p2ContactManager* contact_manager);
+
 private:
 
-
-	static const int MAX_OBJECTS = 10;
+	static const int MAX_OBJECTS = 2;
 	static const int MAX_LEVELS = 5;
 	static const int CHILD_TREE_NMB = 4;
-	int m_NodeLevel = -1;
+	int m_NodeLevel = 0;
 	p2QuadTree* nodes[CHILD_TREE_NMB] = { nullptr };
-	std::list<p2Body*> m_Objects = {nullptr};
-	std::list<p2Body*> m_ChildOject = {nullptr};
+	std::list<p2Body*> m_Objects;
+	std::list<p2Body*> m_ChildObjects;
 	p2AABB m_Bounds;
-	p2ContactManager* m_ContactManager;
 };
 
 #endif
