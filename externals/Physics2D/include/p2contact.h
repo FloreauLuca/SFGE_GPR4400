@@ -67,8 +67,8 @@ public:
 	p2Contact* CreateContact(p2Collider* colliderA, p2Collider* colliderB);
 	void RemoveContact(p2Collider* colliderA, p2Collider* colliderB);
 	void CheckContact(std::vector<p2Body>& bodies);
-	void CheckContactInsideVector(std::vector<p2Body> & m_Bodies);
-	void CheckContactBetweenVector(std::vector<p2Body>& bodies1, std::vector<p2Body>& bodies2);
+	void CheckContactInsideVector(std::vector<p2Body*> m_Bodies);
+	void CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2);
 
 	p2QuadTree* GetQuadtree();
 private:

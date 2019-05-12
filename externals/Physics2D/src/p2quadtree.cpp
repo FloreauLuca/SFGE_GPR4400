@@ -65,7 +65,7 @@ void p2QuadTree::Split()
 	}
 }
 
-int p2QuadTree::GetIndex()
+int p2QuadTree::GetLevel()
 {
 	return m_NodeLevel;
 }
@@ -90,7 +90,56 @@ std::list<p2Body*> p2QuadTree::GetObjects()
 	return m_Objects;
 }
 
-void p2QuadTree::Retrieve()
+std::list<p2Body*> p2QuadTree::GetChildObjects()
 {
+	std::list<p2Body*> childObject;
+	for (p2Body* m_object : m_Objects)
+	{
+		childObject.push_back(m_object);
+	}
+	if (nodes[0] != nullptr)
+	{
+		for (p2QuadTree* node : nodes)
+		{
+			for (p2Body* child_object : node->GetChildObjects())
+			{
+				childObject.push_back(child_object);
+			}
+		}
+	}
+	return childObject;
+}
+
+void p2QuadTree::Retrieve(p2ContactManager* contact_manager)
+{
+	std::vector<p2Body*> objects;
+	for (p2Body* m_object : m_Objects)
+	{
+		objects.push_back(m_object);
+	}
 	
+	if (nodes[0] == nullptr)
+	{
+		if (objects.size() >= 2)
+		{
+			contact_manager->CheckContactInsideVector(objects);
+		}
+	}
+	else
+	{
+		
+		for (p2QuadTree* node : nodes)
+		{
+			node->Retrieve(contact_manager);
+		}
+		std::vector<p2Body*> childObjects;
+		for (p2Body* child_object : GetChildObjects())
+		{
+			childObjects.push_back(child_object);
+		}
+		if (childObjects.size() >= 1 && objects.size() >= 1)
+		{
+			contact_manager->CheckContactBetweenVector(objects, childObjects);
+		}
+	}
 }

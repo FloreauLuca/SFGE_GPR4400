@@ -101,7 +101,7 @@ namespace sfge::ext
 		                              meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Cyan);
 		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)),
 		                              meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Cyan);
-
+		/*
 		std::list<p2Body*> objects = quadTree->GetObjects();
 		for (p2Body* object : objects)
 		{
@@ -121,6 +121,7 @@ namespace sfge::ext
 				}
 			}
 		}
+		*/
 		if (quadTree->GetChild()[0] == nullptr)
 		{
 			colorIterator++;

@@ -55,7 +55,7 @@ public:
 	/**
 	* Get the index of the child trees of the p2Body
 	*/
-	int GetIndex();
+	int GetLevel();
 	p2AABB GetBounds();
 	p2QuadTree** GetChild();
 	/**
@@ -63,10 +63,11 @@ public:
 	*/
 	void Insert(p2Body* obj);
 	std::list<p2Body*> GetObjects();
+	std::list<p2Body*> GetChildObjects();
 	/**
 	* Return a list of all the p2Body that might collide
 	*/
-	void Retrieve();
+	void Retrieve(p2ContactManager* contact_manager);
 
 private:
 

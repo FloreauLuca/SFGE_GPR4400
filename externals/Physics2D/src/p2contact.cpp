@@ -87,31 +87,32 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 		m_RootQuadTree.Insert(&body);
 	}
 	m_RootQuadTree.Split();
+	m_RootQuadTree.Retrieve(this);
 }
 
-void p2ContactManager::CheckContactInsideVector(std::vector<p2Body>& bodies)
+void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
 {
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		if (bodies[i].GetCollider()->empty())continue;
+		if (bodies[i]->GetCollider()->empty())continue;
 
 		for (int j = i; j < bodies.size(); j++)
 		{
-			if (bodies[j].GetCollider()->empty())continue;
-			p2Contact* containedContact = ContainContact(&bodies[i], &bodies[j]);
+			if (bodies[j]->GetCollider()->empty())continue;
+			p2Contact* containedContact = ContainContact(bodies[i], bodies[j]);
 			if (containedContact)
 			{
-				if (!CheckAABBContact(&bodies[i], &bodies[j]))
+				if (!CheckAABBContact(bodies[i], bodies[j]))
 				{
 					m_ContactListener->EndContact(containedContact);
-					RemoveContact(&bodies[i].GetCollider()->at(0), &bodies[j].GetCollider()->at(0));
+					RemoveContact(&bodies[i]->GetCollider()->at(0), &bodies[j]->GetCollider()->at(0));
 				}
 			}
 			else
 			{
-				if (CheckAABBContact(&bodies[i], &bodies[j]))
+				if (CheckAABBContact(bodies[i], bodies[j]))
 				{
-					p2Contact* contact = CreateContact(&bodies[i].GetCollider()->at(0), &bodies[j].GetCollider()->at(0));
+					p2Contact* contact = CreateContact(&bodies[i]->GetCollider()->at(0), &bodies[j]->GetCollider()->at(0));
 					m_ContactListener->BeginContact(contact);
 				}
 			}
@@ -119,29 +120,29 @@ void p2ContactManager::CheckContactInsideVector(std::vector<p2Body>& bodies)
 	}
 }
 
-void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body>& bodies1, std::vector<p2Body>& bodies2)
+void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2)
 {
 	for (int i = 0; i < bodies1.size(); i++)
 	{
-		if (bodies1[i].GetCollider()->empty())continue;
+		if (bodies1[i]->GetCollider()->empty())continue;
 
 		for (int j = 0; j < bodies2.size(); j++)
 		{
-			if (bodies2[j].GetCollider()->empty())continue;
-			p2Contact* containedContact = ContainContact(&bodies1[i], &bodies2[j]);
+			if (bodies2[j]->GetCollider()->empty())continue;
+			p2Contact* containedContact = ContainContact(bodies1[i], bodies2[j]);
 			if (containedContact)
 			{
-				if (!CheckAABBContact(&bodies1[i], &bodies2[j]))
+				if (!CheckAABBContact(bodies1[i], bodies2[j]))
 				{
 					m_ContactListener->EndContact(containedContact);
-					RemoveContact(&bodies1[i].GetCollider()->at(0), &bodies2[j].GetCollider()->at(0));
+					RemoveContact(&bodies1[i]->GetCollider()->at(0), &bodies2[j]->GetCollider()->at(0));
 				}
 			}
 			else
 			{
-				if (CheckAABBContact(&bodies1[i], &bodies2[j]))
+				if (CheckAABBContact(bodies1[i], bodies2[j]))
 				{
-					p2Contact* contact = CreateContact(&bodies1[i].GetCollider()->at(0), &bodies2[j].GetCollider()->at(0));
+					p2Contact* contact = CreateContact(&bodies1[i]->GetCollider()->at(0), &bodies2[j]->GetCollider()->at(0));
 					m_ContactListener->BeginContact(contact);
 				}
 			}
