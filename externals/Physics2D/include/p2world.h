@@ -50,6 +50,8 @@ public:
 	* \brief Set the contact listener
 	*/
 	void SetContactListener(p2ContactListener* contactListener);
+
+	p2QuadTree* GetQuadtree();
 private:
 	p2Vec2 m_Gravity;
 	std::vector<p2Body> m_Bodies;

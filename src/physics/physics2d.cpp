@@ -100,6 +100,10 @@ ColliderManager* Physics2dManager::GetColliderManager()
 {
 	return &m_ColliderManager;
 }
+p2World* Physics2dManager::Getp2World()
+{
+	return m_World.get();
+}
 /*
 float Physics2dManager::Raycast(Vec2f startPoint, Vec2f direction, float rayLength)
 {

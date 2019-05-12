@@ -77,10 +77,11 @@ void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* collider
 
 void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 {
+	
 	p2AABB rootAABB;
-	rootAABB.topRight = p2Vec2(SCREEN_SIZE, SCREEN_SIZE);
-	rootAABB.bottomLeft = p2Vec2(-SCREEN_SIZE, -SCREEN_SIZE);
-	m_RootQuadTree = p2QuadTree(0, rootAABB , *this);
+	rootAABB.topRight = SCREEN_SIZE;
+	rootAABB.bottomLeft = p2Vec2(0, 0);
+	m_RootQuadTree = p2QuadTree(0, rootAABB );
 	for (p2Body& body : bodies)
 	{
 		m_RootQuadTree.Insert(&body);
@@ -146,6 +147,11 @@ void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body>& bodies1, s
 			}
 		}
 	}
+}
+
+p2QuadTree* p2ContactManager::GetQuadtree()
+{
+	return &m_RootQuadTree;
 }
 
 bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)

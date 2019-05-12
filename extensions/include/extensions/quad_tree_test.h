@@ -21,19 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SFGE_EXT_AABB_TEST_H
-#define SFGE_EXT_AABB_TEST_H
+#ifndef SFGE_EXT_QUADTREE_TEST_H
+#define SFGE_EXT_QUADTREE_TEST_H
 
 #include <engine/system.h>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <graphics/graphics2d.h>
 #include "p2body.h"
+#include "p2quadtree.h"
 
 
 namespace sfge
 {
 	struct Transform2d;
 	class Transform2dManager;
+	class Physics2dManager;
 	class Body2dManager;
 	class TextureManager;
 	class SpriteManager;
@@ -43,10 +45,10 @@ namespace sfge::ext
 {
 
 
-	class AabbTest : public System
+	class QuadTreeTest : public System
 	{
 	public:
-		AabbTest(Engine& engine);
+		QuadTreeTest(Engine& engine);
 
 		void OnEngineInit() override;
 
@@ -61,19 +63,30 @@ namespace sfge::ext
 
 		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
+		Physics2dManager* m_Physics2DManager;
 		TextureManager* m_TextureManager;
 		SpriteManager* m_SpriteManager;
 		Graphics2dManager* m_Graphics2DManager;
+		ShapeManager* m_ShapeManager;
 
-
-		void DrawAABB(p2AABB aabb);
+		void DrawQuadTree(p2QuadTree* quadTree);
 
 		float fixedDeltaTime = 0.0f;
 		const size_t entitiesNmb = 10'000;
-
+		p2QuadTree* m_QuadTree;
 		sf::Vector2f screenSize;
 		std::vector<p2Body*> bodies;
 		std::vector<Entity> entities;
+		int colorIterator = 0;
+		std::vector<sf::Color> colors =
+		{
+		sf::Color::Red,
+		sf::Color::Blue,
+		sf::Color::Green,
+		sf::Color::Cyan,
+		sf::Color::Magenta,
+		sf::Color::Yellow,
+		};
 	};
 
 

@@ -31,8 +31,10 @@ SOFTWARE.
 #include <extensions/python_extensions.h>
 #include <extensions/planet_system.h>
 #include "extensions/aabb_test.h"
+#include "extensions/quad_tree_test.h"
 
 #include <tools/tools_pch.h>
+#include "extensions/quad_tree_test.h"
 
 namespace sfge::ext
 {
@@ -46,6 +48,9 @@ void ExtendPython(py::module& m)
 		.def(py::init<Engine&>());
 	py::class_<AabbTest, System> aabbTest(m, "AabbTest");
 	aabbTest
+		.def(py::init<Engine&>());
+	py::class_<QuadTreeTest, System> quadTreeTest(m, "QuadTreeTest");
+	quadTreeTest
 		.def(py::init<Engine&>());
 
 	tools::ExtendPythonTools(m);

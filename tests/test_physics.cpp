@@ -250,9 +250,9 @@ TEST(Physics, TestAABB)
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
-		int sizeX = (rand() % 100) + 50;
-		int sizeY = (rand() % 100) + 50;
-		int radius = (rand() % 75) + 25;
+		int sizeX = (rand() % 100) + 10;
+		int sizeY = (rand() % 100) + 10;
+		int radius = (rand() % 75) + 15;
 		json shapes[] =
 		{
 			{
@@ -310,8 +310,8 @@ TEST(Physics, TestAABB)
 			{
 				{
 					"script_path",
-					"scripts/contact_debug_system.py"
-					//"nothing"
+					//"scripts/contact_debug_system.py"
+					"nothing"
 				}
 			},
 			{
@@ -327,6 +327,11 @@ TEST(Physics, TestAABB)
 			{
 
 				{"systemClassName", "AabbTest"}
+
+			},
+			{
+
+				{"systemClassName", "QuadTreeTest"}
 
 			}
 		}
@@ -436,7 +441,13 @@ TEST(Physics, TestAABBRotation)
 		{"systemClassName", "AabbTest"}
 
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider, aabbTest });
+	json quadTest =
+	{
+
+		{"systemClassName", "QuadTreeTest"}
+
+	};
+	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider, aabbTest, quadTest });
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }

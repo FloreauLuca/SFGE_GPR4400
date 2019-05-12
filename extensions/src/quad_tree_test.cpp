@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <extensions/aabb_test.h>
+#include <extensions/quad_tree_test.h>
 #include <engine/engine.h>
 #include <engine/config.h>
 #include <graphics/graphics2d.h>
@@ -34,20 +34,21 @@ SOFTWARE.
 namespace sfge::ext
 {
 
-	AabbTest::AabbTest(Engine& engine) :
+	QuadTreeTest::QuadTreeTest(Engine& engine) :
 		System(engine)
 	{
 
 	}
 	
-	void AabbTest::OnEngineInit()
+	void QuadTreeTest::OnEngineInit()
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
-		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
+		m_Physics2DManager = m_Engine.GetPhysicsManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
-
+		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
+		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 
 		auto config = m_Engine.GetConfig();
 		fixedDeltaTime = config->fixedDeltaTime;
@@ -62,7 +63,7 @@ namespace sfge::ext
 		}
 	}
 
-	void AabbTest::OnUpdate(float dt)
+	void QuadTreeTest::OnUpdate(float dt)
 	{
 		(void)dt;
 		/*
@@ -75,27 +76,61 @@ namespace sfge::ext
 	}
 
 
-	void AabbTest::OnFixedUpdate()
+	void QuadTreeTest::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(AabbTestFixedUpdate, 0);
+		rmt_ScopedCPUSample(QuadTreeTestFixedUpdate, 0);
 
 	}
 
-	void AabbTest::OnDraw()
+	void QuadTreeTest::OnDraw()
 	{
-		rmt_ScopedCPUSample(AabbTestDraw, 0);
-		for (auto i = 0u; i < bodies.size(); i++)
+		rmt_ScopedCPUSample(QuadTreeTestDraw, 0);
+		m_QuadTree = m_Physics2DManager->Getp2World()->GetQuadtree();
+		colorIterator = 0;
+		DrawQuadTree(m_QuadTree);
+	}
+
+	void QuadTreeTest::DrawQuadTree(p2QuadTree* quadTree)
+	{
+		p2AABB aabb = quadTree->GetBounds();
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)),
+		                              meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Cyan);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)),
+		                              meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Cyan);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)),
+		                              meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Cyan);
+		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)),
+		                              meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Cyan);
+
+		std::list<p2Body*> objects = quadTree->GetObjects();
+		for (p2Body* object : objects)
 		{
-			DrawAABB(bodies[i]->GetAABB());
+			for (int i = 0; i < bodies.size(); i++)
+			{
+				if (bodies[i] == object)
+				{
+					Shape* shape = m_ShapeManager->GetComponentPtr(entities[i]);
+					if (quadTree->GetChild()[0] == nullptr)
+					{
+						shape->SetFillColor(colors[colorIterator % colors.size()]);
+					}
+					else
+					{
+						shape->SetFillColor(sf::Color::White);
+					}
+				}
+			}
+		}
+		if (quadTree->GetChild()[0] == nullptr)
+		{
+			colorIterator++;
+		}
+		else
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				DrawQuadTree(quadTree->GetChild()[i]);
+			}
 		}
 	}
-
-	void AabbTest::DrawAABB(p2AABB aabb)
-	{
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-	}
-	
 }
