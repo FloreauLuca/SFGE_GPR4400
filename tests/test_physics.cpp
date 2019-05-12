@@ -578,9 +578,9 @@ TEST(Physics, TestQuadTree)
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
-		int sizeX = (rand() % 25) + 10;
-		int sizeY = (rand() % 25) + 10;
-		int radius = (rand() % 10) + 5;
+		int sizeX = (rand() % 25) + 1;
+		int sizeY = (rand() % 25) + 1;
+		int radius = (rand() % 10) + 1;
 		json shapes[] =
 		{
 			{
