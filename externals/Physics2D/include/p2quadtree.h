@@ -68,7 +68,7 @@ public:
 	/**
 	* Return a list of all the p2Body that might collide
 	*/
-	void Retrieve(p2ContactManager* contact_manager);
+	void Retrieve(std::list<p2Body*>& returnedObject, p2Body* object);
 
 private:
 

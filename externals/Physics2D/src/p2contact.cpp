@@ -78,20 +78,26 @@ void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* collider
 
 void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 {
-	p2AABB rootAABB;
-	rootAABB.topRight = SCREEN_SIZE;
-	rootAABB.bottomLeft = p2Vec2(0, 0);
-	m_RootQuadTree = p2QuadTree(0, rootAABB );
+	p2AABB aabb;
+	aabb.topRight = SCREEN_SIZE;
+	aabb.bottomLeft = p2Vec2(0, 0);
+	m_RootQuadTree = p2QuadTree(0, aabb);
+	m_RootQuadTree.Clear();
+	for (int i = 0; i < bodies.size(); i++)
+	{
+		m_RootQuadTree.Insert(&bodies[i]);
+	}
+	std::list<p2Body*> returnedObjects = {nullptr};
 	for (p2Body& body : bodies)
 	{
-		if (body.GetType() != p2BodyType::STATIC)
+		if (body.GetType() == p2BodyType::STATIC) continue;
+		returnedObjects.clear();
+		m_RootQuadTree.Retrieve(returnedObjects, &body);
+		for (p2Body* returnedObject : returnedObjects)
 		{
-			m_RootQuadTree.Insert(&body);
+			CheckContactBetweenBodies(&body, returnedObject);
 		}
 	}
-	m_RootQuadTree.Split();
-	rmt_ScopedCPUSample(CheckContact, 0);
-	m_RootQuadTree.Retrieve(this);
 }
 
 void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
@@ -117,7 +123,8 @@ void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
 			{
 				if (CheckAABBContact(bodies[i], bodies[j]))
 				{
-					p2Contact* contact = CreateContact(&bodies[i]->GetCollider()->at(0), &bodies[j]->GetCollider()->at(0));
+					p2Contact* contact = CreateContact(&bodies[i]->GetCollider()->at(0),
+					                                   &bodies[j]->GetCollider()->at(0));
 					m_ContactListener->BeginContact(contact);
 				}
 			}
@@ -150,10 +157,35 @@ void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body*> bodies1, s
 			{
 				if (CheckAABBContact(bodies1[i], bodies2[j]))
 				{
-					p2Contact* contact = CreateContact(&bodies1[i]->GetCollider()->at(0), &bodies2[j]->GetCollider()->at(0));
+					p2Contact* contact = CreateContact(&bodies1[i]->GetCollider()->at(0),
+					                                   &bodies2[j]->GetCollider()->at(0));
 					m_ContactListener->BeginContact(contact);
 				}
 			}
+		}
+	}
+}
+
+
+void p2ContactManager::CheckContactBetweenBodies(p2Body* body1, p2Body* body2)
+{
+	rmt_ScopedCPUSample(CheckContactBetweenBody, 0);
+
+	p2Contact* containedContact = ContainContact(body1, body2);
+	if (containedContact)
+	{
+		if (!CheckAABBContact(body1, body2))
+		{
+			m_ContactListener->EndContact(containedContact);
+			RemoveContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
+		}
+	}
+	else
+	{
+		if (CheckAABBContact(body1, body2))
+		{
+			p2Contact* contact = CreateContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
+			m_ContactListener->BeginContact(contact);
 		}
 	}
 }
@@ -167,11 +199,15 @@ bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 {
 	p2AABB aabbA = bodyA->GetAABB();
 	p2AABB aabbB = bodyB->GetAABB();
-	if (aabbA.ContainsPoint(aabbB.topRight)|| aabbA.ContainsPoint(aabbB.bottomLeft) || aabbA.ContainsPoint(p2Vec2(aabbB.bottomLeft.x, aabbB.topRight.y)) || aabbA.ContainsPoint(p2Vec2(aabbB.topRight.x, aabbB.bottomLeft.y)))
+	if (aabbA.ContainsPoint(aabbB.topRight) || aabbA.ContainsPoint(aabbB.bottomLeft) || aabbA.
+		ContainsPoint(p2Vec2(aabbB.bottomLeft.x, aabbB.topRight.y)) || aabbA.ContainsPoint(
+			p2Vec2(aabbB.topRight.x, aabbB.bottomLeft.y)))
 	{
 		return true;
 	}
-	if (aabbB.ContainsPoint(aabbA.topRight) || aabbB.ContainsPoint(aabbA.bottomLeft) || aabbB.ContainsPoint(p2Vec2(aabbA.bottomLeft.x, aabbA.topRight.y)) || aabbB.ContainsPoint(p2Vec2(aabbA.topRight.x, aabbA.bottomLeft.y)))
+	if (aabbB.ContainsPoint(aabbA.topRight) || aabbB.ContainsPoint(aabbA.bottomLeft) || aabbB.
+		ContainsPoint(p2Vec2(aabbA.bottomLeft.x, aabbA.topRight.y)) || aabbB.ContainsPoint(
+			p2Vec2(aabbA.topRight.x, aabbA.bottomLeft.y)))
 	{
 		return true;
 	}
@@ -189,5 +225,3 @@ p2Contact* p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
 	}
 	return nullptr;
 }
-
-
