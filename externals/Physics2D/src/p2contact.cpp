@@ -25,6 +25,7 @@ SOFTWARE.
 #include <p2contact.h>
 #include "p2body.h"
 #include "p2quadtree.h"
+#include "../../Remotery/Remotery.h"
 
 void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
@@ -77,21 +78,25 @@ void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* collider
 
 void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 {
-	
 	p2AABB rootAABB;
 	rootAABB.topRight = SCREEN_SIZE;
 	rootAABB.bottomLeft = p2Vec2(0, 0);
 	m_RootQuadTree = p2QuadTree(0, rootAABB );
 	for (p2Body& body : bodies)
 	{
-		m_RootQuadTree.Insert(&body);
+		if (body.GetType() != p2BodyType::STATIC)
+		{
+			m_RootQuadTree.Insert(&body);
+		}
 	}
 	m_RootQuadTree.Split();
+	rmt_ScopedCPUSample(CheckContact, 0);
 	m_RootQuadTree.Retrieve(this);
 }
 
 void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
 {
+	rmt_ScopedCPUSample(CheckContactInsideVector, 0);
 	for (int i = 0; i < bodies.size(); i++)
 	{
 		if (bodies[i]->GetCollider()->empty())continue;
@@ -122,6 +127,8 @@ void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
 
 void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2)
 {
+	rmt_ScopedCPUSample(CheckContactBetweenVector, 0);
+
 	for (int i = 0; i < bodies1.size(); i++)
 	{
 		if (bodies1[i]->GetCollider()->empty())continue;
@@ -129,6 +136,7 @@ void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body*> bodies1, s
 		for (int j = 0; j < bodies2.size(); j++)
 		{
 			if (bodies2[j]->GetCollider()->empty())continue;
+			if (bodies2[j] == bodies1[i])continue;
 			p2Contact* containedContact = ContainContact(bodies1[i], bodies2[j]);
 			if (containedContact)
 			{

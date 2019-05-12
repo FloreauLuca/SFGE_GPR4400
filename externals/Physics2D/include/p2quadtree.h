@@ -58,6 +58,7 @@ public:
 	int GetLevel();
 	p2AABB GetBounds();
 	p2QuadTree** GetChild();
+	int GetIndex(p2AABB aabb);
 	/**
 	* Insert a new p2Body in the tree
 	*/

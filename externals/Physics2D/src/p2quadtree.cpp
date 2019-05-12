@@ -14,11 +14,21 @@ p2QuadTree::p2QuadTree(int nodeLevel, p2AABB bounds)
 
 p2QuadTree::~p2QuadTree()
 {
-
+	Clear();
 }
 
 void p2QuadTree::Clear()
 {
+	m_Objects.clear();
+	for (int i = 0; i < CHILD_TREE_NMB; i++)
+	{
+		if(nodes[i] != nullptr)
+		{
+			nodes[i]->Clear();
+			delete nodes[i];
+			nodes[i] = nullptr;
+		}
+	}
 }
 
 void p2QuadTree::Split()
@@ -45,7 +55,6 @@ void p2QuadTree::Split()
 			for (p2Body* object : m_Objects)
 			{
 				if (object == nullptr) continue;
-				if (object->GetType() == p2BodyType::STATIC) continue;
 				if (nodes[i]->GetBounds().ContainsAABB(object->GetAABB()))
 				{
 					nodes[i]->Insert(object);
@@ -78,6 +87,12 @@ p2AABB p2QuadTree::GetBounds()
 p2QuadTree** p2QuadTree::GetChild()
 {
 	return nodes;
+}
+
+int p2QuadTree::GetIndex(p2AABB aabb)
+{
+	int index = -1;
+	return index;
 }
 
 void p2QuadTree::Insert(p2Body * obj)

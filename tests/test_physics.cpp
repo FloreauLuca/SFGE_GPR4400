@@ -580,7 +580,7 @@ TEST(Physics, TestQuadTree)
 	{
 		int sizeX = (rand() % 25) + 10;
 		int sizeY = (rand() % 25) + 10;
-		int radius = (rand() % 50) + 15;
+		int radius = (rand() % 10) + 5;
 		json shapes[] =
 		{
 			{
