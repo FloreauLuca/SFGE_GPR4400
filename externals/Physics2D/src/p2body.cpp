@@ -35,8 +35,6 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	
 }
 
-
-
 p2Vec2 p2Body::GetLinearVelocity() const
 {
 	return linearVelocity;

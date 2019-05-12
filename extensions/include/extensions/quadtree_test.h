@@ -21,45 +21,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef SFGE_EXT_AABB_TEST_H
+#define SFGE_EXT_AABB_TEST_H
 
-#ifndef SFGE_P2AABB_H
-#define SFGE_P2AABB_H
+#include <engine/system.h>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <graphics/graphics2d.h>
+#include "p2body.h"
 
-#include <p2vector.h>
-#include "p2shape.h"
 
-/**
-* \brief Struct representing a Axis Aligned Bounding Box
-*/
-struct p2AABB
+namespace sfge
+{
+	struct Transform2d;
+	class Transform2dManager;
+	class Body2dManager;
+	class TextureManager;
+	class SpriteManager;
+}
+
+namespace sfge::ext
 {
 
-	/**
-	* \brief Calculate the center and return it
-	*/
-	p2Vec2 GetCenter();
-	/**
-	* \brief Calculate the extends and return it
-	*/
-	p2Vec2 GetExtends();
 
-	float GetBottom();
-	float GetTop();
-	float GetRight();
-	float GetLeft();
+	class AabbTest : public System
+	{
+	public:
+		AabbTest(Engine& engine);
 
-	void SetSide(float top, float bottom, float right, float left);
-	void SetShape(p2Shape* shape);
-	void SetExtends(p2Vec2 extends);
-	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
-	bool ContainsPoint(p2Vec2 point);
-	bool ContainsAABB(p2AABB aabb);
-	void Write();
-	void Rotate(float angle);
-	void SetCenter(p2Vec2 center);
-	
-	p2Vec2 topRight;
-	p2Vec2 bottomLeft;
+		void OnEngineInit() override;
 
-};
-#endif // !SFGE_P2AABB:H
+		void OnUpdate(float dt) override;
+
+		void OnFixedUpdate() override;
+
+		void OnDraw() override;
+
+	private:
+
+
+		Transform2dManager* m_Transform2DManager;
+		Body2dManager* m_Body2DManager;
+		TextureManager* m_TextureManager;
+		SpriteManager* m_SpriteManager;
+		Graphics2dManager* m_Graphics2DManager;
+
+
+		void DrawAABB(p2AABB aabb);
+
+		float fixedDeltaTime = 0.0f;
+		const size_t entitiesNmb = 10'000;
+
+		sf::Vector2f screenSize;
+		std::vector<p2Body*> bodies;
+		std::vector<Entity> entities;
+	};
+
+
+}
+
+#endif

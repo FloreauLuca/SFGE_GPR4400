@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <p2collider.h>
 #include "p2body.h"
+#include "p2quadtree.h"
 
 const size_t MAX_CONTACT_LEN = 100;
 
@@ -65,13 +66,17 @@ public:
 	void Init(p2ContactListener* contactListener);
 	p2Contact* CreateContact(p2Collider* colliderA, p2Collider* colliderB);
 	void RemoveContact(p2Collider* colliderA, p2Collider* colliderB);
-	void CheckContact(std::vector<p2Body> & m_Bodies);
+	void CheckContact(std::vector<p2Body>& bodies);
+	void CheckContactInsideVector(std::vector<p2Body> & m_Bodies);
+	void CheckContactBetweenVector(std::vector<p2Body>& bodies1, std::vector<p2Body>& bodies2);
 private:
 	bool CheckAABBContact(p2Body* bodyA, p2Body* bodyB);
 	p2Contact* ContainContact(p2Body* bodyA, p2Body* bodyB);
 	p2ContactListener* m_ContactListener;
 	std::vector<p2Contact> m_Contacts;
 	int m_ContactIndex = 0;
+	const int SCREEN_SIZE = 100;
+	p2QuadTree m_RootQuadTree;
 
 };
 #endif

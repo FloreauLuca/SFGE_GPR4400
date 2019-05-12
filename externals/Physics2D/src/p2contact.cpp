@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <p2contact.h>
 #include "p2body.h"
+#include "p2quadtree.h"
 
 void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
@@ -74,8 +75,20 @@ void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* collider
 	}
 }
 
-
 void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
+{
+	p2AABB rootAABB;
+	rootAABB.topRight = p2Vec2(SCREEN_SIZE, SCREEN_SIZE);
+	rootAABB.bottomLeft = p2Vec2(-SCREEN_SIZE, -SCREEN_SIZE);
+	m_RootQuadTree = p2QuadTree(0, rootAABB , *this);
+	for (p2Body& body : bodies)
+	{
+		m_RootQuadTree.Insert(&body);
+	}
+	m_RootQuadTree.Split();
+}
+
+void p2ContactManager::CheckContactInsideVector(std::vector<p2Body>& bodies)
 {
 	for (int i = 0; i < bodies.size(); i++)
 	{
@@ -98,6 +111,36 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 				if (CheckAABBContact(&bodies[i], &bodies[j]))
 				{
 					p2Contact* contact = CreateContact(&bodies[i].GetCollider()->at(0), &bodies[j].GetCollider()->at(0));
+					m_ContactListener->BeginContact(contact);
+				}
+			}
+		}
+	}
+}
+
+void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body>& bodies1, std::vector<p2Body>& bodies2)
+{
+	for (int i = 0; i < bodies1.size(); i++)
+	{
+		if (bodies1[i].GetCollider()->empty())continue;
+
+		for (int j = 0; j < bodies2.size(); j++)
+		{
+			if (bodies2[j].GetCollider()->empty())continue;
+			p2Contact* containedContact = ContainContact(&bodies1[i], &bodies2[j]);
+			if (containedContact)
+			{
+				if (!CheckAABBContact(&bodies1[i], &bodies2[j]))
+				{
+					m_ContactListener->EndContact(containedContact);
+					RemoveContact(&bodies1[i].GetCollider()->at(0), &bodies2[j].GetCollider()->at(0));
+				}
+			}
+			else
+			{
+				if (CheckAABBContact(&bodies1[i], &bodies2[j]))
+				{
+					p2Contact* contact = CreateContact(&bodies1[i].GetCollider()->at(0), &bodies2[j].GetCollider()->at(0));
 					m_ContactListener->BeginContact(contact);
 				}
 			}

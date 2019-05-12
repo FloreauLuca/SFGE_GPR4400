@@ -28,6 +28,7 @@ SOFTWARE.
 #include <vector>
 #include <algorithm>
 #include "p2shape.h"
+#include <string>
 
 p2Vec2 p2AABB::GetCenter()
 {
@@ -112,6 +113,11 @@ bool p2AABB::ContainsPoint(p2Vec2 point)
 bool p2AABB::ContainsAABB(p2AABB aabb)
 {
 	return (ContainsPoint(aabb.topRight) && ContainsPoint(aabb.bottomLeft));
+}
+
+void p2AABB::Write()
+{
+	std::cout << "Top : " + std::to_string(topRight.y) + "Bottom : " + std::to_string(bottomLeft.y) + "Right : " + std::to_string(topRight.x) + "Left : " + std::to_string(bottomLeft.x) << std::endl;
 }
 
 

@@ -31,13 +31,16 @@ SOFTWARE.
 #include <p2aabb.h>
 #include <p2body.h>
 
+class p2ContactManager;
+
 /**
 * \brief Representation of a tree with 4 branches containing p2Body defined by their p2AABB
 */
 class p2QuadTree
 {
 public:
-	p2QuadTree(int nodeLevel, p2AABB bounds);
+	p2QuadTree();
+	p2QuadTree(int nodeLevel, p2AABB bounds, p2ContactManager contactManager);
 	~p2QuadTree();
 
 	/**
@@ -53,6 +56,8 @@ public:
 	* Get the index of the child trees of the p2Body
 	*/
 	int GetIndex(p2Body* rect);
+	p2AABB GetBounds();
+	void GetChild(std::vector<p2QuadTree>& node);
 	/**
 	* Insert a new p2Body in the tree
 	*/
@@ -60,7 +65,7 @@ public:
 	/**
 	* Return a list of all the p2Body that might collide
 	*/
-	std::list<p2Body*> Retrieve();
+	void Retrieve();
 	
 private:
 
@@ -70,8 +75,10 @@ private:
 	static const int CHILD_TREE_NMB = 4;
 	int m_NodeLevel = -1;
 	p2QuadTree* nodes[CHILD_TREE_NMB] = { nullptr };
-	std::list<p2Body*> m_Objects;
+	std::list<p2Body*> m_Objects = {nullptr};
+	std::list<p2Body*> m_ChildOject = {nullptr};
 	p2AABB m_Bounds;
+	p2ContactManager* m_ContactManager;
 };
 
 #endif
