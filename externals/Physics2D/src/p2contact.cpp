@@ -87,6 +87,8 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 	{
 		m_RootQuadTree.Insert(&bodies[i]);
 	}
+	rmt_ScopedCPUSample(CheckContact, 0);
+
 	std::list<p2Body*> returnedObjects = {nullptr};
 	for (p2Body& body : bodies)
 	{
@@ -169,7 +171,7 @@ void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body*> bodies1, s
 
 void p2ContactManager::CheckContactBetweenBodies(p2Body* body1, p2Body* body2)
 {
-	rmt_ScopedCPUSample(CheckContactBetweenBody, 0);
+	//rmt_ScopedCPUSample(CheckContactBetweenBody, 0);
 
 	p2Contact* containedContact = ContainContact(body1, body2);
 	if (containedContact)
