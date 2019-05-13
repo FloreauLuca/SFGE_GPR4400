@@ -28,7 +28,7 @@ SOFTWARE.
 #include <p2collider.h>
 #include "p2body.h"
 
-const size_t MAX_CONTACT_LEN = 100;
+const size_t MAX_CONTACT_LEN = 1000;
 
 /**
 * \brief Representation of a contact given as argument in a p2ContactListener

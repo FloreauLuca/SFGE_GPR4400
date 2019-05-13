@@ -440,3 +440,106 @@ TEST(Physics, TestAABBRotation)
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
+
+
+TEST(Physics, TestQuadTree)
+{
+	sfge::Engine engine;
+	auto config = std::make_unique<sfge::Configuration>();
+	config->gravity = p2Vec2(0.0f, 0.0f);
+	engine.Init(std::move(config));
+
+	auto* sceneManager = engine.GetSceneManager();
+
+	json sceneJson;
+	sceneJson["name"] = "Contacts";
+
+	const int entitiesNmb = 100;
+	json entities[entitiesNmb];
+
+	for (int i = 0; i < entitiesNmb; i++)
+	{
+		int sizeX = (rand() % 25) + 10;
+		int sizeY = (rand() % 25) + 10;
+		int radius = (rand() % 10) + 5;
+		json shapes[] =
+		{
+			{
+				{"name", "Rect Shape Component"},
+				{"type", sfge::ComponentType::SHAPE2D},
+				{"shape_type", sfge::ShapeType::RECTANGLE},
+				{"size", {sizeX, sizeY}}
+			},
+			{
+				{"name", "Rect Shape Component"},
+				{"type", sfge::ComponentType::SHAPE2D},
+				{"shape_type", sfge::ShapeType::CIRCLE},
+				{"radius", radius}
+			}
+		};
+		json colliders[] =
+		{
+			{
+				{"name", "Rect Collider"},
+				{"type", sfge::ComponentType::COLLIDER2D},
+				{"collider_type", sfge::ColliderType::BOX},
+				{"size", {sizeX, sizeY}},
+				{"sensor", true}
+			},
+			{
+				{"name", "Circle Collider"},
+				{"type", sfge::ComponentType::COLLIDER2D},
+				{"collider_type", sfge::ColliderType::CIRCLE},
+				{"radius", radius},
+				{"sensor", true}
+			}
+		};
+
+		json& entityJson = entities[i];
+
+		json transformJson =
+		{
+			{"position", {rand() % 800, rand() % 600}},
+			{"type", sfge::ComponentType::TRANSFORM2D}
+		};
+
+		json rigidbody =
+		{
+			{"name", "Rigidbody"},
+			{"type", sfge::ComponentType::BODY2D},
+			{"body_type", p2BodyType::DYNAMIC},
+			{"velocity", {rand() % 400, rand() % 400}}
+		};
+
+		int randShapeIndex = rand() % 2;
+		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
+	}
+	sceneJson["entities"] = entities;
+	sceneJson["systems"] = json::array({
+			{
+				{
+					"script_path",
+					"scripts/contact_debug_system.py"
+					//"nothing"
+				}
+			},
+			{
+				{"script_path", "scripts/stay_onscreen_system.py"}
+			},
+			{
+				{
+					"script_path",
+					//"scripts/mouse_raycast_system.py" 
+					"nothing"
+				}
+			},
+			{
+
+				{"systemClassName", "AabbTest"}
+
+			}
+		}
+	);
+	sceneManager->LoadSceneFromJson(sceneJson);
+	engine.Start();
+}
