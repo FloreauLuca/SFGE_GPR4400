@@ -573,7 +573,7 @@ TEST(Physics, TestQuadTree)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 100;
+	const int entitiesNmb = 50;
 	json entities[entitiesNmb];
 
 	for (int i = 0; i < entitiesNmb; i++)
