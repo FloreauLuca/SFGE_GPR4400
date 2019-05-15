@@ -42,20 +42,12 @@ struct p2AABB
 	* \brief Calculate the extends and return it
 	*/
 	p2Vec2 GetExtends();
-
-	float GetBottom();
-	float GetTop();
-	float GetRight();
-	float GetLeft();
-
-	void SetSide(float top, float bottom, float right, float left);
 	void SetShape(p2Shape* shape);
 	void SetExtends(p2Vec2 extends);
 	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
 	bool ContainsPoint(p2Vec2 point);
 	bool ContainsAABB(p2AABB aabb);
 	void Write();
-	void Rotate(float angle);
 	void SetCenter(p2Vec2 center);
 	
 	p2Vec2 topRight;

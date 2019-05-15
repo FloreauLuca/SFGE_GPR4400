@@ -81,7 +81,7 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 	p2AABB rootAABB;
 	rootAABB.topRight = SCREEN_SIZE;
 	rootAABB.bottomLeft = p2Vec2(0, 0);
-	m_RootQuadTree = p2QuadTree(0, rootAABB );
+	m_RootQuadTree = p2QuadTree(0, rootAABB);
 	for (p2Body& body : bodies)
 	{
 		if (body.IsInstantiate())
@@ -101,7 +101,7 @@ void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
 	{
 		if (bodies[i]->GetCollider()->empty())continue;
 
-		for (int j = i; j < bodies.size(); j++)
+		for (int j = i+1; j < bodies.size(); j++)
 		{
 			if (bodies[j]->GetCollider()->empty())continue;
 			CheckContactBetweenBodies(bodies[i], bodies[j]);
@@ -169,7 +169,7 @@ bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 {
 	p2AABB aabbA = bodyA->GetAABB();
 	p2AABB aabbB = bodyB->GetAABB();
-	if (aabbA.ContainsPoint(aabbB.topRight)|| aabbA.ContainsPoint(aabbB.bottomLeft) || aabbA.ContainsPoint(p2Vec2(aabbB.bottomLeft.x, aabbB.topRight.y)) || aabbA.ContainsPoint(p2Vec2(aabbB.topRight.x, aabbB.bottomLeft.y)))
+	if (aabbA.ContainsPoint(aabbB.topRight) || aabbA.ContainsPoint(aabbB.bottomLeft) || aabbA.ContainsPoint(p2Vec2(aabbB.bottomLeft.x, aabbB.topRight.y)) || aabbA.ContainsPoint(p2Vec2(aabbB.topRight.x, aabbB.bottomLeft.y)))
 	{
 		return true;
 	}
@@ -192,6 +192,7 @@ p2Contact* p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
 	return nullptr;
 }
 
+/*
 bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 {
 	for (p2Collider colliderA : *bodyA->GetCollider())
@@ -266,7 +267,7 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 							int axeSupX = 0;
 							int axeInfY = 0;
 							int axeSupY = 0;
-							/*
+							
 							for (p2Vec2 cornerA : rectShapeA->GetCorner())
 							{
 								float projAxB = p2Vec2::Dot(bodyB->GetPosition() - cornerA + bodyA->GetPosition(), p2Vec2(rectShapeB->GetSize().x, 0)) / p2Vec2::Dot(p2Vec2(rectShapeB->GetSize().x, 0), p2Vec2(rectShapeB->GetSize().x, 0));
@@ -290,7 +291,7 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 							{
 								return false;
 							}
-							*/
+							
 							axeInfX = 0;
 							axeSupX = 0;
 							axeInfY = 0;
@@ -332,4 +333,83 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 }
 
 
+*/
 
+bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
+{
+	for (p2Collider colliderA : *bodyA->GetCollider())
+	{
+		for (p2Collider colliderB : *bodyB->GetCollider())
+		{
+			if (colliderA.GetColliderType() == p2ColliderType::CIRCLE)
+			{
+				if (colliderB.GetColliderType() == p2ColliderType::CIRCLE)
+				{
+					if (p2CircleShape* circleshapeA = dynamic_cast<p2CircleShape*>(colliderA.GetShape()))
+					{
+						if (p2CircleShape* circleshapeB = dynamic_cast<p2CircleShape*>(colliderB.GetShape()))
+						{
+							if (p2Vec2::Distance(bodyA->GetPosition(), bodyB->GetPosition()) < circleshapeA->GetRadius() + circleshapeB->GetRadius())
+							{
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
+				{
+					if (p2CircleShape* circleshapeA = dynamic_cast<p2CircleShape*>(colliderA.GetShape()))
+					{
+						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
+						{
+							if (bodyB->GetPosition().x - (bodyA->GetPosition().x + circleshapeA->GetRadius()) < rectShapeB->GetSize().x && bodyB->GetPosition().x - (bodyA->GetPosition().x - circleshapeA->GetRadius()) > -rectShapeB->GetSize().x)
+							{
+								return true;
+							}
+
+							if (bodyB->GetPosition().y - (bodyA->GetPosition().y + circleshapeA->GetRadius()) < rectShapeB->GetSize().y && bodyB->GetPosition().y - (bodyA->GetPosition().y - circleshapeA->GetRadius()) > -rectShapeB->GetSize().y)
+							{
+								return true;
+							}
+						}
+						return false;
+					}
+				}
+			}
+			else if (colliderA.GetColliderType() == p2ColliderType::BOX)
+			{
+				if (colliderB.GetColliderType() == p2ColliderType::CIRCLE)
+				{
+					if (p2CircleShape* circleshapeB = dynamic_cast<p2CircleShape*>(colliderB.GetShape()))
+					{
+						if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
+						{
+							if ((abs(bodyA->GetPosition().x - bodyB->GetPosition().x) - circleshapeB->GetRadius()) < rectShapeA->GetSize().x)// && abs(bodyA->GetPosition().x - bodyB->GetPosition().x) - circleshapeB->GetRadius()) > -rectShapeA->GetSize().x)
+							{
+								return true;
+							}
+
+							//if (bodyA->GetPosition().y - (bodyB->GetPosition().y + circleshapeB->GetRadius()) < rectShapeA->GetSize().y && bodyA->GetPosition().y - (bodyB->GetPosition().y - circleshapeB->GetRadius()) > -rectShapeA->GetSize().y)
+							if ((abs(bodyA->GetPosition().y - bodyB->GetPosition().y) - circleshapeB->GetRadius()) < rectShapeA->GetSize().y) {
+								return true;
+							}
+						}
+					}
+					return false;
+				}
+				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
+				{
+					if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
+					{
+						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
+						{
+						}
+					}
+					return false;
+				}
+			}
+		}
+	}
+	return false;
+}

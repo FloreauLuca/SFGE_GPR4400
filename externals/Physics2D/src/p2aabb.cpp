@@ -107,7 +107,7 @@ void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
 
 bool p2AABB::ContainsPoint(p2Vec2 point)
 {
-	return  (point<topRight && point>bottomLeft);
+	return  (point<=topRight && point>=bottomLeft);
 }
 
 bool p2AABB::ContainsAABB(p2AABB aabb)

@@ -148,9 +148,12 @@ void p2QuadTree::Retrieve(p2ContactManager* contact_manager)
 			node->Retrieve(contact_manager);
 		}
 		std::vector<p2Body*> childObjects;
-		for (p2Body* child_object : GetChildObjects())
+		for (int i = 0; i < CHILD_TREE_NMB; i++)
 		{
-			childObjects.push_back(child_object);
+			for (p2Body* child_object : nodes[i]->GetChildObjects())
+			{
+				childObjects.push_back(child_object);
+			}
 		}
 		if (childObjects.size() >= 1 && objects.size() >= 1)
 		{

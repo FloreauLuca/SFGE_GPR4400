@@ -245,14 +245,14 @@ TEST(Physics, TestAABB)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 10;
+	const int entitiesNmb = 2;
 	json entities[entitiesNmb];
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
-		int sizeX = (rand() % 100) + 10;
-		int sizeY = (rand() % 100) + 10;
-		int radius = (rand() % 75) + 15;
+		int sizeX = (rand() % 100) + 100;
+		int sizeY = (rand() % 100) + 100;
+		int radius = (rand() % 75) + 150;
 		json shapes[] =
 		{
 			{
@@ -303,7 +303,7 @@ TEST(Physics, TestAABB)
 		};
 
 		int randShapeIndex = rand() % 2;
-		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
+		entityJson["components"] = { transformJson, shapes[i], rigidbody, colliders[i] };
 	}
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
@@ -683,7 +683,7 @@ TEST(Physics, TestSATDetect)
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
-	sceneJson["entities"] = { entityBody1, entityBody2, entityBody3, entityBody4 };
+	sceneJson["entities"] = { entityBody1, entityBody3, entityBody4 };
 	json contactDebugSystem = {
 		{
 			"script_path",

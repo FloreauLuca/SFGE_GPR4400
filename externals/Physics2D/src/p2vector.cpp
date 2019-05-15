@@ -167,6 +167,19 @@ bool p2Vec2::operator>(const p2Vec2& v) const
 	return (x > v.x && y > v.y);
 }
 
+bool p2Vec2::operator<=(const p2Vec2& v) const
+{
+	return  (x <= v.x && y <= v.y);
+}
+
+/**
+ * \brief if x AND y superior
+ */
+bool p2Vec2::operator>=(const p2Vec2& v) const
+{
+	return (x >= v.x && y >= v.y);
+}
+
 p2Vec3::p2Vec3()
 {
 }
