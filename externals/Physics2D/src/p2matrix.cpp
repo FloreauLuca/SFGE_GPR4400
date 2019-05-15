@@ -66,6 +66,7 @@ p2Mat22 p2Mat22::operator/(float f)
 
 p2Mat22 p2Mat22::Invert()
 {
+	if (GetDeterminant() == 0) return *this;
 	return p2Mat22(p2Vec2(rows[1].y, -rows[0].y), p2Vec2(-rows[1].x, rows[0].x)) * 1 / GetDeterminant();
 }
 

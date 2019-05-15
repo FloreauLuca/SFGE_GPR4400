@@ -69,11 +69,13 @@ public:
 	void CheckContact(std::vector<p2Body>& bodies);
 	void CheckContactInsideVector(std::vector<p2Body*> m_Bodies);
 	void CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2);
+	void CheckContactBetweenBodies(p2Body* body1, p2Body* body2);
 
 	p2QuadTree* GetQuadtree();
 private:
 	bool CheckAABBContact(p2Body* bodyA, p2Body* bodyB);
 	p2Contact* ContainContact(p2Body* bodyA, p2Body* bodyB);
+	bool CheckSATContact(p2Body* bodyA, p2Body* bodyB);
 	p2ContactListener* m_ContactListener;
 	std::vector<p2Contact> m_Contacts;
 	int m_ContactIndex = 0;

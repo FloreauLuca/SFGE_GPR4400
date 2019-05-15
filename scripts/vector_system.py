@@ -54,16 +54,17 @@ class VectorSystem(System):
         self.hour = self.hour.rotate(self.rotation_speed*self.thour)
         """
 
-        """
+
         # Affichage projeté
-        self.v = Vec2f(10, 10)
+        self.v = Vec2f(0, 10)
         self.v = self.v.rotate(self.rotation_speed*self.t)
-        self.u = Vec2f(10, 10)
+        self.u = Vec2f(0, 10)
 
         self.pu = Physics2dManager.pixel2meter(self.u)
         self.pv = Physics2dManager.pixel2meter(self.v)
         self.result = Physics2dManager.meter2pixel(self.pu * p2Vec2.dot(self.pu, self.pv)/p2Vec2.dot(self.pv, self.pv))
-        """
+        print("dot: " + str(Physics2dManager.meter2pixel(p2Vec2.dot(self.pu, self.pv))))
+        print("dot / dot: " +  str(Physics2dManager.meter2pixel(p2Vec2.dot(self.pu, self.pv)/p2Vec2.dot(self.pv, self.pv))))
 
         """
         #Affichage Lerp
@@ -80,7 +81,7 @@ class VectorSystem(System):
         
         """
 
-        # """
+        """
         # Rotation and angle test
         self.v = Vec2f(10, -10)
         self.u = Vec2f(10, 10)
@@ -89,7 +90,7 @@ class VectorSystem(System):
         self.pv = self.pv.rotate(self.t)
         self.result = Physics2dManager.meter2pixel(self.pv)
 
-        # """
+        """
 
     def on_draw(self):
         # rotating vector

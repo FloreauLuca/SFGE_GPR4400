@@ -32,7 +32,13 @@ void p2Body::Init(p2BodyDef* bodyDef)
 	bodyType = bodyDef->type;
 	m_Mass = bodyDef->mass;
 	m_Angle = bodyDef->angle;
-	
+	m_GravityScale = bodyDef->gravityScale;
+	isInstantiate = true;
+}
+
+bool p2Body::IsInstantiate()
+{
+	return isInstantiate;
 }
 
 p2Vec2 p2Body::GetLinearVelocity() const
@@ -82,8 +88,7 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {
-	if (m_Mass == 0) m_Mass = 1;
-	linearVelocity += force/m_Mass;
+	linearVelocity += force*m_GravityScale/m_Mass;
 }
 
 p2BodyType p2Body::GetType() const
