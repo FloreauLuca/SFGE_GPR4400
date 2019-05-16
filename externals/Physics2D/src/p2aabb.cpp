@@ -94,17 +94,6 @@ void p2AABB::SetCenter(p2Vec2 center)
 	bottomLeft = center - extends;
 }
 
-
-void p2AABB::SetCenterExtend(p2Vec2 center, p2Vec2 extends)
-{
-	p2Vec2 Extend = extends;
-	if (Extend.x < 0) Extend.x -= Extend.x;
-	if (Extend.y < 0) Extend.y -= Extend.y;
-	topRight = center + Extend;
-	bottomLeft = center - Extend;
-
-}
-
 bool p2AABB::ContainsPoint(p2Vec2 point)
 {
 	return  (point<=topRight && point>=bottomLeft);

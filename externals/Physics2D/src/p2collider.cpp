@@ -39,9 +39,9 @@ p2ColliderType p2Collider::GetColliderType()
 p2AABB p2Collider::GetAABB(p2Vec2 position, float angle)
 {
 	if (m_Shape) m_Shape->Rotate(angle);
-	aabb.SetCenter(position);
-	aabb.SetShape(m_Shape);
-	return aabb;
+	m_Aabb.SetCenter(position);
+	m_Aabb.SetShape(m_Shape);
+	return m_Aabb;
 }
 
 

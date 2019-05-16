@@ -29,18 +29,18 @@ SOFTWARE.
 
 void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
-	m_colliderA = colliderA;
-	m_colliderB = colliderB;
+	m_ColliderA = colliderA;
+	m_ColliderB = colliderB;
 }
 
 p2Collider* p2Contact::GetColliderA()
 {
-	return m_colliderA;
+	return m_ColliderA;
 }
 
 p2Collider* p2Contact::GetColliderB()
 {
-	return m_colliderB;
+	return m_ColliderB;
 }
 
 bool p2Contact::CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB)

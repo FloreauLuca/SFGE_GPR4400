@@ -37,13 +37,19 @@ const size_t MAX_CONTACT_LEN = 1000;
 class p2Contact
 {
 public:
+	/**
+	 * \brief Set the colliders ptr in contact
+	 */
 	void Init(p2Collider * colliderA, p2Collider * colliderB);
 	p2Collider* GetColliderA();
 	p2Collider* GetColliderB();
+	/**
+	 * \brief Check if the contact contain the same collider
+	 */
 	bool CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB);
 private :
-	p2Collider* m_colliderA;
-	p2Collider* m_colliderB;
+	p2Collider* m_ColliderA;
+	p2Collider* m_ColliderB;
 	int m_ContactIndex;
 };
 
@@ -58,28 +64,60 @@ public:
 };
 
 /**
-* \brief Managing the creation and destruction of contact between colliders
+* \brief Managing the creation and destruction of contact between colliders and correct the position and the speed
 */
 class p2ContactManager
 {
 public:
+	/**
+	 * \brief Save the contactListener adress
+	 */
 	void Init(p2ContactListener* contactListener);
+	/**
+	 * \brief Factory method creating a p2Contact and save it
+	 */
 	p2Contact* CreateContact(p2Collider* colliderA, p2Collider* colliderB);
+	/**
+	 * \brief Factory method removing a p2Contact
+	 */
 	void RemoveContact(p2Collider* colliderA, p2Collider* colliderB);
+	/**
+	 * \brief Construct, split and retrieve the QuadTree
+	 */
 	void CheckContact(std::vector<p2Body>& bodies);
+	/**
+	 * \brief Check contact inside a vector of p2Body
+	 */
 	void CheckContactInsideVector(std::vector<p2Body*> m_Bodies);
+	/**
+	 * \brief Check contact between 2 vector of p2Body
+	 */
 	void CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2);
+	/**
+	 * \brief Check contact between 2 p2Body
+	 */
 	void CheckContactBetweenBodies(p2Body* body1, p2Body* body2);
-
+	/**
+	 * \brief Return the QuadTree
+	 */
 	p2QuadTree* GetQuadtree();
 private:
+	/**
+	 * \brief Check the AABB contact between 2 p2Body
+	 */
 	bool CheckAABBContact(p2Body* bodyA, p2Body* bodyB);
-	p2Contact* ContainContact(p2Body* bodyA, p2Body* bodyB);
+	/**
+	 * \brief Check the SAT contact between 2 p2Body
+	 */
 	bool CheckSATContact(p2Body* bodyA, p2Body* bodyB);
-	p2ContactListener* m_ContactListener;
+	/**
+	 * \brief Check if 2 p2Body are alread in contact
+	 */
+	p2Contact* ContainContact(p2Body* bodyA, p2Body* bodyB);
+	p2ContactListener* m_ContactListener = nullptr;
 	std::vector<p2Contact> m_Contacts;
 	int m_ContactIndex = 0;
-	const p2Vec2 SCREEN_SIZE = p2Vec2(13,7.5);
+	const p2Vec2 SCREEN_SIZE = p2Vec2(13,7.5); //TODO set dynamic quadtree
 	p2QuadTree m_RootQuadTree;
 
 };

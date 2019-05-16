@@ -42,6 +42,9 @@ struct p2Mat22
 	* \brief Calculate the invert of the 2x2 matrix
 	*/
 	p2Mat22 Invert();
+	/**
+	* \brief Calculate the determinant
+	*/
 	float GetDeterminant();
 
 	p2Vec2 rows[2] = {};

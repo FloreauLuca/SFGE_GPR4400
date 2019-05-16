@@ -43,14 +43,18 @@ public:
 	*/
 	void Step(float dt);
 	/**
-	* \brief Factory method to create a new p2Body attached to the p2World
+	* \brief Factory method creating a p2Body
+	* \param bodyDef p2BodyDef definition of the body
+	* \return p2Body body attached to the p2World
 	*/
 	p2Body* CreateBody(p2BodyDef* bodyDef);
 	/**
 	* \brief Set the contact listener
 	*/
 	void SetContactListener(p2ContactListener* contactListener);
-
+	/**
+	 * \brief Return the QuadTree
+	 */
 	p2QuadTree* GetQuadtree();
 private:
 	p2Vec2 m_Gravity;

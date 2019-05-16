@@ -49,14 +49,11 @@ void p2CircleShape::Rotate(float angle)
 void p2RectShape::SetSize(p2Vec2 size)
 {
 	m_Size = size;
-	corners.resize(MAX_CORNER);
-	axis.resize(MAX_CORNER);
-	corners[0] = p2Vec2(m_Size.x, m_Size.y);
-	corners[1] = p2Vec2(-m_Size.x, m_Size.y);
-	corners[2] = p2Vec2(m_Size.x, -m_Size.y);
-	corners[3] = p2Vec2(-m_Size.x, -m_Size.y);
-	axis[0] = p2Vec2(m_Size.x * 2, 0);
-	axis[1] = p2Vec2(0, m_Size.y * 2);
+	m_Corners.resize(MAX_CORNER);
+	m_Corners[0] = p2Vec2(m_Size.x, m_Size.y);
+	m_Corners[1] = p2Vec2(-m_Size.x, m_Size.y);
+	m_Corners[2] = p2Vec2(m_Size.x, -m_Size.y);
+	m_Corners[3] = p2Vec2(-m_Size.x, -m_Size.y);
 }
 
 p2Vec2 p2RectShape::GetSize()
@@ -66,23 +63,15 @@ p2Vec2 p2RectShape::GetSize()
 
 std::vector<p2Vec2> p2RectShape::GetCorner()
 {
-	return corners;
-}
-
-
-std::vector<p2Vec2> p2RectShape::GetAxis()
-{
-	return axis;
+	return m_Corners;
 }
 
 void p2RectShape::Rotate(float angle)
 {
 	float newAngle = angle / 180 * M_PI;
 	SetSize(m_Size);
-	for (p2Vec2& corner : corners)
+	for (p2Vec2& corner : m_Corners)
 	{
 		corner = corner.Rotate(newAngle);
 	}
-	axis[0] = corners[0] - corners[1];
-	axis[1] = corners[0] - corners[2];
 }

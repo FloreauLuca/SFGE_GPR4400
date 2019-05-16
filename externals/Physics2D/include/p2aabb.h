@@ -42,13 +42,32 @@ struct p2AABB
 	* \brief Calculate the extends and return it
 	*/
 	p2Vec2 GetExtends();
+	/**
+	 * \brief Calculate the topRight and bottomLeft thanks to a shape and this center
+	 */
 	void SetShape(p2Shape* shape);
+	/**
+	 * \brief Calculate the topRight and bottomLeft thanks to an extend and this center
+	 */
 	void SetExtends(p2Vec2 extends);
-	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
-	bool ContainsPoint(p2Vec2 point);
-	bool ContainsAABB(p2AABB aabb);
-	void Write();
+	/**
+	 * \brief Calculate the topRight and bottomLeft thanks to a center and this extend
+	 */
 	void SetCenter(p2Vec2 center);
+	/**
+	 * \brief test if a point is in the AABB
+	 * \param point p2Vec2 to test
+	 */
+	bool ContainsPoint(p2Vec2 point);
+	/**
+	 * \brief test if a AABB is in contact with this AABB
+	 * \param aabb p2AABB to test
+	 */
+	bool ContainsAABB(p2AABB aabb);
+	/**
+	 * \brief Display the top, bottom, right and left of the AABB
+	 */
+	void Write();
 	
 	p2Vec2 topRight;
 	p2Vec2 bottomLeft;

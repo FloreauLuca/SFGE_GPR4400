@@ -89,12 +89,6 @@ p2QuadTree** p2QuadTree::GetChild()
 	return nodes;
 }
 
-int p2QuadTree::GetIndex(p2AABB aabb)
-{
-	int index = -1;
-	return index;
-}
-
 void p2QuadTree::Insert(p2Body * obj)
 {
 	m_Objects.push_back(obj);

@@ -51,14 +51,9 @@ public:
 	* Called when node have too much objects and split the current node into four
 	*/
 	void Split();
-
-	/**
-	* Get the index of the child trees of the p2Body
-	*/
 	int GetLevel();
 	p2AABB GetBounds();
 	p2QuadTree** GetChild();
-	int GetIndex(p2AABB aabb);
 	/**
 	* Insert a new p2Body in the tree
 	*/
@@ -66,7 +61,7 @@ public:
 	std::list<p2Body*> GetObjects();
 	std::list<p2Body*> GetChildObjects();
 	/**
-	* Return a list of all the p2Body that might collide
+	* Check the contact between all the nodeObjects
 	*/
 	void Retrieve(p2ContactManager* contact_manager);
 
