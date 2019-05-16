@@ -385,15 +385,7 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
 						{
-							if ((abs(bodyA->GetPosition().x - bodyB->GetPosition().x) - circleshapeB->GetRadius()) < rectShapeA->GetSize().x)// && abs(bodyA->GetPosition().x - bodyB->GetPosition().x) - circleshapeB->GetRadius()) > -rectShapeA->GetSize().x)
-							{
-								return true;
-							}
-
-							//if (bodyA->GetPosition().y - (bodyB->GetPosition().y + circleshapeB->GetRadius()) < rectShapeA->GetSize().y && bodyA->GetPosition().y - (bodyB->GetPosition().y - circleshapeB->GetRadius()) > -rectShapeA->GetSize().y)
-							if ((abs(bodyA->GetPosition().y - bodyB->GetPosition().y) - circleshapeB->GetRadius()) < rectShapeA->GetSize().y) {
-								return true;
-							}
+							
 						}
 					}
 					return false;
