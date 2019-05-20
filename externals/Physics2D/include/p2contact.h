@@ -88,11 +88,11 @@ public:
 	/**
 	 * \brief Check contact inside a vector of p2Body
 	 */
-	void CheckContactInsideVector(std::vector<p2Body*> m_Bodies);
+	void CheckContactInsideList(std::vector<p2Body*> m_Bodies);
 	/**
 	 * \brief Check contact between 2 vector of p2Body
 	 */
-	void CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2);
+	void CheckContactBetweenList(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2);
 	/**
 	 * \brief Check contact between 2 p2Body
 	 */

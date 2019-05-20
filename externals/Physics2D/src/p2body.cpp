@@ -51,7 +51,6 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 	m_LinearVelocity = velocity;
 }
 
-
 /**
  * \brief 
  * \param angle in degree

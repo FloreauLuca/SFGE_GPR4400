@@ -26,6 +26,7 @@ SOFTWARE.
 #include "p2body.h"
 #include "p2quadtree.h"
 #include "../../Remotery/Remotery.h"
+#include <corecrt_math_defines.h>
 
 void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
@@ -94,14 +95,14 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 	m_RootQuadTree.Retrieve(this);
 }
 
-void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
+void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
 {
 	rmt_ScopedCPUSample(CheckContactInsideVector, 0);
 	for (int i = 0; i < bodies.size(); i++)
 	{
 		if (bodies[i]->GetCollider()->empty())continue;
 
-		for (int j = i+1; j < bodies.size(); j++)
+		for (int j = i + 1; j < bodies.size(); j++)
 		{
 			if (bodies[j]->GetCollider()->empty())continue;
 			CheckContactBetweenBodies(bodies[i], bodies[j]);
@@ -109,7 +110,7 @@ void p2ContactManager::CheckContactInsideVector(std::vector<p2Body*> bodies)
 	}
 }
 
-void p2ContactManager::CheckContactBetweenVector(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2)
+void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2)
 {
 	rmt_ScopedCPUSample(CheckContactBetweenVector, 0);
 
@@ -363,17 +364,18 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 						{
-							if (bodyB->GetPosition().x - (bodyA->GetPosition().x + circleshapeA->GetRadius()) < rectShapeB->GetSize().x && bodyB->GetPosition().x - (bodyA->GetPosition().x - circleshapeA->GetRadius()) > -rectShapeB->GetSize().x)
-							{
-								return true;
-							}
+							float newAngle = bodyB->GetAngle() / 180 * M_PI;
+							p2Vec2 u = bodyA->GetPosition() - (bodyB->GetPosition());
+							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x + circleshapeA->GetRadius(), 0).Rotate(newAngle);
+							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y + circleshapeA->GetRadius()).Rotate(newAngle);
+							p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+							p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
 
-							if (bodyB->GetPosition().y - (bodyA->GetPosition().y + circleshapeA->GetRadius()) < rectShapeB->GetSize().y && bodyB->GetPosition().y - (bodyA->GetPosition().y - circleshapeA->GetRadius()) > -rectShapeB->GetSize().y)
-							{
-								return true;
-							}
+							float projX = resultX.GetMagnitude() / x.GetMagnitude();
+							float projY = resultY.GetMagnitude() / y.GetMagnitude();
+
+							return !((projX > 1 && projX > 1) || (projX < -1 && projX < -1) || (projY > 1 && projY > 1) || (projY < -1 && projY < -1));
 						}
-						return false;
 					}
 				}
 			}
@@ -385,7 +387,17 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
 						{
-							
+							float newAngle = bodyA->GetAngle() / 180 * M_PI;
+							p2Vec2 u = bodyB->GetPosition() - (bodyA->GetPosition());
+							p2Vec2 x = p2Vec2(rectShapeA->GetSize().x + circleshapeB->GetRadius(), 0).Rotate(newAngle);
+							p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y + circleshapeB->GetRadius()).Rotate(newAngle);
+							p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+							p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
+							float projX = resultX.GetMagnitude() / x.GetMagnitude();
+							float projY = resultY.GetMagnitude() / y.GetMagnitude();
+
+							return !((projX > 1 && projX > 1) || (projX < -1 && projX < -1) || (projY > 1 && projY > 1) || (projY < -1 && projY < -1));
 						}
 					}
 					return false;
@@ -396,9 +408,84 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 						{
+							float projXSup = 0;
+							float projXInf = 0;
+							float projYInf = 0;
+							float projYSup = 0;
+							float newAngle = bodyB->GetAngle() / 180 * M_PI;
+							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
+							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
+
+							for (p2Vec2 cornerA : rectShapeA->GetCorner())
+							{
+								p2Vec2 u = bodyA->GetPosition() + cornerA - (bodyB->GetPosition());
+
+								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
+								if (kx > 1)
+								{
+									projXSup++;
+								}
+								if (kx < -1)
+								{
+									projXInf++;
+								}
+								if (ky > 1)
+								{
+									projYSup++;
+								}
+								if (ky < -1)
+								{
+									projYInf++;
+								}
+							}
+
+							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4)
+							{
+								return false;
+							}
+
+							projXSup = 0;
+							projXInf = 0;
+							projYInf = 0;
+							projYSup = 0;
+							newAngle = bodyA->GetAngle() / 180 * M_PI;
+							x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
+							y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
+
+							for (p2Vec2 cornerB : rectShapeB->GetCorner())
+							{
+								p2Vec2 u = bodyB->GetPosition() + cornerB - (bodyA->GetPosition());
+
+								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								
+								if (kx > 1)
+								{
+									projXSup++;
+								}
+								if (kx < -1)
+								{
+									projXInf++;
+								}
+								if (ky > 1)
+								{
+									projYSup++;
+								}
+								if (ky < -1)
+								{
+									projYInf++;
+								}
+							}
+
+							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4)
+							{
+								return false;
+							}
 						}
 					}
-					return false;
+					return true;
 				}
 			}
 		}

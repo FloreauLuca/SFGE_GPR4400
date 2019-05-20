@@ -3,7 +3,6 @@
 
 p2QuadTree::p2QuadTree()
 {
-	
 }
 
 p2QuadTree::p2QuadTree(int nodeLevel, p2AABB bounds)
@@ -22,7 +21,7 @@ void p2QuadTree::Clear()
 	m_Objects.clear();
 	for (int i = 0; i < CHILD_TREE_NMB; i++)
 	{
-		if(nodes[i] != nullptr)
+		if (nodes[i] != nullptr)
 		{
 			nodes[i]->Clear();
 			delete nodes[i];
@@ -33,7 +32,7 @@ void p2QuadTree::Clear()
 
 void p2QuadTree::Split()
 {
-	if (m_NodeLevel<MAX_LEVELS && m_Objects.size()>MAX_OBJECTS)// && m_Objects.size()>MAX_OBJECTS)
+	if (m_NodeLevel < MAX_LEVELS && m_Objects.size() > MAX_OBJECTS) // && m_Objects.size()>MAX_OBJECTS)
 	{
 		int nodeLevel = m_NodeLevel + 1;
 		p2AABB aabb;
@@ -49,7 +48,7 @@ void p2QuadTree::Split()
 		aabb.topRight = p2Vec2(m_Bounds.topRight.x, m_Bounds.GetCenter().y);
 		aabb.bottomLeft = p2Vec2(m_Bounds.GetCenter().x, m_Bounds.bottomLeft.y);
 		nodes[3] = new p2QuadTree(nodeLevel, aabb);
-		
+
 		for (int i = 0; i < CHILD_TREE_NMB; i++)
 		{
 			for (p2Body* object : m_Objects)
@@ -61,7 +60,7 @@ void p2QuadTree::Split()
 					m_ChildObjects.push_back(object);
 				}
 			}
-		nodes[i]->Split();
+			nodes[i]->Split();
 		}
 		for (p2Body* childObject : m_ChildObjects)
 		{
@@ -89,7 +88,7 @@ p2QuadTree** p2QuadTree::GetChild()
 	return nodes;
 }
 
-void p2QuadTree::Insert(p2Body * obj)
+void p2QuadTree::Insert(p2Body* obj)
 {
 	m_Objects.push_back(obj);
 }
@@ -126,32 +125,28 @@ void p2QuadTree::Retrieve(p2ContactManager* contact_manager)
 	{
 		objects.push_back(m_object);
 	}
-	
+
 	if (nodes[0] == nullptr)
 	{
 		if (objects.size() >= 2)
 		{
-			contact_manager->CheckContactInsideVector(objects);
+			contact_manager->CheckContactInsideList(objects);
 		}
 	}
 	else
 	{
-		
 		for (p2QuadTree* node : nodes)
 		{
 			node->Retrieve(contact_manager);
 		}
 		std::vector<p2Body*> childObjects;
-		for (int i = 0; i < CHILD_TREE_NMB; i++)
+		for (p2Body* child_object : GetChildObjects())
 		{
-			for (p2Body* child_object : nodes[i]->GetChildObjects())
-			{
-				childObjects.push_back(child_object);
-			}
+			childObjects.push_back(child_object);
 		}
-		if (childObjects.size() >= 1 && objects.size() >= 1)
+		if (!childObjects.empty() && !objects.empty())
 		{
-			contact_manager->CheckContactBetweenVector(objects, childObjects);
+			contact_manager->CheckContactBetweenList(objects, childObjects);
 		}
 	}
 }

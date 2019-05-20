@@ -40,8 +40,10 @@ struct p2Vec2
 	bool operator!=(const p2Vec2 &rhs) const;
 
 	p2Vec2 operator+(const p2Vec2& v)const;
+	p2Vec2 operator+(const float& v) const;
 	p2Vec2& operator+=(const p2Vec2& v);
 	p2Vec2 operator-(const p2Vec2& v) const;
+	p2Vec2 operator-(const float& v) const;
 	p2Vec2& operator-=(const p2Vec2& v);
 	p2Vec2& operator*=(float f);
 	p2Vec2 operator /(float f) const;

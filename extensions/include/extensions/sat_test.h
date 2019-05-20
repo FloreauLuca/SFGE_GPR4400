@@ -21,43 +21,62 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef SFGE_EXT_SAT_TEST_H
+#define SFGE_EXT_SAT_TEST_H
 
 #include <engine/system.h>
-#include <engine/engine.h>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <graphics/graphics2d.h>
+#include "p2body.h"
 
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
 
-#include <extensions/python_extensions.h>
-#include <extensions/planet_system.h>
-#include "extensions/aabb_test.h"
-#include "extensions/quad_tree_test.h"
-#include "extensions/sat_test.h"
-
-#include <tools/tools_pch.h>
-#include "extensions/quad_tree_test.h"
+namespace sfge
+{
+	struct Transform2d;
+	class Transform2dManager;
+	class Body2dManager;
+	class TextureManager;
+	class SpriteManager;
+}
 
 namespace sfge::ext
 {
 
-static std::vector<std::function<void(py::module&)>> m_OtherPythonExtensions;
 
-void ExtendPython(py::module& m)
-{
-	py::class_<PlanetSystem, System> planetSystem(m, "PlanetSystem");
-	planetSystem
-		.def(py::init<Engine&>());
-	py::class_<AabbTest, System> aabbTest(m, "AabbTest");
-	aabbTest
-		.def(py::init<Engine&>());
-	py::class_<QuadTreeTest, System> quadTreeTest(m, "QuadTreeTest");
-	quadTreeTest
-		.def(py::init<Engine&>());
-	py::class_<SatTest, System> satTest(m, "SatTest");
-	satTest
-		.def(py::init<Engine&>());
+	class SatTest : public System
+	{
+	public:
+		SatTest(Engine& engine);
 
-	tools::ExtendPythonTools(m);
+		void OnEngineInit() override;
+
+		void OnUpdate(float dt) override;
+
+		void OnFixedUpdate() override;
+
+		void OnDraw() override;
+
+	private:
+
+
+		Transform2dManager* m_Transform2DManager;
+		Body2dManager* m_Body2DManager;
+		TextureManager* m_TextureManager;
+		SpriteManager* m_SpriteManager;
+		Graphics2dManager* m_Graphics2DManager;
+
+
+		void DrawSAT(p2Body* bodyA, p2Body* bodyB);
+
+		float fixedDeltaTime = 0.0f;
+		const size_t entitiesNmb = 10'000;
+
+		sf::Vector2f screenSize;
+		std::vector<p2Body*> bodies;
+		std::vector<Entity> entities;
+	};
+
+
 }
 
-}
+#endif

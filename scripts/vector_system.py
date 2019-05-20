@@ -52,7 +52,7 @@ class VectorSystem(System):
 
         self.positionA = Vec2f(1,2)
         self.positionB = Vec2f(2,6)
-        self.extendA = Vec2f(1,2)
+        self.extendA = Vec2f(1,5)
         self.extendB = Vec2f(1,1)
 
         self.ppositionA = Physics2dManager.pixel2meter(self.positionA)
@@ -122,10 +122,6 @@ class VectorSystem(System):
         self.pu = Physics2dManager.pixel2meter((Vec2f(self.extendA.x, 0)).rotate(self.rotation_speed*self.t))
         self.pv = Physics2dManager.pixel2meter((self.positionB-self.positionA))
         self.result = Physics2dManager.meter2pixel(self.pu * p2Vec2.dot(self.pv, self.pu) / p2Vec2.dot(self.pu, self.pu))
-        print("Python : extendA : " + str(Physics2dManager.meter2pixel(self.pu)) + "   dist : " + str(Physics2dManager.meter2pixel(self.pv)))
-        print("Python : dot : " + str(p2Vec2.dot(self.pv, self.pu)) + "   dot/ : " + str(p2Vec2.dot(self.pv, self.pu) / p2Vec2.dot(self.pu, self.pu)) + "   result : " + str(self.result))
-        print("Python : magnitudeproj " + str(self.result.magnitude) + "   magnitudeextend : " + str(Vec2f(self.extendA.x, 0).magnitude) + "   magnitudepercent : " + str(self.result.magnitude/Vec2f(self.extendA.x, 0).magnitude))
-
 
     def on_draw(self):
         """
@@ -146,15 +142,48 @@ class VectorSystem(System):
         graphics2d_manager.draw_vector(Vec2f(0, self.extendA.y)*resize,self.positionA*resize, Color.Blue)
         graphics2d_manager.draw_vector(Vec2f(self.extendB.x, 0)*resize,self.positionB*resize, Color.Blue)
         graphics2d_manager.draw_vector(Vec2f(0, self.extendB.y)*resize,self.positionB*resize, Color.Blue)
-        graphics2d_manager.draw_vector(Vec2f(0,1)*resize,Vec2f(0, 0)*resize, Color.White)
-        graphics2d_manager.draw_vector(Vec2f(1,0)*resize,Vec2f(0, 0)*resize, Color.White)
-        graphics2d_manager.draw_vector((self.positionB - self.positionA) * resize, self.positionA * resize, Color.Blue)
+
+        graphics2d_manager.draw_vector(Vec2f(0, 1) * resize, Vec2f(0, 0) * resize, Color.White)
+        graphics2d_manager.draw_vector(Vec2f(1, 0) * resize, Vec2f(0, 0) * resize, Color.White)
+
+        self.pu = Physics2dManager.pixel2meter((Vec2f(self.extendA.x, 0)).rotate(self.rotation_speed * self.t))
+        self.pv = Physics2dManager.pixel2meter((self.positionB - self.positionA))
+        self.result = Physics2dManager.meter2pixel(self.pu * p2Vec2.dot(self.pv, self.pu) / p2Vec2.dot(self.pu, self.pu))
         graphics2d_manager.draw_vector(Physics2dManager.meter2pixel(self.pu)*resize,self.positionA*resize, Color.Red)
         graphics2d_manager.draw_vector(Physics2dManager.meter2pixel(self.pv)*resize,self.positionA*resize, Color.Red)
-        if (self.result.magnitude/Vec2f(self.extendA.x, 0).magnitude) > 1 or (self.result.magnitude/Vec2f(self.extendA.x, 0).magnitude) < -1:
+
+        if (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) > 1 or (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) < -1:
             graphics2d_manager.draw_vector(self.result * resize, self.positionA * resize, Color.Red)
         else:
             graphics2d_manager.draw_vector(self.result * resize, self.positionA * resize, Color.Green)
 
+        self.pu = Physics2dManager.pixel2meter((Vec2f(0, self.extendA.y)).rotate(self.rotation_speed * self.t))
+        self.pv = Physics2dManager.pixel2meter((self.positionB - self.positionA))
+        self.result = Physics2dManager.meter2pixel(self.pu * p2Vec2.dot(self.pv, self.pu) / p2Vec2.dot(self.pu, self.pu))
+        graphics2d_manager.draw_vector(Physics2dManager.meter2pixel(self.pu) * resize, self.positionA * resize, Color.Red)
+        if (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) > 1 or (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) < -1:
+            graphics2d_manager.draw_vector(self.result * resize, self.positionA * resize, Color.Red)
+        else:
+            graphics2d_manager.draw_vector(self.result * resize, self.positionA * resize, Color.Green)
+
+        self.pu = Physics2dManager.pixel2meter((Vec2f(self.extendB.x, 0)).rotate(self.rotation_speed * self.t))
+        self.pv = Physics2dManager.pixel2meter((self.positionA - self.positionB))
+        self.result = Physics2dManager.meter2pixel(self.pu * p2Vec2.dot(self.pv, self.pu) / p2Vec2.dot(self.pu, self.pu))
+        graphics2d_manager.draw_vector(Physics2dManager.meter2pixel(self.pu) * resize, self.positionB * resize, Color.Red)
+
+        if (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) > 1 or (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) < -1:
+            graphics2d_manager.draw_vector(self.result * resize, self.positionB * resize, Color.Red)
+        else:
+            graphics2d_manager.draw_vector(self.result * resize, self.positionB * resize, Color.Green)
+
+        self.pu = Physics2dManager.pixel2meter((Vec2f(0, self.extendB.y)).rotate(self.rotation_speed * self.t))
+        self.pv = Physics2dManager.pixel2meter((self.positionA - self.positionB))
+        self.result = Physics2dManager.meter2pixel(self.pu * p2Vec2.dot(self.pv, self.pu) / p2Vec2.dot(self.pu, self.pu))
+        graphics2d_manager.draw_vector(Physics2dManager.meter2pixel(self.pu) * resize, self.positionB * resize, Color.Red)
+
+        if (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) > 1 or (self.result.magnitude/Physics2dManager.meter2pixel(self.pu).magnitude) < -1:
+            graphics2d_manager.draw_vector(self.result * resize, self.positionB * resize, Color.Red)
+        else:
+            graphics2d_manager.draw_vector(self.result * resize, self.positionB * resize, Color.Green)
 
 

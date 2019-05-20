@@ -592,7 +592,7 @@ TEST(Physics, TestSATDetect)
 	rigidBodyJson1["name"] = "Rigidbody";
 	rigidBodyJson1["type"] = sfge::ComponentType::BODY2D;
 	rigidBodyJson1["body_type"] = p2BodyType::DYNAMIC;
-	rigidBodyJson1["gravity_scale"] = 2;
+	rigidBodyJson1["gravity_scale"] = 0.5;
 
 	json circleColliderJson;
 	circleColliderJson["name"] = "Circle Collider";
@@ -629,7 +629,7 @@ TEST(Physics, TestSATDetect)
 	transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
 	transformJson3["position"] = { 200, 200 };
 	transformJson3["scale"] = { 1.0, 1.0 };
-	transformJson3["angle"] = 0.0;
+	transformJson3["angle"] = 45;
 
 	json rectShapeJson2;
 	rectShapeJson2["name"] = "Circle Shape Component";
@@ -661,7 +661,7 @@ TEST(Physics, TestSATDetect)
 	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
 	transformJson2["position"] = { 400, 600 };
 	transformJson2["scale"] = { 1.0, 1.0 };
-	transformJson2["angle"] = 45.0;
+	transformJson2["angle"] = 0.0;
 
 	json rectShapeJson;
 	rectShapeJson["name"] = "Rect Shape Component";
@@ -683,7 +683,7 @@ TEST(Physics, TestSATDetect)
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
-	sceneJson["entities"] = { entityBody1, entityBody3, entityBody4 };
+	sceneJson["entities"] = { entityBody3, entityBody2 };// , entityBody1};
 	json contactDebugSystem = {
 		{
 			"script_path",
@@ -719,7 +719,13 @@ TEST(Physics, TestSATDetect)
 		{"systemClassName", "QuadTreeTest"}
 
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider, aabbTest, quadTest });
+	json satTest =
+	{
+
+		{"systemClassName", "SatTest"}
+
+	};
+	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider, aabbTest, quadTest, satTest});
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }

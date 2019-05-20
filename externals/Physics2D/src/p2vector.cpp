@@ -41,6 +41,11 @@ p2Vec2 p2Vec2::operator+(const p2Vec2& v) const
 	return p2Vec2(x + v.x, y + v.y);
 }
 
+p2Vec2 p2Vec2::operator+(const float& v) const
+{
+	return p2Vec2(x + v, y + v);
+}
+
 p2Vec2& p2Vec2::operator+=(const p2Vec2& v)
 {
 	x += v.x;
@@ -51,6 +56,11 @@ p2Vec2& p2Vec2::operator+=(const p2Vec2& v)
 p2Vec2 p2Vec2::operator-(const p2Vec2& v) const
 {
 	return p2Vec2(x - v.x, y - v.y);
+}
+
+p2Vec2 p2Vec2::operator-(const float& v) const
+{
+	return p2Vec2(x - v, y - v);
 }
 
 p2Vec2& p2Vec2::operator-=(const p2Vec2& v)
