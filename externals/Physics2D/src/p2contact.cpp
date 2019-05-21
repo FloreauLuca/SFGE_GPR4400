@@ -54,6 +54,7 @@ void p2ContactManager::Init(p2ContactListener* contactListener)
 {
 	m_ContactListener = contactListener;
 	m_Contacts.resize(MAX_CONTACT_LEN);
+	m_ContactIndex = 0;
 }
 
 p2Contact* p2ContactManager::CreateContact(p2Collider* colliderA, p2Collider* colliderB)
@@ -66,7 +67,7 @@ p2Contact* p2ContactManager::CreateContact(p2Collider* colliderA, p2Collider* co
 
 void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* colliderB)
 {
-	for (int i = 0; i < m_Contacts.size(); i++)
+	for (int i = 0; i < m_ContactIndex; i++)
 	{
 		if (m_Contacts[i].CheckSameCollider(colliderA, colliderB))
 		{
@@ -83,6 +84,7 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 	rootAABB.topRight = SCREEN_SIZE;
 	rootAABB.bottomLeft = p2Vec2(0, 0);
 	m_RootQuadTree = p2QuadTree(0, rootAABB);
+	rmt_ScopedCPUSample(Insert, 0);
 	for (p2Body& body : bodies)
 	{
 		if (body.IsInstantiate())
@@ -90,8 +92,7 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 			m_RootQuadTree.Insert(&body);
 		}
 	}
-	m_RootQuadTree.Split();
-	rmt_ScopedCPUSample(CheckContact, 0);
+	rmt_ScopedCPUSample(Retrieve, 0);
 	m_RootQuadTree.Retrieve(this);
 }
 
@@ -100,10 +101,13 @@ void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
 	rmt_ScopedCPUSample(CheckContactInsideVector, 0);
 	for (int i = 0; i < bodies.size(); i++)
 	{
+		if(bodies[i]==nullptr)continue;
 		if (bodies[i]->GetCollider()->empty())continue;
 
 		for (int j = i + 1; j < bodies.size(); j++)
 		{
+			if (bodies[j] == nullptr)continue;
+
 			if (bodies[j]->GetCollider()->empty())continue;
 			CheckContactBetweenBodies(bodies[i], bodies[j]);
 		}
@@ -112,7 +116,7 @@ void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
 
 void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2)
 {
-	rmt_ScopedCPUSample(CheckContactBetweenVector, 0);
+	rmt_ScopedCPUSample(CheckContactBetweenList, 0);
 
 	for (int i = 0; i < bodies1.size(); i++)
 	{
@@ -130,6 +134,7 @@ void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std
 
 void p2ContactManager::CheckContactBetweenBodies(p2Body* body1, p2Body* body2)
 {
+	rmt_ScopedCPUSample(ContainContact, 0);
 	p2Contact* containedContact = ContainContact(body1, body2);
 	if (containedContact)
 	{
@@ -183,11 +188,12 @@ bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 
 p2Contact* p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
 {
-	for (p2Contact& m_contact : m_Contacts)
+	for (int i = 0; i < m_ContactIndex; i++)
 	{
-		if (m_contact.CheckSameCollider(&bodyA->GetCollider()->at(0), &bodyB->GetCollider()->at(0)))
+		if (m_Contacts[i].GetColliderA() == nullptr) continue;
+		if (m_Contacts[i].CheckSameCollider(&bodyA->GetCollider()->at(0), &bodyB->GetCollider()->at(0)))
 		{
-			return &m_contact;
+			return &m_Contacts[i];
 		}
 	}
 	return nullptr;
@@ -366,15 +372,15 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 						{
 							float newAngle = bodyB->GetAngle() / 180 * M_PI;
 							p2Vec2 u = bodyA->GetPosition() - (bodyB->GetPosition());
-							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x + circleshapeA->GetRadius(), 0).Rotate(newAngle);
-							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y + circleshapeA->GetRadius()).Rotate(newAngle);
-							p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-							p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+							if (u.GetMagnitude() < circleshapeA->GetRadius()) return true;
+							u = u.Normalized() * (u.GetMagnitude() - circleshapeA->GetRadius());
+							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
+							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
 
-							float projX = resultX.GetMagnitude() / x.GetMagnitude();
-							float projY = resultY.GetMagnitude() / y.GetMagnitude();
+							float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+							float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
 
-							return !((projX > 1 && projX > 1) || (projX < -1 && projX < -1) || (projY > 1 && projY > 1) || (projY < -1 && projY < -1));
+							return !((kx > 1) || (kx < -1) || (ky > 1) || (ky < -1));
 						}
 					}
 				}
@@ -389,15 +395,16 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 						{
 							float newAngle = bodyA->GetAngle() / 180 * M_PI;
 							p2Vec2 u = bodyB->GetPosition() - (bodyA->GetPosition());
-							p2Vec2 x = p2Vec2(rectShapeA->GetSize().x + circleshapeB->GetRadius(), 0).Rotate(newAngle);
-							p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y + circleshapeB->GetRadius()).Rotate(newAngle);
-							p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-							p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+							if (u.GetMagnitude() < circleshapeB->GetRadius()) return true;
 
-							float projX = resultX.GetMagnitude() / x.GetMagnitude();
-							float projY = resultY.GetMagnitude() / y.GetMagnitude();
+							u = u.Normalized() * (u.GetMagnitude() - circleshapeB->GetRadius());
+							p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
+							p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
 
-							return !((projX > 1 && projX > 1) || (projX < -1 && projX < -1) || (projY > 1 && projY > 1) || (projY < -1 && projY < -1));
+							float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+							float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
+							return !((kx > 1) || (kx < -1) || (ky > 1) || (ky < -1));
 						}
 					}
 					return false;

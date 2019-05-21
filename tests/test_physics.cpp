@@ -245,14 +245,14 @@ TEST(Physics, TestAABB)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 2;
+	const int entitiesNmb = 50;
 	json entities[entitiesNmb];
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
-		int sizeX = (rand() % 100) + 100;
-		int sizeY = (rand() % 100) + 100;
-		int radius = (rand() % 75) + 150;
+		int sizeX = (rand() % 100) + 10;
+		int sizeY = (rand() % 100) + 10;
+		int radius = (rand() % 75) + 10;
 		json shapes[] =
 		{
 			{
@@ -291,7 +291,8 @@ TEST(Physics, TestAABB)
 		json transformJson =
 		{
 			{"position", {rand() % 800, rand() % 600}},
-			{"type", sfge::ComponentType::TRANSFORM2D}
+			{"type", sfge::ComponentType::TRANSFORM2D},
+			{"angle", rand() % 360}
 		};
 
 		json rigidbody =
@@ -303,7 +304,7 @@ TEST(Physics, TestAABB)
 		};
 
 		int randShapeIndex = rand() % 2;
-		entityJson["components"] = { transformJson, shapes[i], rigidbody, colliders[i] };
+		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
 	}
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
@@ -331,7 +332,7 @@ TEST(Physics, TestAABB)
 			},
 			{
 
-				{"systemClassName", "QuadTreeTest"}
+				{"systemClassName", "SatTest nothing"}
 
 			}
 		}
@@ -458,6 +459,8 @@ TEST(Physics, TestQuadTree)
 	sfge::Engine engine;
 	auto config = std::make_unique<sfge::Configuration>();
 	config->gravity = p2Vec2(0.0f, 0.0f);
+	config->devMode = false;
+
 	engine.Init(std::move(config));
 
 	auto* sceneManager = engine.GetSceneManager();
@@ -465,14 +468,14 @@ TEST(Physics, TestQuadTree)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 10;
+	const int entitiesNmb = 250;
 	json entities[entitiesNmb];
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
-		int sizeX = (rand() % 25) + 1;
-		int sizeY = (rand() % 25) + 1;
-		int radius = (rand() % 10) + 1;
+		int sizeX = (rand() % 10) + 5;
+		int sizeY = (rand() % 10) + 5;
+		int radius = (rand() % 10) + 5;
 		json shapes[] =
 		{
 			{
@@ -528,14 +531,10 @@ TEST(Physics, TestQuadTree)
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
 			{
-				{
-					"script_path",
-					"scripts/contact_debug_system.py"
-					//"nothing"
-				}
+				{"systemClassName", "ContactDebug"}
 			},
 			{
-				{"script_path", "scripts/stay_onscreen_system.py"}
+				{"systemClassName", "StayOnScreen"}
 			},
 			{
 				{

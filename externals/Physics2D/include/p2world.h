@@ -29,7 +29,7 @@ SOFTWARE.
 #include <p2body.h>
 #include <p2contact.h>
 
-const size_t MAX_BODY_LEN = 256;
+const size_t MAX_BODY_LEN = 1000;
 
 /**
 * \brief Representation of the physical world in meter

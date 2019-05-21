@@ -58,8 +58,8 @@ public:
 	* Insert a new p2Body in the tree
 	*/
 	void Insert(p2Body* obj);
-	std::list<p2Body*> GetObjects();
-	std::list<p2Body*> GetChildObjects();
+	std::vector<p2Body*> GetObjects();
+	std::vector<p2Body*> GetChildObjects();
 	/**
 	* Check the contact between all the nodeObjects
 	*/
@@ -67,13 +67,14 @@ public:
 
 private:
 
+	static const int TOTAL_MAX_OBJECTS = 1000;
 	static const int MAX_OBJECTS = 2;
 	static const int MAX_LEVELS = 5;
 	static const int CHILD_TREE_NMB = 4;
 	int m_NodeLevel = 0;
 	p2QuadTree* nodes[CHILD_TREE_NMB] = { nullptr };
-	std::list<p2Body*> m_Objects;
-	std::list<p2Body*> m_ChildObjects;
+	std::vector<p2Body*> m_Objects;
+	int m_ObjectIndex = 0;
 	p2AABB m_Bounds;
 };
 

@@ -21,8 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SFGE_EXT_AABB_TEST_H
-#define SFGE_EXT_AABB_TEST_H
+#ifndef SFGE_EXT_STAY_ON_SCREEN_H
+#define SFGE_EXT_STAY_ON_SCREEN_H
 
 #include <engine/system.h>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -37,16 +37,17 @@ namespace sfge
 	class Body2dManager;
 	class TextureManager;
 	class SpriteManager;
+	class ShapeManager;
 }
 
 namespace sfge::ext
 {
 
 
-	class ContactDebug : public System
+	class StayOnScreen : public System
 	{
 	public:
-		ContactDebug(Engine& engine);
+		StayOnScreen(Engine& engine);
 
 		void OnEngineInit() override;
 
@@ -54,7 +55,6 @@ namespace sfge::ext
 
 		void OnFixedUpdate() override;
 
-		void OnDraw() override;
 
 	private:
 
@@ -63,6 +63,7 @@ namespace sfge::ext
 		Body2dManager* m_Body2DManager;
 		TextureManager* m_TextureManager;
 		SpriteManager* m_SpriteManager;
+		ShapeManager* m_ShapeManager;
 		Graphics2dManager* m_Graphics2DManager;
 
 
@@ -74,6 +75,7 @@ namespace sfge::ext
 		sf::Vector2f screenSize;
 		std::vector<p2Body*> bodies;
 		std::vector<Entity> entities;
+		std::vector<int> count;
 	};
 
 

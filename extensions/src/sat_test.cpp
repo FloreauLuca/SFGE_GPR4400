@@ -121,10 +121,9 @@ namespace sfge::ext
 							{
 								float newAngle = bodyB->GetAngle() / 180 * M_PI;
 								p2Vec2 u = bodyA->GetPosition() - (bodyB->GetPosition());
-								p2Vec2 x = p2Vec2(rectShapeB->GetSize().x + circleshapeA->GetRadius(), 0).Rotate(
-									newAngle);
-								p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y + circleshapeA->GetRadius()).Rotate(
-									newAngle);
+								u = u.Normalized() * (u.GetMagnitude() - circleshapeA->GetRadius());
+								p2Vec2 x = p2Vec2(rectShapeB->GetSize().x + circleshapeA->GetRadius(), 0).Rotate(newAngle);
+								p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y + circleshapeA->GetRadius()).Rotate(newAngle);
 								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
 
@@ -156,10 +155,9 @@ namespace sfge::ext
 							{
 								float newAngle = bodyA->GetAngle() / 180 * M_PI;
 								p2Vec2 u = bodyB->GetPosition() - (bodyA->GetPosition());
-								p2Vec2 x = p2Vec2(rectShapeA->GetSize().x + circleshapeB->GetRadius(), 0).Rotate(
-									newAngle);
-								p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y + circleshapeB->GetRadius()).Rotate(
-									newAngle);
+								u = u.Normalized() * (u.GetMagnitude() - circleshapeB->GetRadius());
+								p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
+								p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
 								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
 
@@ -170,11 +168,37 @@ namespace sfge::ext
 								float projX = resultX.GetMagnitude() / x.GetMagnitude();
 								float projY = resultY.GetMagnitude() / y.GetMagnitude();
 
+								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								
+								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
+								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
+								if (kx > 1 || kx < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								if (ky > 1 || ky < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								
+
+								/*
 								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
 								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
 								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
 								m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
 								m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+								*/
 
 								//return ((projXmax > 1 && projXmin > 1) || (projXmax < -1 && projXmin < -1) || (projYmax > 1 && projYmin > 1) || (projYmax < -1 && projYmin < -1));
 							}
@@ -203,7 +227,7 @@ namespace sfge::ext
 									
 									float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 									float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
-									/*
+									
 									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
 									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
 									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
@@ -223,7 +247,7 @@ namespace sfge::ext
 									{
 										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
 									}
-									*/
+									
 									if (kx > 1)
 									{
 										projXSup++;
@@ -242,7 +266,7 @@ namespace sfge::ext
 									}
 								}
 
-
+								/*
 								if (projXSup == 4)
 								{
 									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel((bodyA->GetPosition() - bodyB->GetPosition()) / 2 + bodyB->GetPosition()) * resize, sf::Color::Green);
@@ -259,6 +283,7 @@ namespace sfge::ext
 								{
 									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel((bodyA->GetPosition() - bodyB->GetPosition()) / 2 + bodyB->GetPosition()) * resize, sf::Color::Green);
 								}
+								*/
 
 								projXSup = 0;
 								projXInf = 0;
@@ -277,7 +302,7 @@ namespace sfge::ext
 
 									float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 									float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
-									/*
+									
 									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
 									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
 									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
@@ -297,7 +322,7 @@ namespace sfge::ext
 									{
 										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
 									}
-									*/
+									
 
 									if (kx > 1)
 									{
@@ -317,7 +342,7 @@ namespace sfge::ext
 									}
 								}
 
-
+								/*
 								if (projXSup == 4)
 								{
 									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel((bodyA->GetPosition()+x - (bodyB->GetPosition()+x))/2 + bodyB->GetPosition()) * resize, sf::Color::Green);
@@ -334,6 +359,7 @@ namespace sfge::ext
 								{
 									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel((bodyA->GetPosition() - bodyB->GetPosition())/2 + bodyB->GetPosition()) * resize, sf::Color::Green);
 								}
+								*/
 							}
 						}
 					}

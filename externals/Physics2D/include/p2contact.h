@@ -48,9 +48,8 @@ public:
 	 */
 	bool CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB);
 private :
-	p2Collider* m_ColliderA;
-	p2Collider* m_ColliderB;
-	int m_ContactIndex;
+	p2Collider* m_ColliderA = nullptr;
+	p2Collider* m_ColliderB = nullptr;
 };
 
 /**

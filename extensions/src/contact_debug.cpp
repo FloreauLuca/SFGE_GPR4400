@@ -27,7 +27,7 @@ SOFTWARE.
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-#include "extensions/contact_debug_system.h"
+#include "extensions/contact_debug.h"
 
 
 namespace sfge::ext
@@ -45,6 +45,7 @@ namespace sfge::ext
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
+		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
 
 
@@ -58,7 +59,10 @@ namespace sfge::ext
 		{
 			auto body = m_Body2DManager->GetComponentPtr(entities[i]);
 			bodies.push_back(body->GetBody());
+			auto shape = m_ShapeManager->GetComponentPtr(entities[i]);
+			shape->SetFillColor(sf::Color::Red);
 		}
+		count.resize(entities.size());
 	}
 
 	void ContactDebug::OnUpdate(float dt)
@@ -76,25 +80,58 @@ namespace sfge::ext
 
 	void ContactDebug::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(AabbTestFixedUpdate, 0);
+		rmt_ScopedCPUSample(ContactDebugFixedUpdate, 0);
 
 	}
 
 	void ContactDebug::OnDraw()
 	{
-		rmt_ScopedCPUSample(AabbTestDraw, 0);
-		for (auto i = 0u; i < bodies.size(); i++)
+		rmt_ScopedCPUSample(ContactDebugDraw, 0);
+		for (int i = 0; i < entities.size(); i++)
 		{
-			DrawVector(bodies[i]);
+			auto shape = m_ShapeManager->GetComponentPtr(entities[i]);
+			if (count[i] > 0)
+			{
+				shape->SetFillColor(sf::Color::Green);
+			}
+			else
+			{
+				shape->SetFillColor(sf::Color::Magenta);
+
+			}
+		}
+		
+	}
+
+	void ContactDebug::OnContact(ColliderData* c1, ColliderData* c2, bool enter)
+	{
+		if (enter)
+		{
+			for (int i = 0; i < entities.size(); i++)
+			{
+				if (entities[i] == c1->entity)
+				{
+					count[i] += 1;
+				}
+				if (entities[i] == c2->entity)
+				{
+					count[i] += 1;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < entities.size(); i++)
+			{
+				if (entities[i] == c1->entity)
+				{
+					count[i] -= 1;
+				}
+				if (entities[i] == c2->entity)
+				{
+					count[i] -= 1;
+				}
+			}
 		}
 	}
-
-	void ContactDebug::DrawVector(p2Body* body)
-	{
-		p2Vec2 u;
-		p2Vec2 v;
-		Vec2f vector = meter2pixel(u);
-		m_Graphics2DManager->DrawVector(vector, meter2pixel(body->GetPosition()), sf::Color::Green);
-	}
-
 }
