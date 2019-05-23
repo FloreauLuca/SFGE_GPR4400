@@ -34,6 +34,17 @@ p2Mat22::p2Mat22(p2Vec2 r1, p2Vec2 r2)
 	this->rows[1] = r2;
 }
 
+bool p2Mat22::operator==(p2Mat22 m1)
+{
+	return (rows[0] == m1.rows[0] && rows[1] == m1.rows[1]);
+}
+
+
+bool p2Mat22::operator!=(p2Mat22 m1)
+{
+	return (rows[0] != m1.rows[0] || rows[1] != m1.rows[1]);
+}
+
 p2Mat22 p2Mat22::operator+(p2Mat22 m1)
 {
 	return p2Mat22(rows[0]+m1.rows[0], rows[1]+m1.rows[1]);

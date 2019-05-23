@@ -27,6 +27,7 @@ SOFTWARE.
 #include "p2quadtree.h"
 #include "../../Remotery/Remotery.h"
 #include <corecrt_math_defines.h>
+#include "p2matrix.h"
 
 void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
@@ -46,8 +47,7 @@ p2Collider* p2Contact::GetColliderB()
 
 bool p2Contact::CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB)
 {
-	return ((colliderA == GetColliderA() && colliderB == GetColliderB()) || (colliderA == GetColliderB() && colliderB ==
-		GetColliderA()));
+	return ((colliderA == GetColliderA() && colliderB == GetColliderB()) || (colliderA == GetColliderB() && colliderB == GetColliderA()));
 }
 
 void p2ContactManager::Init(p2ContactListener* contactListener)
@@ -101,7 +101,7 @@ void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
 	rmt_ScopedCPUSample(CheckContactInsideVector, 0);
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		if(bodies[i]==nullptr)continue;
+		if (bodies[i] == nullptr)continue;
 		if (bodies[i]->GetCollider()->empty())continue;
 
 		for (int j = i + 1; j < bodies.size(); j++)
@@ -135,32 +135,56 @@ void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std
 void p2ContactManager::CheckContactBetweenBodies(p2Body* body1, p2Body* body2)
 {
 	rmt_ScopedCPUSample(ContainContact, 0);
-	p2Contact* containedContact = ContainContact(body1, body2);
-	if (containedContact)
+
+	if (!CheckAABBContact(body1, body2))
 	{
-		if (!CheckAABBContact(body1, body2))
+		p2Contact* containedContact = ContainContact(body1, body2);
+		if (containedContact)
 		{
 			m_ContactListener->EndContact(containedContact);
 			RemoveContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
 		}
-		else
+	}
+	else
+	{
+		p2Mat22 mtv = CheckSATContact(body1, body2);
+		if (mtv == p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0)))
 		{
-			if (!CheckSATContact(body1, body2))
+			p2Contact* containedContact = ContainContact(body1, body2);
+			if (containedContact)
 			{
 				m_ContactListener->EndContact(containedContact);
 				RemoveContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
 			}
 		}
-	}
-	else
-	{
-		if (CheckAABBContact(body1, body2))
+		else
 		{
-			if (CheckSATContact(body1, body2))
+			p2Contact* containedContact = ContainContact(body1, body2);
+			if (!containedContact)
 			{
 				p2Contact* contact = CreateContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
 				m_ContactListener->BeginContact(contact);
 			}
+			/*
+			body1->SetLinearVelocity(p2Vec2());
+			body2->SetLinearVelocity(p2Vec2());
+			
+			if ((body1->GetPosition() - mtv.rows[0]).GetMagnitude() < (body1->GetPosition() - mtv.rows[1]).GetMagnitude())
+			{
+				body1->SetPosition(body1->GetPosition() - (mtv.rows[1]));
+				body2->SetPosition(body2->GetPosition() + (mtv.rows[1]));
+				body1->ApplyForceToCenter(mtv.rows[1]);
+				body2->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
+			}
+			else
+			{
+				body1->SetPosition(body1->GetPosition() + (mtv.rows[1]));
+				body2->SetPosition(body2->GetPosition() - (mtv.rows[1]));
+				body2->ApplyForceToCenter(mtv.rows[1]);
+				body1->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
+			}
+			*/
+			
 		}
 	}
 }
@@ -342,7 +366,7 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 
 */
 
-bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
+p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 {
 	for (p2Collider colliderA : *bodyA->GetCollider())
 	{
@@ -358,11 +382,11 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 						{
 							if (p2Vec2::Distance(bodyA->GetPosition(), bodyB->GetPosition()) < circleshapeA->GetRadius() + circleshapeB->GetRadius())
 							{
-								return true;
+								return p2Mat22(p2Vec2(1, 1), p2Vec2(1, 1));
 							}
 						}
 					}
-					return false;
+					return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 				}
 				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
 				{
@@ -370,17 +394,57 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 						{
+							p2Mat22 mtv;
 							float newAngle = bodyB->GetAngle() / 180 * M_PI;
 							p2Vec2 u = bodyA->GetPosition() - (bodyB->GetPosition());
-							if (u.GetMagnitude() < circleshapeA->GetRadius()) return true;
+							if (u.GetMagnitude() < circleshapeA->GetRadius()) return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 							u = u.Normalized() * (u.GetMagnitude() - circleshapeA->GetRadius());
 							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
 							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
-
+							mtv = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize());
 							float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 							float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
 
-							return !((kx > 1) || (kx < -1) || (ky > 1) || (ky < -1));
+							if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+							{
+								if (kx < 1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+									{
+										mtv.rows[1] = (x * (1 - kx));
+										mtv.rows[0] = u + bodyB->GetPosition();
+									}
+								}
+								if (kx > -1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
+									{
+										mtv.rows[1] = (x * (-1 - kx));
+										mtv.rows[0] = u + bodyB->GetPosition();
+									}
+								}
+								if (ky < 1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+									{
+										mtv.rows[1] = (y * (1 - ky));
+										mtv.rows[0] = u + bodyB->GetPosition();
+									}
+								}
+								if (ky > -1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
+									{
+										mtv.rows[1] = (y * (-1 - ky));
+										mtv.rows[0] = u + bodyB->GetPosition();
+									}
+								}
+								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
+							}
+							else
+							{
+								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
+							}
 						}
 					}
 				}
@@ -393,21 +457,61 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
 						{
+							p2Mat22 mtv;
 							float newAngle = bodyA->GetAngle() / 180 * M_PI;
 							p2Vec2 u = bodyB->GetPosition() - (bodyA->GetPosition());
-							if (u.GetMagnitude() < circleshapeB->GetRadius()) return true;
+							if (u.GetMagnitude() < circleshapeB->GetRadius()) return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 
 							u = u.Normalized() * (u.GetMagnitude() - circleshapeB->GetRadius());
 							p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
 							p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
-
+							mtv = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize());
 							float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 							float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
 
-							return !((kx > 1) || (kx < -1) || (ky > 1) || (ky < -1));
+							if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+							{
+								if (kx < 1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+									{
+										mtv.rows[1] = (x * (1 - kx));
+										mtv.rows[0] = u + bodyA->GetPosition();
+									}
+								}
+								if (kx > -1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
+									{
+										mtv.rows[1] = (x * (-1 - kx));
+										mtv.rows[0] = u + bodyA->GetPosition();
+									}
+								}
+								if (ky < 1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+									{
+										mtv.rows[1] = (y * (1 - ky));
+										mtv.rows[0] = u + bodyA->GetPosition();
+									}
+								}
+								if (ky > -1)
+								{
+									if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
+									{
+										mtv.rows[1] = (y * (-1 - ky));
+										mtv.rows[0] = u + bodyA->GetPosition();
+									}
+								}
+								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
+							}
+							else
+							{
+								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
+							}
 						}
 					}
-					return false;
+					return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 				}
 				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
 				{
@@ -415,6 +519,7 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 						{
+							p2Mat22 mtv = p2Mat22();
 							float projXSup = 0;
 							float projXInf = 0;
 							float projYInf = 0;
@@ -422,7 +527,7 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 							float newAngle = bodyB->GetAngle() / 180 * M_PI;
 							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
 							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
-
+							mtv = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize());
 							for (p2Vec2 cornerA : rectShapeA->GetCorner())
 							{
 								p2Vec2 u = bodyA->GetPosition() + cornerA - (bodyB->GetPosition());
@@ -446,11 +551,47 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 								{
 									projYInf++;
 								}
+
+								if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								{
+									if (kx < 1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * (1 - kx));
+											mtv.rows[0] = cornerA + bodyA->GetPosition();
+										}
+									}
+									if (kx > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * (-1 - kx));
+											mtv.rows[0] = cornerA + bodyA->GetPosition();
+										}
+									}
+									if (ky < 1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * (1 - ky));
+											mtv.rows[0] = cornerA + bodyA->GetPosition();
+										}
+									}
+									if (ky > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * (-1 - ky));
+											mtv.rows[0] = cornerA + bodyA->GetPosition();
+										}
+									}
+								}
 							}
 
 							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4)
 							{
-								return false;
+								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 							}
 
 							projXSup = 0;
@@ -460,14 +601,13 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 							newAngle = bodyA->GetAngle() / 180 * M_PI;
 							x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
 							y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
-
 							for (p2Vec2 cornerB : rectShapeB->GetCorner())
 							{
 								p2Vec2 u = bodyB->GetPosition() + cornerB - (bodyA->GetPosition());
 
 								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
-								
+
 								if (kx > 1)
 								{
 									projXSup++;
@@ -484,18 +624,53 @@ bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 								{
 									projYInf++;
 								}
+								if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								{
+									if (kx < 1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * (1 - kx));
+											mtv.rows[0] = cornerB + bodyB->GetPosition();
+										}
+									}
+									if (kx > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * (-1 - kx));
+											mtv.rows[0] = cornerB + bodyB->GetPosition();
+										}
+									}
+									if (ky < 1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (y * (1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * (1 - kx));
+											mtv.rows[0] = cornerB + bodyB->GetPosition();
+										}
+									}
+									if (ky > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (y * (-1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * (-1 - kx));
+											mtv.rows[0] = cornerB + bodyB->GetPosition();
+										}
+									}
+								}
 							}
 
 							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4)
 							{
-								return false;
+								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 							}
+							return mtv;
 						}
 					}
-					return true;
 				}
 			}
 		}
 	}
-	return false;
+	return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 }

@@ -96,6 +96,7 @@ public:
 	float GetAngle();
 	float GetAngularVelocity();
 	p2Vec2 GetPosition();
+	void SetPosition(p2Vec2 newPosition);
 	p2AABB GetAABB();
 	std::vector<p2Collider>* GetCollider();
 	p2BodyType GetType() const;

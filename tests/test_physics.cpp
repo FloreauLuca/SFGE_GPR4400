@@ -682,7 +682,7 @@ TEST(Physics, TestSATDetect)
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
-	sceneJson["entities"] = { entityBody3, entityBody2 };// , entityBody1};
+	sceneJson["entities"] = { entityBody3, entityBody2, entityBody1 };// , entityBody1};
 	json contactDebugSystem = {
 		{
 			"script_path",

@@ -28,6 +28,7 @@ SOFTWARE.
 #include <p2collider.h>
 #include "p2body.h"
 #include "p2quadtree.h"
+#include "p2matrix.h"
 
 const size_t MAX_CONTACT_LEN = 1000;
 
@@ -108,7 +109,7 @@ private:
 	/**
 	 * \brief Check the SAT contact between 2 p2Body
 	 */
-	bool CheckSATContact(p2Body* bodyA, p2Body* bodyB);
+	p2Mat22 CheckSATContact(p2Body* bodyA, p2Body* bodyB);
 	/**
 	 * \brief Check if 2 p2Body are alread in contact
 	 */

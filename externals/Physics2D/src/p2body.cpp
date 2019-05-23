@@ -75,6 +75,12 @@ p2Vec2 p2Body::GetPosition()
 	return m_Position;
 }
 
+
+void p2Body::SetPosition(p2Vec2 newPosition)
+{
+	m_Position = newPosition;
+}
+
 p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 {
 	p2Collider& collider = m_Colliders[m_ColliderIndex];

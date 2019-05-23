@@ -36,8 +36,8 @@ struct p2Vec2
 	p2Vec2();
 
 	p2Vec2(float x, float y);
-	bool operator==(const p2Vec2 &rhs) const;
-	bool operator!=(const p2Vec2 &rhs) const;
+	bool operator==(const p2Vec2 &v) const;
+	bool operator!=(const p2Vec2 &v) const;
 
 	p2Vec2 operator+(const p2Vec2& v)const;
 	p2Vec2 operator+(const float& v) const;
