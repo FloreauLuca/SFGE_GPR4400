@@ -223,149 +223,6 @@ p2Contact* p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
 	return nullptr;
 }
 
-/*
-bool p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
-{
-	for (p2Collider colliderA : *bodyA->GetCollider())
-	{
-		for (p2Collider colliderB : *bodyB->GetCollider())
-		{
-			if (colliderA.GetColliderType() == p2ColliderType::CIRCLE)
-			{
-				if (colliderB.GetColliderType() == p2ColliderType::CIRCLE)
-				{
-					if (p2CircleShape* circleshapeA = dynamic_cast<p2CircleShape*>(colliderA.GetShape()))
-					{
-						if (p2CircleShape* circleshapeB = dynamic_cast<p2CircleShape*>(colliderB.GetShape()))
-						{
-							if	(p2Vec2::Distance(bodyA->GetPosition(), bodyB->GetPosition()) < circleshapeA->GetRadius()+circleshapeB->GetRadius())
-							{
-								return true;
-							}
-						}
-					}
-					return false;
-				}
-				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
-				{
-					if (p2CircleShape* circleshapeA = dynamic_cast<p2CircleShape*>(colliderA.GetShape()))
-					{
-						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
-						{
-							if (bodyB->GetPosition().x - (bodyA->GetPosition().x+circleshapeA->GetRadius()) < rectShapeB->GetSize().x && bodyB->GetPosition().x - (bodyA->GetPosition().x - circleshapeA->GetRadius()) > -rectShapeB->GetSize().x)
-							{
-								return true;
-							}
-
-							if (bodyB->GetPosition().y - (bodyA->GetPosition().y + circleshapeA->GetRadius()) < rectShapeB->GetSize().y && bodyB->GetPosition().y - (bodyA->GetPosition().y - circleshapeA->GetRadius()) > -rectShapeB->GetSize().y)
-							{
-								return true;
-							}
-						}
-					}
-					return false;
-					
-				}
-			} else if (colliderA.GetColliderType() == p2ColliderType::BOX)
-			{
-				if (colliderB.GetColliderType() == p2ColliderType::CIRCLE)
-				{
-					if (p2CircleShape* circleshapeB = dynamic_cast<p2CircleShape*>(colliderB.GetShape()))
-					{
-						if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
-						{
-							if (bodyA->GetPosition().x - (bodyB->GetPosition().x + circleshapeB->GetRadius()) < rectShapeA->GetSize().x && bodyA->GetPosition().x - (bodyB->GetPosition().x - circleshapeB->GetRadius()) > -rectShapeA->GetSize().x)
-							{
-								return true;
-							}
-
-							if (bodyA->GetPosition().y - (bodyB->GetPosition().y + circleshapeB->GetRadius()) < rectShapeA->GetSize().y && bodyA->GetPosition().y - (bodyB->GetPosition().y - circleshapeB->GetRadius()) > -rectShapeA->GetSize().y)
-							{
-								return true;
-							}
-						}
-					}
-					return false;
-				}
-				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
-				{
-					if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
-					{
-						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
-						{
-							
-							int axeInfX = 0;
-							int axeSupX = 0;
-							int axeInfY = 0;
-							int axeSupY = 0;
-							
-							for (p2Vec2 cornerA : rectShapeA->GetCorner())
-							{
-								float projAxB = p2Vec2::Dot(bodyB->GetPosition() - cornerA + bodyA->GetPosition(), p2Vec2(rectShapeB->GetSize().x, 0)) / p2Vec2::Dot(p2Vec2(rectShapeB->GetSize().x, 0), p2Vec2(rectShapeB->GetSize().x, 0));
-								if (projAxB > rectShapeB->GetSize().x)
-								{
-									axeSupX = true;
-								}
-								if (projAxB < -rectShapeB->GetSize().x)
-								{
-									axeInfX = true;
-
-								}
-
-								float projAyB = p2Vec2::Dot(bodyB->GetPosition() - cornerA + bodyA->GetPosition(), p2Vec2(0, rectShapeB->GetSize().y)) / p2Vec2::Dot(p2Vec2(0, rectShapeB->GetSize().y), p2Vec2(0, rectShapeB->GetSize().y));
-								if (projAyB > rectShapeB->GetSize().y || projAyB < -rectShapeB->GetSize().y)
-								{
-									axeInfY = true;
-								}
-							}
-							if (!axeInfX || !axeInfY)
-							{
-								return false;
-							}
-							
-							axeInfX = 0;
-							axeSupX = 0;
-							axeInfY = 0;
-							axeSupY = 0;
-							for (p2Vec2 cornerB : rectShapeB->GetCorner())
-							{
-								float projBxA = p2Vec2::Dot(bodyA->GetPosition() - cornerB - bodyB->GetPosition(), p2Vec2(rectShapeA->GetSize().Rotate(bodyA->GetAngle()))) / p2Vec2(rectShapeA->GetSize().x, 0).GetMagnitude();
-								float projByA = p2Vec2::Dot(bodyA->GetPosition() - cornerB - bodyB->GetPosition(), p2Vec2(0, rectShapeA->GetSize().y).Rotate(bodyA->GetAngle())) / p2Vec2(0, rectShapeA->GetSize().y).GetMagnitude();
-								p2Vec2 size = rectShapeA->GetSize().Rotate(bodyA->GetAngle());
-								if (abs(projByA) > abs(rectShapeA->GetSize().Rotate(bodyA->GetAngle()).x))
-								{
-									axeSupX++;
-								}
-								if (abs(projByA) < abs(rectShapeA->GetSize().Rotate(bodyA->GetAngle()).x))
-								{
-									axeInfX++;
-								}
-								if (abs(projBxA) > abs(rectShapeA->GetSize().Rotate(bodyA->GetAngle()).y))
-								{
-									axeSupY++;
-								}
-								if (abs(projBxA) < abs(rectShapeA->GetSize().Rotate(bodyA->GetAngle()).y))
-								{
-									axeInfY++;
-								}
-							}
-							if (axeInfX == 4 || axeSupX == 4 || axeInfY == 4 || axeSupY == 4)
-							{
-								return false;
-							}
-						}
-					}
-					return true;
-				}
-			}
-		}
-	}
-	return false;
-}
-
-
-*/
-
 p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 {
 	for (p2Collider colliderA : *bodyA->GetCollider())
@@ -382,7 +239,8 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 						{
 							if (p2Vec2::Distance(bodyA->GetPosition(), bodyB->GetPosition()) < circleshapeA->GetRadius() + circleshapeB->GetRadius())
 							{
-								return p2Mat22(p2Vec2(1, 1), p2Vec2(1, 1));
+								p2Mat22 mtv = p2Mat22(bodyA->GetPosition() - (bodyA->GetPosition() - bodyB->GetPosition()).Normalized()*circleshapeA->GetRadius(), (bodyA->GetPosition() - bodyB->GetPosition()).Normalized() * ((circleshapeB->GetRadius() + circleshapeA->GetRadius() - (bodyA->GetPosition() - bodyB->GetPosition()).GetMagnitude())));
+								return mtv;
 							}
 						}
 					}
@@ -394,57 +252,146 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 						{
-							p2Mat22 mtv;
-							float newAngle = bodyB->GetAngle() / 180 * M_PI;
-							p2Vec2 u = bodyA->GetPosition() - (bodyB->GetPosition());
-							if (u.GetMagnitude() < circleshapeA->GetRadius()) return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
-							u = u.Normalized() * (u.GetMagnitude() - circleshapeA->GetRadius());
-							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
-							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
-							mtv = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize());
-							float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-							float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+							p2Vec2 closestCornerB;
+							float minDist = p2Vec2::Distance(rectShapeB->GetCorner()[0], bodyA->GetPosition());
+							for (p2Vec2 cornerB : rectShapeB->GetCorner())
+							{
+								if (p2Vec2::Distance(bodyB->GetPosition() + cornerB, bodyA->GetPosition()) <= minDist)
+								{
+									closestCornerB = cornerB;
+									minDist = p2Vec2::Distance(bodyB->GetPosition() + cornerB, bodyA->GetPosition());
+								}
+							}
 
-							if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+							p2Mat22 mtv = p2Mat22();
+							float projXSup = 0;
+							float projXInf = 0;
+							float projYInf = 0;
+							float projYSup = 0;
+							float projCInf = 0;
+							float projCSup = 0;
+							float newAngle = bodyB->GetAngle() / 180 * M_PI;
+							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle).Normalized()*circleshapeA->GetRadius();
+							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle).Normalized()*circleshapeA->GetRadius();
+							p2Vec2 c = (bodyB->GetPosition() + closestCornerB - bodyA->GetPosition()).Normalized()*circleshapeA->GetRadius();
+							mtv = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize());
+							for (p2Vec2 cornerB : rectShapeB->GetCorner())
 							{
-								if (kx < 1)
+								p2Vec2 u = bodyB->GetPosition() + cornerB - (bodyA->GetPosition());
+
+								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								float kc = (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+
+								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								p2Vec2 resultC = c * (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+								if (kx > 1)
 								{
-									if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+									projXSup++;
+								}
+								if (kx < -1)
+								{
+									projXInf++;
+								}
+								if (ky > 1)
+								{
+									projYSup++;
+								}
+								if (ky < -1)
+								{
+									projYInf++;
+								}
+								if (kc > 1)
+								{
+									projCSup++;
+								}
+								if (kc < -1)
+								{
+									projCInf++;
+								}
+								/*
+								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
+								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(c) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(bodyB->GetPosition() + closestCornerB - (bodyA->GetPosition())) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::White);
+								if (kx > 1 || kx < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								if (ky > 1 || ky < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								if (kc > 1 || kc < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								*/
+								if ((kx < 1 && kx > -1) || (ky < 1 && ky > -1) || (kc < 1 && kc > -1))
+								{
+									if (kx < 1 && kx > -1)
 									{
-										mtv.rows[1] = (x * (1 - kx));
-										mtv.rows[0] = u + bodyB->GetPosition();
+										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * -(1 - kx));
+											mtv.rows[0] = x.Normalized() * circleshapeA->GetRadius() + bodyA->GetPosition();
+										}
+										if (mtv.rows[1].GetMagnitude() > (x * -(1 + kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * (1 + kx));
+											mtv.rows[0] = x.Normalized() * -circleshapeA->GetRadius() + bodyA->GetPosition();
+										}
+									}
+									if (ky < 1 && ky > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * -(1 - ky));
+											mtv.rows[0] = y.Normalized() * circleshapeA->GetRadius() + bodyA->GetPosition();
+										}
+										if (mtv.rows[1].GetMagnitude() > (y * -(1 + ky)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * (1 + ky));
+											mtv.rows[0] = y.Normalized() * -circleshapeA->GetRadius() + bodyA->GetPosition();
+										}
+									}
+									if (kc < 1 && kc > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (c * (1 - kc)).GetMagnitude())
+										{
+											mtv.rows[1] = (c * -(1 - kc));
+											mtv.rows[0] = c.Normalized() * circleshapeA->GetRadius() + bodyA->GetPosition();
+										}
+										if (mtv.rows[1].GetMagnitude() > (c * -(1 + kc)).GetMagnitude())
+										{
+											mtv.rows[1] = (c * (1 + kc));
+											mtv.rows[0] = c.Normalized() * -circleshapeA->GetRadius() + bodyA->GetPosition();
+										}
 									}
 								}
-								if (kx > -1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
-									{
-										mtv.rows[1] = (x * (-1 - kx));
-										mtv.rows[0] = u + bodyB->GetPosition();
-									}
-								}
-								if (ky < 1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
-									{
-										mtv.rows[1] = (y * (1 - ky));
-										mtv.rows[0] = u + bodyB->GetPosition();
-									}
-								}
-								if (ky > -1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
-									{
-										mtv.rows[1] = (y * (-1 - ky));
-										mtv.rows[0] = u + bodyB->GetPosition();
-									}
-								}
+							}
+
+							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4 || projCSup == 4 || projCInf == 4)
+							{
 								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 							}
-							else
-							{
-								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
-							}
+							return mtv;
 						}
 					}
 				}
@@ -457,61 +404,148 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
 						{
-							p2Mat22 mtv;
+							p2Vec2 closestCornerA;
+							float minDist = p2Vec2::Distance(rectShapeA->GetCorner()[0], bodyB->GetPosition());
+							for (p2Vec2 cornerA : rectShapeA->GetCorner())
+							{
+								if (p2Vec2::Distance(bodyA->GetPosition() + cornerA, bodyB->GetPosition()) <= minDist)
+								{
+									closestCornerA = cornerA;
+									minDist = p2Vec2::Distance(bodyA->GetPosition() + cornerA, bodyB->GetPosition());
+								}
+							}
+
+							p2Mat22 mtv = p2Mat22();
+							float projXSup = 0;
+							float projXInf = 0;
+							float projYInf = 0;
+							float projYSup = 0;
+							float projCInf = 0;
+							float projCSup = 0;
 							float newAngle = bodyA->GetAngle() / 180 * M_PI;
-							p2Vec2 u = bodyB->GetPosition() - (bodyA->GetPosition());
-							if (u.GetMagnitude() < circleshapeB->GetRadius()) return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
-
-							u = u.Normalized() * (u.GetMagnitude() - circleshapeB->GetRadius());
-							p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
-							p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
+							p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle).Normalized()*circleshapeB->GetRadius();
+							p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle).Normalized()*circleshapeB->GetRadius();
+							p2Vec2 c = (bodyA->GetPosition() + closestCornerA - bodyB->GetPosition()).Normalized()*circleshapeB->GetRadius();
 							mtv = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize());
-							float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-							float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+							for (p2Vec2 cornerA : rectShapeA->GetCorner())
+							{
+								p2Vec2 u = bodyA->GetPosition() + cornerA - (bodyB->GetPosition());
 
-							if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								float kc = (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+
+								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								p2Vec2 resultC = c * (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+								if (kx > 1)
+								{
+									projXSup++;
+								}
+								if (kx < -1)
+								{
+									projXInf++;
+								}
+								if (ky > 1)
+								{
+									projYSup++;
+								}
+								if (ky < -1)
+								{
+									projYInf++;
+								}
+								if (kc > 1)
+								{
+									projCSup++;
+								}
+								if (kc < -1)
+								{
+									projCInf++;
+								}
+								/*
+								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
+								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(c) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+								m_Graphics2DManager->DrawVector(meter2pixel(bodyA->GetPosition() + closestCornerA - (bodyB->GetPosition())) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::White);
+								if (kx > 1 || kx < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								if (ky > 1 || ky < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								if (kc > 1 || kc < -1)
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+								}
+								else
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+								}
+								*/
+								if ((kx < 1 && kx > -1) || (ky < 1 && ky > -1) || (kc < 1 && kc > -1))
+								{
+									if (kx < 1 && kx > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * -(1 - kx));
+											mtv.rows[0] = x.Normalized() * circleshapeB->GetRadius() + bodyB->GetPosition();
+										}
+										if (mtv.rows[1].GetMagnitude() > (x * -(1 + kx)).GetMagnitude())
+										{
+											mtv.rows[1] = (x * (1 + kx));
+											mtv.rows[0] = x.Normalized() * -circleshapeB->GetRadius() + bodyB->GetPosition();
+										}
+									}
+									if (ky < 1 && ky > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * -(1 - ky));
+											mtv.rows[0] = y.Normalized() * circleshapeB->GetRadius() + bodyB->GetPosition();
+										}
+										if (mtv.rows[1].GetMagnitude() > (y * -(1 + ky)).GetMagnitude())
+										{
+											mtv.rows[1] = (y * (1 + ky));
+											mtv.rows[0] = y.Normalized() * -circleshapeB->GetRadius() + bodyB->GetPosition();
+										}
+									}
+									if (kc < 1 && kc > -1)
+									{
+										if (mtv.rows[1].GetMagnitude() > (c * (1 - kc)).GetMagnitude())
+										{
+											mtv.rows[1] = (c * -(1 - kc));
+											mtv.rows[0] = c.Normalized() * circleshapeB->GetRadius() + bodyB->GetPosition();
+										}
+										if (mtv.rows[1].GetMagnitude() > (c * -(1 + kc)).GetMagnitude())
+										{
+											mtv.rows[1] = (c * (1 + kc));
+											mtv.rows[0] = c.Normalized() * -circleshapeB->GetRadius() + bodyB->GetPosition();
+										}
+									}
+								}
+							}
+
+							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4 || projCSup == 4 || projCInf == 4)
 							{
-								if (kx < 1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
-									{
-										mtv.rows[1] = (x * (1 - kx));
-										mtv.rows[0] = u + bodyA->GetPosition();
-									}
-								}
-								if (kx > -1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
-									{
-										mtv.rows[1] = (x * (-1 - kx));
-										mtv.rows[0] = u + bodyA->GetPosition();
-									}
-								}
-								if (ky < 1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
-									{
-										mtv.rows[1] = (y * (1 - ky));
-										mtv.rows[0] = u + bodyA->GetPosition();
-									}
-								}
-								if (ky > -1)
-								{
-									if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
-									{
-										mtv.rows[1] = (y * (-1 - ky));
-										mtv.rows[0] = u + bodyA->GetPosition();
-									}
-								}
 								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 							}
-							else
-							{
-								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
-							}
+							return mtv;
 						}
 					}
-					return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
 				}
 				else if (colliderB.GetColliderType() == p2ColliderType::BOX)
 				{

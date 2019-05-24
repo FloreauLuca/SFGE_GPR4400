@@ -107,7 +107,8 @@ namespace sfge::ext
 							{
 								if (p2Vec2::Distance(bodyA->GetPosition(), bodyB->GetPosition()) < circleshapeA->GetRadius() + circleshapeB->GetRadius())
 								{
-									//return true;
+									p2Mat22 mtv = p2Mat22(bodyA->GetPosition() - (bodyA->GetPosition() - bodyB->GetPosition()).Normalized()*circleshapeA->GetRadius(), (bodyA->GetPosition() - bodyB->GetPosition()).Normalized() * ((circleshapeB->GetRadius() + circleshapeA->GetRadius() - (bodyA->GetPosition() - bodyB->GetPosition()).GetMagnitude())));
+									m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Red);
 								}
 							}
 						}
@@ -118,91 +119,146 @@ namespace sfge::ext
 						{
 							if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 							{
-								p2Mat22 mtv;
+								p2Vec2 closestCornerB;
+								float minDist = p2Vec2::Distance(rectShapeB->GetCorner()[0], bodyA->GetPosition());
+								for (p2Vec2 cornerB : rectShapeB->GetCorner())
+								{
+									if (p2Vec2::Distance(bodyB->GetPosition() + cornerB, bodyA->GetPosition()) <= minDist)
+									{
+										closestCornerB = cornerB;
+										minDist = p2Vec2::Distance(bodyB->GetPosition() + cornerB, bodyA->GetPosition());
+									}
+								}
+
+								p2Mat22 mtv = p2Mat22();
+								float projXSup = 0;
+								float projXInf = 0;
+								float projYInf = 0;
+								float projYSup = 0;
+								float projCInf = 0;
+								float projCSup = 0;
 								float newAngle = bodyB->GetAngle() / 180 * M_PI;
-								p2Vec2 u = bodyA->GetPosition() - (bodyB->GetPosition());
-								u = u.Normalized() * (u.GetMagnitude() - circleshapeA->GetRadius());
-								p2Vec2 x = p2Vec2(rectShapeB->GetSize().x + circleshapeA->GetRadius(), 0).Rotate(newAngle);
-								p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y + circleshapeA->GetRadius()).Rotate(newAngle);
-								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle).Normalized()*circleshapeA->GetRadius();
+								p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle).Normalized()*circleshapeA->GetRadius();
+								p2Vec2 c = (bodyB->GetPosition() + closestCornerB - bodyA->GetPosition()).Normalized()*circleshapeA->GetRadius();
 								mtv = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize());
-								float resultXMagn = resultX.GetMagnitude();
-								float resultYMagn = resultY.GetMagnitude();
-								float uMagn = u.GetMagnitude();
-
-								float projX = resultX.GetMagnitude() / x.GetMagnitude();
-								float projY = resultY.GetMagnitude() / y.GetMagnitude();
-
-
-								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
-								if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								for (p2Vec2 cornerB : rectShapeB->GetCorner())
 								{
-									if (kx < 1)
+									p2Vec2 u = bodyB->GetPosition() + cornerB - (bodyA->GetPosition());
+
+									float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+									float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+									float kc = (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+
+									p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+									p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+									p2Vec2 resultC = c * (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+									if (kx > 1)
 									{
-										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										projXSup++;
+									}
+									if (kx < -1)
+									{
+										projXInf++;
+									}
+									if (ky > 1)
+									{
+										projYSup++;
+									}
+									if (ky < -1)
+									{
+										projYInf++;
+									}
+									if (kc > 1)
+									{
+										projCSup++;
+									}
+									if (kc < -1)
+									{
+										projCInf++;
+									}
+									/*
+									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
+									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(c) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(bodyB->GetPosition() + closestCornerB - (bodyA->GetPosition())) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::White);
+									if (kx > 1 || kx < -1)
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+									}
+									else
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+									}
+									if (ky > 1 || ky < -1)
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+									}
+									else
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+									}
+									if (kc > 1 || kc < -1)
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+									}
+									else
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+									}
+									*/
+									if ((kx < 1 && kx > -1) || (ky < 1 && ky > -1) || (kc < 1 && kc > -1))
+									{
+										if (kx < 1 && kx > -1)
 										{
-											mtv.rows[1] = (x * (1 - kx));
-											mtv.rows[0] = u + bodyB->GetPosition();
+											if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+											{
+												mtv.rows[1] = (x * -(1 - kx));
+												mtv.rows[0] = x.Normalized() * circleshapeA->GetRadius() + bodyA->GetPosition();
+											}
+											if (mtv.rows[1].GetMagnitude() > (x * -(1 + kx)).GetMagnitude())
+											{
+												mtv.rows[1] = (x * (1 + kx));
+												mtv.rows[0] = x.Normalized() * -circleshapeA->GetRadius() + bodyA->GetPosition();
+											}
+										}
+										if (ky < 1 && ky > -1)
+										{
+											if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+											{
+												mtv.rows[1] = (y * -(1 - ky));
+												mtv.rows[0] = y.Normalized() * circleshapeA->GetRadius() + bodyA->GetPosition();
+											}
+											if (mtv.rows[1].GetMagnitude() > (y * -(1 + ky)).GetMagnitude())
+											{
+												mtv.rows[1] = (y * (1 + ky));
+												mtv.rows[0] = y.Normalized() * -circleshapeA->GetRadius() + bodyA->GetPosition();
+											}
+										}
+										if (kc < 1 && kc > -1)
+										{
+											if (mtv.rows[1].GetMagnitude() > (c * (1 - kc)).GetMagnitude())
+											{
+												mtv.rows[1] = (c * -(1 - kc));
+												mtv.rows[0] = c.Normalized() * circleshapeA->GetRadius() + bodyA->GetPosition();
+											}
+											if (mtv.rows[1].GetMagnitude() > (c * -(1 + kc)).GetMagnitude())
+											{
+												mtv.rows[1] = (c * (1 + kc));
+												mtv.rows[0] = c.Normalized() * -circleshapeA->GetRadius() + bodyA->GetPosition();
+											}
 										}
 									}
-									if (kx > -1)
-									{
-										if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
-										{
-											mtv.rows[1] = (x * (-1 - kx));
-											mtv.rows[0] = u + bodyB->GetPosition();
-										}
-									}
-									if (ky < 1)
-									{
-										if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
-										{
-											mtv.rows[1] = (y * (1 - ky));
-											mtv.rows[0] = u + bodyB->GetPosition();
-										}
-									}
-									if (ky > -1)
-									{
-										if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
-										{
-											mtv.rows[1] = (y * (-1 - ky));
-											mtv.rows[0] = u + bodyB->GetPosition();
-										}
-									}
-									m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Red);
-								}
-								
-
-								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
-								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								if (kx > 1 || kx < -1)
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-								}
-								else
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
-								}
-								if (ky > 1 || ky < -1)
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-								}
-								else
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
 								}
 
-								/*
-								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-								m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-								*/
-								//return !((projX > 1 && projX > 1) || (projX < -1 && projX < -1) || (projY > 1 && projY > 1) || (projY < -1 && projY < -1));
+								if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4 || projCSup == 4 || projCInf == 4)
+								{
+									continue;
+								}
+								m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Red);
 							}
 						}
 					}
@@ -215,91 +271,146 @@ namespace sfge::ext
 						{
 							if (p2RectShape* rectShapeA = dynamic_cast<p2RectShape*>(colliderA.GetShape()))
 							{
-								p2Mat22 mtv;
+								p2Vec2 closestCornerA;
+								float minDist = p2Vec2::Distance(rectShapeA->GetCorner()[0], bodyB->GetPosition());
+								for (p2Vec2 cornerA : rectShapeA->GetCorner())
+								{
+									if (p2Vec2::Distance(bodyA->GetPosition() + cornerA, bodyB->GetPosition()) <= minDist)
+									{
+										closestCornerA = cornerA;
+										minDist = p2Vec2::Distance(bodyA->GetPosition() + cornerA, bodyB->GetPosition());
+									}
+								}
+
+								p2Mat22 mtv = p2Mat22();
+								float projXSup = 0;
+								float projXInf = 0;
+								float projYInf = 0;
+								float projYSup = 0;
+								float projCInf = 0;
+								float projCSup = 0;
 								float newAngle = bodyA->GetAngle() / 180 * M_PI;
-								p2Vec2 u = bodyB->GetPosition() - (bodyA->GetPosition());
-								u = u.Normalized() * (u.GetMagnitude() - circleshapeB->GetRadius());
-								p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
-								p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
-								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+								p2Vec2 x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle).Normalized()*circleshapeB->GetRadius();
+								p2Vec2 y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle).Normalized()*circleshapeB->GetRadius();
+								p2Vec2 c = (bodyA->GetPosition() + closestCornerA - bodyB->GetPosition()).Normalized()*circleshapeB->GetRadius();
 								mtv = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize());
-								float resultXMagn = resultX.GetMagnitude();
-								float resultYMagn = resultY.GetMagnitude();
-								float uMagn = u.GetMagnitude();
-
-								float projX = resultX.GetMagnitude() / x.GetMagnitude();
-								float projY = resultY.GetMagnitude() / y.GetMagnitude();
-
-								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
-								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
-								if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								for (p2Vec2 cornerA : rectShapeA->GetCorner())
 								{
-									if (kx < 1)
+									p2Vec2 u = bodyA->GetPosition() + cornerA - (bodyB->GetPosition());
+
+									float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+									float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+									float kc = (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+
+									p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+									p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+									p2Vec2 resultC = c * (p2Vec2::Dot(u, c) / p2Vec2::Dot(c, c));
+
+									if (kx > 1)
 									{
-										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										projXSup++;
+									}
+									if (kx < -1)
+									{
+										projXInf++;
+									}
+									if (ky > 1)
+									{
+										projYSup++;
+									}
+									if (ky < -1)
+									{
+										projYInf++;
+									}
+									if (kc > 1)
+									{
+										projCSup++;
+									}
+									if (kc < -1)
+									{
+										projCInf++;
+									}
+									/*
+									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
+									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(c) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(bodyA->GetPosition() + closestCornerA - (bodyB->GetPosition())) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::White);
+									if (kx > 1 || kx < -1)
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+									}
+									else
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+									}
+									if (ky > 1 || ky < -1)
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+									}
+									else
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+									}
+									if (kc > 1 || kc < -1)
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+									}
+									else
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(resultC) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+									}
+									*/
+									if ((kx < 1 && kx > -1) || (ky < 1 && ky > -1) || (kc < 1 && kc > -1))
+									{
+										if (kx < 1 && kx > -1)
 										{
-											mtv.rows[1] = (x * (1 - kx));
-											mtv.rows[0] = u;
+											if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+											{
+												mtv.rows[1] = (x * -(1 - kx));
+												mtv.rows[0] = x.Normalized() * circleshapeB->GetRadius() + bodyB->GetPosition();
+											}
+											if (mtv.rows[1].GetMagnitude() > (x * -(1 + kx)).GetMagnitude())
+											{
+												mtv.rows[1] = (x * (1 + kx));
+												mtv.rows[0] = x.Normalized() * -circleshapeB->GetRadius() + bodyB->GetPosition();
+											}
+										}
+										if (ky < 1 && ky > -1)
+										{
+											if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+											{
+												mtv.rows[1] = (y * -(1 - ky));
+												mtv.rows[0] = y.Normalized() * circleshapeB->GetRadius() + bodyB->GetPosition();
+											}
+											if (mtv.rows[1].GetMagnitude() > (y * -(1 + ky)).GetMagnitude())
+											{
+												mtv.rows[1] = (y * (1 + ky));
+												mtv.rows[0] = y.Normalized() * -circleshapeB->GetRadius() + bodyB->GetPosition();
+											}
+										}
+										if (kc < 1 && kc > -1)
+										{
+											if (mtv.rows[1].GetMagnitude() > (c * (1 - kc)).GetMagnitude())
+											{
+												mtv.rows[1] = (c * -(1 - kc));
+												mtv.rows[0] = c.Normalized() * circleshapeB->GetRadius() + bodyB->GetPosition();
+											}
+											if (mtv.rows[1].GetMagnitude() > (c * -(1 + kc)).GetMagnitude())
+											{
+												mtv.rows[1] = (c * (1 + kc));
+												mtv.rows[0] = c.Normalized() * -circleshapeB->GetRadius() + bodyB->GetPosition();
+											}
 										}
 									}
-									if (kx > -1)
-									{
-										if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
-										{
-											mtv.rows[1] = (x * (-1 - kx));
-											mtv.rows[0] = u + bodyA->GetPosition();
-										}
-									}
-									if (ky < 1)
-									{
-										if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
-										{
-											mtv.rows[1] = (y * (1 - ky));
-											mtv.rows[0] = u + bodyA->GetPosition();
-										}
-									}
-									if (ky > -1)
-									{
-										if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
-										{
-											mtv.rows[1] = (y * (-1 - ky));
-											mtv.rows[0] = u + bodyA->GetPosition();
-										}
-									}
-									m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Red);
 								}
-								
-								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
-								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
-								if (kx > 1 || kx < -1)
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
-								}
-								else
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
-								}
-								if (ky > 1 || ky < -1)
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
-								}
-								else
-								{
-									m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
-								}
-								
 
-								/*
-								m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-								m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-								m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-								*/
-
-								//return ((projXmax > 1 && projXmin > 1) || (projXmax < -1 && projXmin < -1) || (projYmax > 1 && projYmin > 1) || (projYmax < -1 && projYmin < -1));
+								if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4 || projCSup == 4 || projCInf == 4)
+								{
+									continue;
+								}
+								m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Red);
 							}
 						}
 					}

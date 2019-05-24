@@ -245,14 +245,14 @@ TEST(Physics, TestAABB)
 	json sceneJson;
 	sceneJson["name"] = "Contacts";
 
-	const int entitiesNmb = 50;
+	const int entitiesNmb = 5;
 	json entities[entitiesNmb];
 
 	for (int i = 0; i < entitiesNmb; i++)
 	{
-		int sizeX = (rand() % 100) + 10;
-		int sizeY = (rand() % 100) + 10;
-		int radius = (rand() % 75) + 10;
+		int sizeX = (rand() % 100) + 50;
+		int sizeY = (rand() % 100) + 50;
+		int radius = (rand() % 75) + 50;
 		json shapes[] =
 		{
 			{
@@ -300,7 +300,7 @@ TEST(Physics, TestAABB)
 			{"name", "Rigidbody"},
 			{"type", sfge::ComponentType::BODY2D},
 			{"body_type", p2BodyType::DYNAMIC},
-			{"velocity", {rand() % 400, rand() % 400}}
+			{"velocity", {rand() % 200, rand() % 200}}
 		};
 
 		int randShapeIndex = rand() % 2;
@@ -332,7 +332,7 @@ TEST(Physics, TestAABB)
 			},
 			{
 
-				{"systemClassName", "SatTest nothing"}
+				{"systemClassName", "SatTest"}
 
 			}
 		}
@@ -365,8 +365,8 @@ TEST(Physics, TestAABBRotation)
 	json rectShapeJson;
 	rectShapeJson["name"] = "Circle Shape Component";
 	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
-	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson["size"] = { 200, 100 };
+	rectShapeJson["shape_type"] = sfge::ShapeType::CIRCLE;
+	rectShapeJson["radius"] =  100 ;
 
 	json rigidBodyJson1;
 	rigidBodyJson1["name"] = "Rigidbody";
@@ -377,8 +377,8 @@ TEST(Physics, TestAABBRotation)
 	json rectColliderJson;
 	rectColliderJson["name"] = "Circle Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
-	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = { 200, 100 };
+	rectColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
+	rectColliderJson["radius"] =  100 ;
 	rectColliderJson["bouncing"] = 0.5;
 	rectColliderJson["sensor"] = false;
 
@@ -449,7 +449,13 @@ TEST(Physics, TestAABBRotation)
 		{"systemClassName", "QuadTreeTest"}
 
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider, aabbTest, quadTest });
+	json satTest =
+	{
+
+		{"systemClassName", "SatTest"}
+
+	};
+	sceneJson["systems"] = json::array({ contactDebugSystem, raycastDebugJson, gizmoCollider, aabbTest, quadTest, satTest });
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
@@ -658,9 +664,9 @@ TEST(Physics, TestSATDetect)
 
 	json transformJson2;
 	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson2["position"] = { 400, 600 };
+	transformJson2["position"] = { 500, 400 };
 	transformJson2["scale"] = { 1.0, 1.0 };
-	transformJson2["angle"] = 0.0;
+	transformJson2["angle"] = 45.0;
 
 	json rectShapeJson;
 	rectShapeJson["name"] = "Rect Shape Component";
@@ -682,13 +688,11 @@ TEST(Physics, TestSATDetect)
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
-	sceneJson["entities"] = { entityBody3, entityBody2, entityBody1 };// , entityBody1};
+	sceneJson["entities"] = { entityBody2, entityBody1 };// , entityBody1};
 	json contactDebugSystem = {
-		{
-			"script_path",
-			"scripts/contact_debug_system.py"
-			//"nothing"
-		}
+		
+			{"systemClassName", "ContactDebug"}
+		
 	};
 	json raycastDebugJson =
 	{
