@@ -43,7 +43,7 @@ void p2World::Step(float doriantan)
 			body.Move(doriantan);
 		}
 		// BuildAABB
-		if (body.GetCollider()[0].size()>0)
+		if (!body.GetCollider()[0].empty())
 		{
 			body.BuildAABB();
 		}

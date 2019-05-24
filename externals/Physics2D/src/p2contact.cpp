@@ -165,25 +165,30 @@ void p2ContactManager::CheckContactBetweenBodies(p2Body* body1, p2Body* body2)
 				p2Contact* contact = CreateContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
 				m_ContactListener->BeginContact(contact);
 			}
-			/*
-			body1->SetLinearVelocity(p2Vec2());
-			body2->SetLinearVelocity(p2Vec2());
+
+			p2Vec2 newBody1Velocity = body1->GetLinearVelocity() - (mtv.rows[1].Normalized() * p2Vec2::Dot(body1->GetLinearVelocity(), mtv.rows[1].Normalized())) * 2;
+			p2Vec2 newBody2Velocity = body2->GetLinearVelocity() - (mtv.rows[1].Normalized() * p2Vec2::Dot(body2->GetLinearVelocity(), mtv.rows[1].Normalized())) * 2;
+
+
+
+			body1->SetLinearVelocity(newBody1Velocity);
+			body2->SetLinearVelocity(newBody2Velocity);
 			
 			if ((body1->GetPosition() - mtv.rows[0]).GetMagnitude() < (body1->GetPosition() - mtv.rows[1]).GetMagnitude())
 			{
 				body1->SetPosition(body1->GetPosition() - (mtv.rows[1]));
 				body2->SetPosition(body2->GetPosition() + (mtv.rows[1]));
-				body1->ApplyForceToCenter(mtv.rows[1]);
-				body2->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
+				//body1->ApplyForceToCenter(mtv.rows[1]);
+				//body2->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
 			}
 			else
 			{
 				body1->SetPosition(body1->GetPosition() + (mtv.rows[1]));
 				body2->SetPosition(body2->GetPosition() - (mtv.rows[1]));
-				body2->ApplyForceToCenter(mtv.rows[1]);
-				body1->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
+				//body2->ApplyForceToCenter(mtv.rows[1]);
+				//body1->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
 			}
-			*/
+			
 			
 		}
 	}

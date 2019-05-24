@@ -41,8 +41,6 @@ namespace sfge
 
 namespace sfge::ext
 {
-
-
 	class SatTest : public System
 	{
 	public:
@@ -75,8 +73,6 @@ namespace sfge::ext
 		std::vector<p2Body*> bodies;
 		std::vector<Entity> entities;
 	};
-
-
 }
 
 #endif
