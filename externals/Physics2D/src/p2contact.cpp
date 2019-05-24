@@ -176,15 +176,27 @@ void p2ContactManager::CheckContactBetweenBodies(p2Body* body1, p2Body* body2)
 			
 			if ((body1->GetPosition() - mtv.rows[0]).GetMagnitude() < (body1->GetPosition() - mtv.rows[1]).GetMagnitude())
 			{
-				body1->SetPosition(body1->GetPosition() - (mtv.rows[1]));
-				body2->SetPosition(body2->GetPosition() + (mtv.rows[1]));
+				if(body1->GetType() != p2BodyType::STATIC)
+				{
+					body1->SetPosition(body1->GetPosition() - (mtv.rows[1]));
+				}
+				if (body2->GetType() != p2BodyType::STATIC)
+				{
+					body2->SetPosition(body2->GetPosition() + (mtv.rows[1]));
+				}
 				//body1->ApplyForceToCenter(mtv.rows[1]);
 				//body2->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
 			}
 			else
 			{
-				body1->SetPosition(body1->GetPosition() + (mtv.rows[1]));
-				body2->SetPosition(body2->GetPosition() - (mtv.rows[1]));
+				if (body1->GetType() != p2BodyType::STATIC)
+				{
+					body1->SetPosition(body1->GetPosition() + (mtv.rows[1]));
+				}
+				if (body2->GetType() != p2BodyType::STATIC)
+				{
+					body2->SetPosition(body2->GetPosition() - (mtv.rows[1]));
+				}
 				//body2->ApplyForceToCenter(mtv.rows[1]);
 				//body1->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
 			}

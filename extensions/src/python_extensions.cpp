@@ -35,9 +35,10 @@ SOFTWARE.
 #include "extensions/sat_test.h"
 #include "extensions/quad_tree_test.h"
 #include "extensions/contact_debug.h"
+#include "extensions/stay_on_screen.h"
+#include "extensions/mouse_controller.h"
 
 #include <tools/tools_pch.h>
-#include "extensions/stay_on_screen.h"
 
 namespace sfge::ext
 {
@@ -63,6 +64,9 @@ void ExtendPython(py::module& m)
 		.def(py::init<Engine&>());
 	py::class_<StayOnScreen, System> stayOnScreen(m, "StayOnScreen");
 	stayOnScreen
+		.def(py::init<Engine&>());
+	py::class_<MouseController, System> mouseController(m, "MouseController");
+	mouseController
 		.def(py::init<Engine&>());
 
 	tools::ExtendPythonTools(m);
