@@ -70,9 +70,10 @@ namespace sfge::ext
 		p2Vec2 mousePosition = pixel2meter(mouseManager.GetPosition());
 		for (p2Body* body : bodies)
 		{
-			if ((body->GetPosition() - mousePosition).GetMagnitude() < 0.5 && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			if ((body->GetPosition() - mousePosition).GetMagnitude() < 0.5f && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
 				body->SetPosition(mousePosition);
+				body->SetLinearVelocity(p2Vec2());
 			}
 		}
 		if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::V))

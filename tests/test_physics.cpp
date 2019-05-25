@@ -614,7 +614,7 @@ TEST(Physics, TestSATDetect)
 
 	json transformJson4;
 	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson4["position"] = { 500, 400 };
+	transformJson4["position"] = { 1000, 400 };
 	transformJson4["scale"] = { 1.0, 1.0 };
 	transformJson4["angle"] = 0.0;
 
@@ -688,7 +688,7 @@ TEST(Physics, TestSATDetect)
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
-	sceneJson["entities"] = { entityBody2, entityBody1 };// , entityBody1};
+	sceneJson["entities"] = { entityBody2, entityBody1};// , entityBody1};
 	json contactDebugSystem = {
 		
 			{"systemClassName", "ContactDebug"}

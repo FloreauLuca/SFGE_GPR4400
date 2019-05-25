@@ -30,7 +30,7 @@ SOFTWARE.
 #include "p2quadtree.h"
 #include "p2matrix.h"
 
-const size_t MAX_CONTACT_LEN = 1000;
+const size_t MAX_CONTACT_LEN = 10000;
 
 /**
 * \brief Representation of a contact given as argument in a p2ContactListener
