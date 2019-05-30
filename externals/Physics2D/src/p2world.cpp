@@ -40,7 +40,7 @@ void p2World::Step(float doriantan)
 		// Move
 		if (body.GetType() != p2BodyType::STATIC)
 		{
-			body.Move(doriantan);
+			//body.Move(doriantan);
 		}
 		// BuildAABB
 		if (!body.GetCollider()[0].empty())

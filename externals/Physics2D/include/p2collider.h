@@ -78,6 +78,7 @@ public:
 	void* GetUserData();
 	void SetUserData(void* colliderData);
 	p2Shape* GetShape();
+	float GetRestitution();
 	p2ColliderType GetColliderType();
 	/**
 	 * \brief Rotate the shape and calculate the collider AABB from his shape

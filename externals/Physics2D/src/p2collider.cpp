@@ -31,6 +31,11 @@ p2Shape* p2Collider::GetShape()
 	return m_Shape;
 }
 
+float p2Collider::GetRestitution()
+{
+	return m_Restitution;
+}
+
 p2ColliderType p2Collider::GetColliderType()
 {
 	return m_ColliderType;

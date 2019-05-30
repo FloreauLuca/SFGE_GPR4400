@@ -597,7 +597,7 @@ TEST(Physics, TestSATDetect)
 	rigidBodyJson1["name"] = "Rigidbody";
 	rigidBodyJson1["type"] = sfge::ComponentType::BODY2D;
 	rigidBodyJson1["body_type"] = p2BodyType::DYNAMIC;
-	rigidBodyJson1["gravity_scale"] = 0.5;
+	rigidBodyJson1["gravity_scale"] = 1;
 
 	json circleColliderJson;
 	circleColliderJson["name"] = "Circle Collider";
@@ -614,7 +614,7 @@ TEST(Physics, TestSATDetect)
 
 	json transformJson4;
 	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson4["position"] = { 1000, 400 };
+	transformJson4["position"] = { 1000, 200 };
 	transformJson4["scale"] = { 1.0, 1.0 };
 	transformJson4["angle"] = 0.0;
 
@@ -624,7 +624,21 @@ TEST(Physics, TestSATDetect)
 	rigidBodyJson4["body_type"] = p2BodyType::DYNAMIC;
 	rigidBodyJson4["gravity_scale"] = 1;
 
-	entityBody4["components"] = { transformJson4, circleShapeJson, rigidBodyJson4, circleColliderJson };
+	json circleColliderJson2;
+	circleColliderJson2["name"] = "Circle Collider";
+	circleColliderJson2["type"] = sfge::ComponentType::COLLIDER2D;
+	circleColliderJson2["collider_type"] = sfge::ColliderType::CIRCLE;
+	circleColliderJson2["radius"] = 50;
+	circleColliderJson2["bouncing"] = 1;
+	circleColliderJson2["sensor"] = true;
+
+	json circleShapeJson2;
+	circleShapeJson2["name"] = "Circle Shape Component";
+	circleShapeJson2["type"] = sfge::ComponentType::SHAPE2D;
+	circleShapeJson2["shape_type"] = sfge::ShapeType::CIRCLE;
+	circleShapeJson2["radius"] = 50;
+
+	entityBody4["components"] = { transformJson4, circleShapeJson2, rigidBodyJson4, circleColliderJson2 };
 
 
 	json entityBody3;
@@ -634,26 +648,26 @@ TEST(Physics, TestSATDetect)
 	transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
 	transformJson3["position"] = { 200, 200 };
 	transformJson3["scale"] = { 1.0, 1.0 };
-	transformJson3["angle"] = 45;
+	transformJson3["angle"] = 0;
 
 	json rectShapeJson2;
 	rectShapeJson2["name"] = "Circle Shape Component";
 	rectShapeJson2["type"] = sfge::ComponentType::SHAPE2D;
 	rectShapeJson2["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson2["size"] = { 50, 50 };
+	rectShapeJson2["size"] = { 100, 100 };
 
 	json rigidBodyJson3;
 	rigidBodyJson3["name"] = "Rigidbody";
 	rigidBodyJson3["type"] = sfge::ComponentType::BODY2D;
 	rigidBodyJson3["body_type"] = p2BodyType::DYNAMIC;
-	rigidBodyJson3["gravity_scale"] = 0.5;
+	rigidBodyJson3["gravity_scale"] = 1;
 
 	json rectColliderJson2;
 	rectColliderJson2["name"] = "Circle Collider";
 	rectColliderJson2["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson2["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson2["size"] = { 50, 50 };
-	rectColliderJson2["bouncing"] = 0.5;
+	rectColliderJson2["size"] = { 100, 100 };
+	rectColliderJson2["bouncing"] = 0;
 	rectColliderJson2["sensor"] = false;
 
 	entityBody3["components"] = { transformJson3, rectShapeJson2, rigidBodyJson3, rectColliderJson2 };
@@ -664,7 +678,7 @@ TEST(Physics, TestSATDetect)
 
 	json transformJson2;
 	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson2["position"] = { 500, 400 };
+	transformJson2["position"] = { 500, 750 };
 	transformJson2["scale"] = { 1.0, 1.0 };
 	transformJson2["angle"] = 0.0;
 
@@ -672,7 +686,7 @@ TEST(Physics, TestSATDetect)
 	rectShapeJson["name"] = "Rect Shape Component";
 	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
 	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson["size"] = { 500, 200 };
+	rectShapeJson["size"] = { 1500, 200 };
 
 	json rigidBodyJson2;
 	rigidBodyJson2["name"] = "Rigidbody";
@@ -683,12 +697,12 @@ TEST(Physics, TestSATDetect)
 	rectColliderJson["name"] = "Rect Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = { 500, 200 };
+	rectColliderJson["size"] = { 1500, 200 };
 	rectColliderJson["sensor"] = false;
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };
 
-	sceneJson["entities"] = { entityBody2, entityBody1};// , entityBody1};
+	sceneJson["entities"] = { entityBody2, entityBody3};// , entityBody1};
 	json contactDebugSystem = {
 		
 			{"systemClassName", "ContactDebug"}

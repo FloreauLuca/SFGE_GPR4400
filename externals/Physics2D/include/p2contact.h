@@ -96,7 +96,7 @@ public:
 	/**
 	 * \brief Check contact between 2 p2Body
 	 */
-	void CheckContactBetweenBodies(p2Body* body1, p2Body* body2);
+	void CheckNewContactBetweenBodies(p2Body* body1, p2Body* body2);
 	/**
 	 * \brief Return the QuadTree
 	 */
