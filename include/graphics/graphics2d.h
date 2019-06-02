@@ -86,7 +86,7 @@ protected:
 	ShapeManager m_ShapeManager{m_Engine};
 	std::unique_ptr<sf::RenderWindow> m_Window;
 
-	const float debugVectorPixelResolution = 20.f;
+	const float debugVectorPixelResolution = 1.f;
 };
 
 }

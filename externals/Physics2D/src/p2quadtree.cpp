@@ -3,14 +3,13 @@
 
 p2QuadTree::p2QuadTree()
 {
-	
 }
 
 p2QuadTree::p2QuadTree(int nodeLevel, p2AABB bounds)
 {
 	m_NodeLevel = nodeLevel;
 	m_Bounds = bounds;
-	m_Objects = std::list<p2Body*>();
+	m_Objects.resize(MAX_OBJECTS+1);
 }
 
 p2QuadTree::~p2QuadTree()
@@ -23,7 +22,7 @@ void p2QuadTree::Clear()
 	m_Objects.clear();
 	for (int i = 0; i < CHILD_TREE_NMB; i++)
 	{
-		if(nodes[i] != nullptr)
+		if (nodes[i] != nullptr)
 		{
 			nodes[i]->Clear();
 			delete nodes[i];
@@ -48,7 +47,7 @@ void p2QuadTree::Split()
 	aabb.topRight = p2Vec2(m_Bounds.topRight.x, m_Bounds.GetCenter().y);
 	aabb.bottomLeft = p2Vec2(m_Bounds.GetCenter().x, m_Bounds.bottomLeft.y);
 	nodes[3] = new p2QuadTree(nodeLevel, aabb);
-	
+
 }
 
 int p2QuadTree::GetLevel()
@@ -66,115 +65,97 @@ p2QuadTree** p2QuadTree::GetChild()
 	return nodes;
 }
 
-int p2QuadTree::GetIndex(p2AABB aabb)
+void p2QuadTree::Insert(p2Body* obj)
 {
-	int index = -1;
-	p2Vec2 center = m_Bounds.GetCenter();
-
-	bool leftPart = (aabb.topRight.x < center.x);
-	bool rightPart = (aabb.bottomLeft.x > center.x);
-	bool topPart = (aabb.bottomLeft.y > center.y);
-	bool bottomPart = (aabb.topRight.y < center.y);
-
-	if(rightPart)
+	if (obj == nullptr) return;
+	bool inserted = false;
+	if(nodes[0] == nullptr)
 	{
-		if (topPart)
-		{
-			index = 1;
-		} else if (bottomPart)
-		{
-			index = 3;
-		}
-	} else if (leftPart)
-	{
-		if (topPart)
-		{
-			index = 0;
-		}
-		else if (bottomPart)
-		{
-			index = 2;
-		}
-	}
-
-	return index;
-}
-
-void p2QuadTree::Insert(p2Body * obj)
-{
-	if (nodes[0] != nullptr)
-	{
-		int index = GetIndex(obj->GetAABB());
-
-		if (index != -1)
-		{
-			nodes[index]->Insert(obj);
-			return;
-		}
-	}
-
-	m_Objects.push_back(obj);
-
-	if(m_Objects.size() > MAX_OBJECTS && m_NodeLevel < MAX_LEVELS)
-	{
-		if (nodes[0] == nullptr)
+		if (m_ObjectIndex>= MAX_OBJECTS)
 		{
 			Split();
-		}
-		int i = 0;
-		std::list<p2Body*> objectToDelete;
-		for (p2Body* object : m_Objects)
-		{
-			int index = GetIndex(object->GetAABB());
-			if (index !=-1)
+			std::vector<p2Body*> objects = GetObjects();
+			m_Objects.clear();
+			m_Objects.resize(MAX_OBJECTS);
+			m_ObjectIndex = 0;
+			for (p2Body* object : objects)
 			{
-				nodes[index]->Insert(object);
-				objectToDelete.push_back(object);
+				Insert(object);
 			}
 		}
-		for (p2Body* object_to_delete : objectToDelete)
-		{
-			m_Objects.remove(object_to_delete);
-		}
-	}
-}
-
-std::list<p2Body*> p2QuadTree::GetObjects()
-{
-	return m_Objects;
-}
-
-std::list<p2Body*> p2QuadTree::GetChildObjects()
-{
-	std::list<p2Body*> childObject;
-	for (p2Body* m_object : m_Objects)
-	{
-		childObject.push_back(m_object);
 	}
 	if (nodes[0] != nullptr)
 	{
 		for (p2QuadTree* node : nodes)
 		{
-			for (p2Body* child_object : node->GetChildObjects())
+			if (node->GetBounds().ContainsAABB(obj->GetAABB()))
 			{
-				childObject.push_back(child_object);
+				node->Insert(obj);
+				inserted = true;
+				break;
 			}
 		}
 	}
-	return childObject;
+	
+	if (!inserted)
+	{
+		if (m_ObjectIndex>=m_Objects.size())
+		{
+			m_Objects.push_back(obj);
+			m_ObjectIndex++;
+		}
+		else
+		{
+			m_Objects[m_ObjectIndex] = obj;
+			m_ObjectIndex++;
+		}
+	}
+}
+
+std::vector<p2Body*> p2QuadTree::GetObjects()
+{
+	std::vector<p2Body*> returnedObjects = m_Objects;
+	returnedObjects.resize(m_ObjectIndex);
+	return returnedObjects;
+}
+
+std::vector<p2Body*> p2QuadTree::GetChildObjects()
+{
+	std::vector<p2Body*> childObjects = GetObjects();
+	if (nodes[0] != nullptr)
+	{
+		for (p2QuadTree* node : nodes)
+		{
+			std::vector<p2Body*> nodeChildObject = node->GetChildObjects();
+			if (!nodeChildObject.empty())
+			{
+				childObjects.insert(childObjects.end(), nodeChildObject.begin(), nodeChildObject.end());
+			}
+		}
+	}
+	return childObjects;
 }
 
 void p2QuadTree::Retrieve(std::list<p2Body*>& returnedObject, p2Body* object)
 {
-	int index = GetIndex(object->GetAABB());
+ 	if (nodes[0] == nullptr)
+	{
 
-		if (index != -1 && nodes[0] != nullptr)
+		if (m_ObjectIndex >= 2)
 		{
-			nodes[index]->Retrieve(returnedObject, object);
+			contact_manager->CheckContactInsideList(GetObjects());
 		}
 
 	for (p2Body* m_object : m_Objects)
 	{
-		returnedObject.push_back(m_object);
+		for (p2QuadTree* node : nodes)
+		{
+			node->Retrieve(contact_manager);
+		}
+		std::vector<p2Body*> childObjects = GetChildObjects();
+		if (!childObjects.empty() && !GetObjects().empty())
+		{
+			contact_manager->CheckContactBetweenList(GetObjects(), childObjects);
+		}
 	}
 }

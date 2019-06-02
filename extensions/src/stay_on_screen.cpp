@@ -22,33 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <extensions/quad_tree_test.h>
 #include <engine/engine.h>
 #include <engine/config.h>
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-
+#include "extensions/stay_on_screen.h"
 
 
 namespace sfge::ext
 {
 
-	QuadTreeTest::QuadTreeTest(Engine& engine) :
+	StayOnScreen::StayOnScreen(Engine& engine) :
 		System(engine)
 	{
 
 	}
-	
-	void QuadTreeTest::OnEngineInit()
+
+	void StayOnScreen::OnEngineInit()
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
-		m_Physics2DManager = m_Engine.GetPhysicsManager();
+		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
-		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
 		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
-		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
+		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
+
 
 		auto config = m_Engine.GetConfig();
 		fixedDeltaTime = config->fixedDeltaTime;
@@ -60,10 +59,13 @@ namespace sfge::ext
 		{
 			auto body = m_Body2DManager->GetComponentPtr(entities[i]);
 			bodies.push_back(body->GetBody());
+			auto shape = m_ShapeManager->GetComponentPtr(entities[i]);
+			shape->SetFillColor(sf::Color::Red);
 		}
+		count.resize(entities.size());
 	}
 
-	void QuadTreeTest::OnUpdate(float dt)
+	void StayOnScreen::OnUpdate(float dt)
 	{
 		(void)dt;
 		/*
@@ -76,62 +78,26 @@ namespace sfge::ext
 	}
 
 
-	void QuadTreeTest::OnFixedUpdate()
+	void StayOnScreen::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(QuadTreeTestFixedUpdate, 0);
-
-	}
-
-	void QuadTreeTest::OnDraw()
-	{
-		rmt_ScopedCPUSample(QuadTreeTestDraw, 0);
-		m_QuadTree = m_Physics2DManager->Getp2World()->GetQuadtree();
-		colorIterator = 0;
-		DrawQuadTree(m_QuadTree);
-	}
-
-	void QuadTreeTest::DrawQuadTree(p2QuadTree* quadTree)
-	{
-		p2AABB aabb = quadTree->GetBounds();
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)),
-		                              meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Cyan);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)),
-		                              meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Cyan);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)),
-		                              meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Cyan);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)),
-		                              meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Cyan);
-		
-		std::vector<p2Body*> objects = quadTree->GetObjects();
-		for (p2Body* object : objects)
+		rmt_ScopedCPUSample(StayOnScreenFixedUpdate, 0);
+		auto config = m_Engine.GetConfig();
+		fixedDeltaTime = config->fixedDeltaTime;
+		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
+		for (auto entity : entities)
 		{
-			for (int i = 0; i < bodies.size(); i++)
+			auto transform = m_Transform2DManager->GetComponentPtr(entity);
+			auto body = m_Body2DManager->GetComponentPtr(entity);
+			auto position = transform->Position;
+			if ((position.x < 0 && body->GetLinearVelocity().x < 0) || (position.x > screenSize.x && body->GetLinearVelocity().x > 0))
 			{
-				if (bodies[i] == object)
-				{
-					Shape* shape = m_ShapeManager->GetComponentPtr(entities[i]);
-					if (quadTree->GetChild()[0] == nullptr)
-					{
-						//shape->SetFillColor(colors[colorIterator % colors.size()]);
-					}
-					else
-					{
-						//shape->SetFillColor(sf::Color::White);
-					}
-				}
+				body->SetLinearVelocity(p2Vec2(-body->GetLinearVelocity().x, body->GetLinearVelocity().y));
 			}
-		}
-		
-		if (quadTree->GetChild()[0] == nullptr)
-		{
-			colorIterator++;
-		}
-		else
-		{
-			for (int i = 0; i < 4; i++)
+			if ((position.y < 0 && body->GetLinearVelocity().y < 0) || (position.y > screenSize.y && body->GetLinearVelocity().y > 0))
 			{
-				DrawQuadTree(quadTree->GetChild()[i]);
+				body->SetLinearVelocity(p2Vec2(body->GetLinearVelocity().x, -body->GetLinearVelocity().y));
 			}
 		}
 	}
+
 }

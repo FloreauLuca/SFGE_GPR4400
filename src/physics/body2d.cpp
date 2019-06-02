@@ -208,14 +208,25 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		if (CheckJsonExists(componentJson, "body_type"))
 		{
 			bodyDef.type = componentJson["body_type"];
+		} else
+		{
+			bodyDef.type = p2BodyType::STATIC;
 		}
 		if (CheckJsonNumber(componentJson, "gravity_scale"))
 		{
 			bodyDef.gravityScale = componentJson["gravity_scale"];
 		}
+		else
+		{
+			bodyDef.gravityScale = 1;
+		}
 		if (CheckJsonNumber(componentJson, "mass"))
 		{
 			bodyDef.mass = componentJson["mass"];
+		}
+		else
+		{
+			bodyDef.mass = 1;
 		}
 
 		const auto offset = GetVectorFromJson(componentJson, "offset");
