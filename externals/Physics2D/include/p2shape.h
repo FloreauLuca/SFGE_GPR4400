@@ -62,14 +62,15 @@ public:
 	void SetSize(p2Vec2 size);
 	p2Vec2 GetSize();
 	std::vector<p2Vec2> GetCorner();
-	std::vector<p2Vec2> GetAxis();
+	/**
+	 * \brief Calculate the corner of the rotated shape
+	 * \param angle in degree
+	 */
 	void Rotate(float angle) override;
 private:
 	const size_t MAX_CORNER = 4;
-
 	p2Vec2 m_Size;
-	std::vector<p2Vec2> axis;
-	std::vector<p2Vec2> corners;
+	std::vector<p2Vec2> m_Corners;
 };
 
 class p2PolygonShape : public p2Shape

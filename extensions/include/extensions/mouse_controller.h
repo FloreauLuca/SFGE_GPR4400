@@ -21,47 +21,66 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#ifndef SFGE_EXT_MOUSE_CONTROLLER_H
+#define SFGE_EXT_MOUSE_CONTROLLER_H
 
-#ifndef SFGE_P2WORLD_H
-#define SFGE_P2WORLD_H
+#include <engine/system.h>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <graphics/graphics2d.h>
+#include "input/input.h"
+#include "p2body.h"
 
-#include <p2vector.h>
-#include <p2body.h>
-#include <p2contact.h>
 
-const size_t MAX_BODY_LEN = 1000;
-
-/**
-* \brief Representation of the physical world in meter
-*/
-class p2World
+namespace sfge
 {
-public:
-	p2World(p2Vec2 gravity);
-	/**
-	* \brief Simulate a new step of the physical world, simplify the resolution with a QuadTree, generate the new contacts
-	*/
-	void Step(float dt);
-	/**
-	* \brief Factory method creating a p2Body
-	* \param bodyDef p2BodyDef definition of the body
-	* \return p2Body body attached to the p2World
-	*/
-	p2Body* CreateBody(p2BodyDef* bodyDef);
-	/**
-	* \brief Set the contact listener
-	*/
-	void SetContactListener(p2ContactListener* contactListener);
-	/**
-	 * \brief Return the QuadTree
-	 */
-	p2QuadTree* GetQuadtree();
-private:
-	p2Vec2 m_Gravity;
-	std::vector<p2Body> m_Bodies;
-	int m_BodyIndex = 0;
-	p2ContactListener* m_ContactListener;
-	p2ContactManager m_ContactManager;
-};
+	struct Transform2d;
+	class Transform2dManager;
+	class Body2dManager;
+	class TextureManager;
+	class SpriteManager;
+	class ShapeManager;
+}
+
+namespace sfge::ext
+{
+
+
+	class MouseController : public System
+	{
+	public:
+		MouseController(Engine& engine);
+
+		void OnEngineInit() override;
+
+		void OnUpdate(float dt) override;
+
+		void OnFixedUpdate() override;
+
+
+	private:
+
+
+		Transform2dManager* m_Transform2DManager;
+		Body2dManager* m_Body2DManager;
+		TextureManager* m_TextureManager;
+		SpriteManager* m_SpriteManager;
+		ShapeManager* m_ShapeManager;
+		Graphics2dManager* m_Graphics2DManager;
+		InputManager* m_InputManager;
+
+
+		void DrawVector(p2Body* body);
+
+		float fixedDeltaTime = 0.0f;
+		const size_t entitiesNmb = 10'000;
+
+		sf::Vector2f screenSize;
+		std::vector<p2Body*> bodies;
+		std::vector<Entity> entities;
+		std::vector<int> count;
+	};
+
+
+}
 
 #endif

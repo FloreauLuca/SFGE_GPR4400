@@ -22,30 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <extensions/aabb_test.h>
 #include <engine/engine.h>
 #include <engine/config.h>
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-
+#include "extensions/stay_on_screen.h"
 
 
 namespace sfge::ext
 {
 
-	AabbTest::AabbTest(Engine& engine) :
+	StayOnScreen::StayOnScreen(Engine& engine) :
 		System(engine)
 	{
 
 	}
-	
-	void AabbTest::OnEngineInit()
+
+	void StayOnScreen::OnEngineInit()
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
+		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
 
 
@@ -59,10 +59,13 @@ namespace sfge::ext
 		{
 			auto body = m_Body2DManager->GetComponentPtr(entities[i]);
 			bodies.push_back(body->GetBody());
+			auto shape = m_ShapeManager->GetComponentPtr(entities[i]);
+			shape->SetFillColor(sf::Color::Red);
 		}
+		count.resize(entities.size());
 	}
 
-	void AabbTest::OnUpdate(float dt)
+	void StayOnScreen::OnUpdate(float dt)
 	{
 		(void)dt;
 		/*
@@ -75,27 +78,26 @@ namespace sfge::ext
 	}
 
 
-	void AabbTest::OnFixedUpdate()
+	void StayOnScreen::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(AabbTestFixedUpdate, 0);
-
-	}
-
-	void AabbTest::OnDraw()
-	{
-		rmt_ScopedCPUSample(AabbTestDraw, 0);
-		for (auto i = 0u; i < bodies.size(); i++)
+		rmt_ScopedCPUSample(StayOnScreenFixedUpdate, 0);
+		auto config = m_Engine.GetConfig();
+		fixedDeltaTime = config->fixedDeltaTime;
+		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
+		for (auto entity : entities)
 		{
-			DrawAABB(bodies[i]->GetAABB());
+			auto transform = m_Transform2DManager->GetComponentPtr(entity);
+			auto body = m_Body2DManager->GetComponentPtr(entity);
+			auto position = transform->Position;
+			if ((position.x < 0 && body->GetLinearVelocity().x < 0) || (position.x > screenSize.x && body->GetLinearVelocity().x > 0))
+			{
+				body->SetLinearVelocity(p2Vec2(-body->GetLinearVelocity().x, body->GetLinearVelocity().y));
+			}
+			if ((position.y < 0 && body->GetLinearVelocity().y < 0) || (position.y > screenSize.y && body->GetLinearVelocity().y > 0))
+			{
+				body->SetLinearVelocity(p2Vec2(body->GetLinearVelocity().x, -body->GetLinearVelocity().y));
+			}
 		}
 	}
 
-	void AabbTest::DrawAABB(p2AABB aabb)
-	{
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-	}
-	
 }

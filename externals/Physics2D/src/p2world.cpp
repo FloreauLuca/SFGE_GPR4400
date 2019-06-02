@@ -23,7 +23,6 @@ SOFTWARE.
 */
 #include <p2world.h>
 
-
 p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 {
 	m_Bodies.resize(MAX_BODY_LEN);
@@ -33,20 +32,25 @@ void p2World::Step(float doriantan)
 {
 	for (p2Body &body : m_Bodies)
 	{
+		// ApplyForce
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			//body.ApplyForceToCenter(m_Gravity*doriantan);
+			body.ApplyForceToCenter(m_Gravity*doriantan);
 		}
+		// Move
 		if (body.GetType() != p2BodyType::STATIC)
 		{
 			body.Move(doriantan);
+			body.SetAngle(body.GetAngle() + 100 * doriantan);
+
 		}
-		if (body.GetCollider()[0].size()>0)
+		// BuildAABB
+		if (!body.GetCollider()[0].empty())
 		{
 			body.BuildAABB();
 		}
-		body.SetAngle(body.GetAngle() + 100 * doriantan);
 	}
+	// CheckContact
 	m_ContactManager.CheckContact(m_Bodies);
 
 }
@@ -64,4 +68,9 @@ void p2World::SetContactListener(p2ContactListener * contactListener)
 {
 	m_ContactListener = contactListener;
 	m_ContactManager.Init(m_ContactListener);
+}
+
+p2QuadTree* p2World::GetQuadtree()
+{
+	return m_ContactManager.GetQuadtree();
 }

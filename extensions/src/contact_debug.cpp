@@ -22,30 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <extensions/aabb_test.h>
 #include <engine/engine.h>
 #include <engine/config.h>
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-
+#include "extensions/contact_debug.h"
 
 
 namespace sfge::ext
 {
 
-	AabbTest::AabbTest(Engine& engine) :
+	ContactDebug::ContactDebug(Engine& engine) :
 		System(engine)
 	{
 
 	}
-	
-	void AabbTest::OnEngineInit()
+
+	void ContactDebug::OnEngineInit()
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
+		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
 
 
@@ -59,10 +59,13 @@ namespace sfge::ext
 		{
 			auto body = m_Body2DManager->GetComponentPtr(entities[i]);
 			bodies.push_back(body->GetBody());
+			auto shape = m_ShapeManager->GetComponentPtr(entities[i]);
+			shape->SetFillColor(sf::Color::Red);
 		}
+		count.resize(entities.size());
 	}
 
-	void AabbTest::OnUpdate(float dt)
+	void ContactDebug::OnUpdate(float dt)
 	{
 		(void)dt;
 		/*
@@ -75,27 +78,60 @@ namespace sfge::ext
 	}
 
 
-	void AabbTest::OnFixedUpdate()
+	void ContactDebug::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(AabbTestFixedUpdate, 0);
+		rmt_ScopedCPUSample(ContactDebugFixedUpdate, 0);
 
 	}
 
-	void AabbTest::OnDraw()
+	void ContactDebug::OnDraw()
 	{
-		rmt_ScopedCPUSample(AabbTestDraw, 0);
-		for (auto i = 0u; i < bodies.size(); i++)
+		rmt_ScopedCPUSample(ContactDebugDraw, 0);
+		for (int i = 0; i < entities.size(); i++)
 		{
-			DrawAABB(bodies[i]->GetAABB());
+			auto shape = m_ShapeManager->GetComponentPtr(entities[i]);
+			if (count[i] > 0)
+			{
+				shape->SetFillColor(sf::Color::Green);
+			}
+			else
+			{
+				shape->SetFillColor(sf::Color::Magenta);
+
+			}
+		}
+		
+	}
+
+	void ContactDebug::OnContact(ColliderData* c1, ColliderData* c2, bool enter)
+	{
+		if (enter)
+		{
+			for (int i = 0; i < entities.size(); i++)
+			{
+				if (entities[i] == c1->entity)
+				{
+					count[i] += 1;
+				}
+				if (entities[i] == c2->entity)
+				{
+					count[i] += 1;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < entities.size(); i++)
+			{
+				if (entities[i] == c1->entity)
+				{
+					count[i] -= 1;
+				}
+				if (entities[i] == c2->entity)
+				{
+					count[i] -= 1;
+				}
+			}
 		}
 	}
-
-	void AabbTest::DrawAABB(p2AABB aabb)
-	{
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-	}
-	
 }

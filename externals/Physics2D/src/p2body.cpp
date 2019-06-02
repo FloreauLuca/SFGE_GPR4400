@@ -27,26 +27,29 @@ SOFTWARE.
 void p2Body::Init(p2BodyDef* bodyDef)
 {
 	m_Colliders.resize(MAX_COLLIDER_LEN);
-	position = bodyDef->position;
-	linearVelocity = bodyDef->linearVelocity;
-	bodyType = bodyDef->type;
+	m_Position = bodyDef->position;
+	m_LinearVelocity = bodyDef->linearVelocity;
+	m_BodyType = bodyDef->type;
 	m_Mass = bodyDef->mass;
 	m_Angle = bodyDef->angle;
-	
+	m_GravityScale = bodyDef->gravityScale;
+	m_IsInstantiate = true;
 }
 
-
+bool p2Body::IsInstantiate()
+{
+	return m_IsInstantiate;
+}
 
 p2Vec2 p2Body::GetLinearVelocity() const
 {
-	return linearVelocity;
+	return m_LinearVelocity;
 }
 
 void p2Body::SetLinearVelocity(p2Vec2 velocity)
 {
-	linearVelocity = velocity;
+	m_LinearVelocity = velocity;
 }
-
 
 /**
  * \brief 
@@ -64,12 +67,18 @@ float p2Body::GetAngle()
 
 float p2Body::GetAngularVelocity()
 {
-	return angularVelocity;
+	return m_AngularVelocity;
 }
 
 p2Vec2 p2Body::GetPosition()
 {
-	return position;
+	return m_Position;
+}
+
+
+void p2Body::SetPosition(p2Vec2 newPosition)
+{
+	m_Position = newPosition;
 }
 
 p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
@@ -84,13 +93,12 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {
-	if (m_Mass == 0) m_Mass = 1;
-	linearVelocity += force/m_Mass;
+	m_LinearVelocity += force*m_GravityScale/m_Mass;
 }
 
 p2BodyType p2Body::GetType() const
 {
-	return bodyType;
+	return m_BodyType;
 }
 
 
@@ -101,45 +109,43 @@ float p2Body::GetMass() const
 
 void p2Body::Move(float dt)
 {
-	position += linearVelocity * dt*1/2;
+	m_Position += m_LinearVelocity * dt*1/2;
 	//std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }
 
 void p2Body::BuildAABB()
 {
-	float bottom = position.y;
-	float top = position.y;
-	float right = position.x;
-	float left = position.x;
+	float bottom = m_Position.y;
+	float top = m_Position.y;
+	float right = m_Position.x;
+	float left = m_Position.x;
 	for (p2Collider m_collider : m_Colliders)
 	{
 		if (m_collider.GetUserData() == nullptr) continue;
-		p2AABB colliderAABB = m_collider.GetAABB(position, m_Angle);
+		p2AABB colliderAABB = m_collider.GetAABB(m_Position, m_Angle);
 
-		if (colliderAABB.GetBottom() < bottom)
+		if (colliderAABB.bottomLeft.y < bottom)
 		{
-			bottom = colliderAABB.GetBottom();
+			m_Aabb.bottomLeft.y = colliderAABB.bottomLeft.y;
 		}
-		if (colliderAABB.GetTop() > top)
+		if (colliderAABB.topRight.y > top)
 		{
-			top = colliderAABB.GetTop();
+			m_Aabb.topRight.y = colliderAABB.topRight.y;
 		}
-		if (colliderAABB.GetLeft() < left)
+		if (colliderAABB.bottomLeft.x < left)
 		{
-			left = colliderAABB.GetLeft();
+			m_Aabb.bottomLeft.x = colliderAABB.bottomLeft.x;
 		}
-		if (colliderAABB.GetRight() > right)
+		if (colliderAABB.topRight.x > right)
 		{
-			right = colliderAABB.GetRight();
+			m_Aabb.topRight.x = colliderAABB.topRight.x;
 		}
 	}
-	aabb.SetSide(top, bottom, right, left);
-	std::cout << "top : " + std::to_string(aabb.GetTop()) + " bottom : " + std::to_string(aabb.GetBottom()) + " right : " + std::to_string(aabb.GetRight()) + " left : " + std::to_string(aabb.GetLeft()) << std::endl; // Debug
 }
 
 p2AABB p2Body::GetAABB()
 {
-	return aabb;
+	return m_Aabb;
 }
 
 std::vector<p2Collider>* p2Body::GetCollider()

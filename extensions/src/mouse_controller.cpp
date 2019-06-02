@@ -22,31 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <extensions/aabb_test.h>
 #include <engine/engine.h>
 #include <engine/config.h>
 #include <graphics/graphics2d.h>
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
-
+#include "extensions/mouse_controller.h"
 
 
 namespace sfge::ext
 {
 
-	AabbTest::AabbTest(Engine& engine) :
+	MouseController::MouseController(Engine& engine) :
 		System(engine)
 	{
 
 	}
-	
-	void AabbTest::OnEngineInit()
+
+	void MouseController::OnEngineInit()
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
+		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
+		m_InputManager = m_Engine.GetInputManager();
 
 
 		auto config = m_Engine.GetConfig();
@@ -62,40 +63,49 @@ namespace sfge::ext
 		}
 	}
 
-	void AabbTest::OnUpdate(float dt)
+	void MouseController::OnUpdate(float dt)
 	{
 		(void)dt;
-		/*
-		for (auto i = 0u; i < entities.size(); i++)
+		MouseManager& mouseManager = m_InputManager->GetMouseManager();
+		p2Vec2 mousePosition = pixel2meter(mouseManager.GetPosition());
+		for (p2Body* body : bodies)
 		{
-			auto transform = m_Transform2DManager->GetComponentPtr(entities[i]);
-			transform->EulerAngle += 5*dt;
+			if ((body->GetPosition() - mousePosition).GetMagnitude() < 0.5f && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				body->SetPosition(mousePosition);
+				body->SetLinearVelocity(p2Vec2());
+			}
 		}
-		*/
-	}
-
-
-	void AabbTest::OnFixedUpdate()
-	{
-		rmt_ScopedCPUSample(AabbTestFixedUpdate, 0);
-
-	}
-
-	void AabbTest::OnDraw()
-	{
-		rmt_ScopedCPUSample(AabbTestDraw, 0);
-		for (auto i = 0u; i < bodies.size(); i++)
+		if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::V))
 		{
-			DrawAABB(bodies[i]->GetAABB());
+			std::cout << std::to_string(mouseManager.GetPosition().x) + " , " + std::to_string(mouseManager.GetPosition().y) << std::endl;
+		}
+		if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::B))
+		{
+			std::cout << std::to_string(pixel2meter(mouseManager.GetPosition().x)) + " , " + std::to_string(pixel2meter(mouseManager.GetPosition().y)) << std::endl;
 		}
 	}
 
-	void AabbTest::DrawAABB(p2AABB aabb)
+	void MouseController::OnFixedUpdate()
 	{
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.topRight.x, aabb.topRight.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.topRight.y)), sf::Color::Red);
-		m_Graphics2DManager->DrawLine(meter2pixel(p2Vec2(aabb.bottomLeft.x, aabb.bottomLeft.y)), meter2pixel(p2Vec2(aabb.topRight.x, aabb.bottomLeft.y)), sf::Color::Red);
+		rmt_ScopedCPUSample(StayOnScreenFixedUpdate, 0);
+		auto config = m_Engine.GetConfig();
+		fixedDeltaTime = config->fixedDeltaTime;
+		screenSize = sf::Vector2f(config->screenResolution.x, config->screenResolution.y);
+		for (auto entity : entities)
+		{
+			auto transform = m_Transform2DManager->GetComponentPtr(entity);
+			auto body = m_Body2DManager->GetComponentPtr(entity);
+			auto position = transform->Position;
+			if ((position.x < 0 && body->GetLinearVelocity().x < 0) || (position.x > screenSize.x && body->GetLinearVelocity().x > 0))
+			{
+				body->SetLinearVelocity(p2Vec2(-body->GetLinearVelocity().x, body->GetLinearVelocity().y));
+			}
+			if ((position.y < 0 && body->GetLinearVelocity().y < 0) || (position.y > screenSize.y && body->GetLinearVelocity().y > 0))
+			{
+				body->SetLinearVelocity(p2Vec2(body->GetLinearVelocity().x, -body->GetLinearVelocity().y));
+			}
+		}
 	}
-	
+
 }

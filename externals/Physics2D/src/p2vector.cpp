@@ -36,9 +36,24 @@ p2Vec2::p2Vec2(float x, float y)
 	this->y = y;
 }
 
+bool p2Vec2::operator==(const p2Vec2& v) const
+{
+	return  (x == v.x && y == v.y);
+}
+
+bool p2Vec2::operator!=(const p2Vec2& v) const
+{
+	return  (x != v.x || y != v.y);
+}
+
 p2Vec2 p2Vec2::operator+(const p2Vec2& v) const
 {
 	return p2Vec2(x + v.x, y + v.y);
+}
+
+p2Vec2 p2Vec2::operator+(const float& f) const
+{
+	return p2Vec2(x + f, y + f);
 }
 
 p2Vec2& p2Vec2::operator+=(const p2Vec2& v)
@@ -51,6 +66,11 @@ p2Vec2& p2Vec2::operator+=(const p2Vec2& v)
 p2Vec2 p2Vec2::operator-(const p2Vec2& v) const
 {
 	return p2Vec2(x - v.x, y - v.y);
+}
+
+p2Vec2 p2Vec2::operator-(const float& f) const
+{
+	return p2Vec2(x - f, y - f);
 }
 
 p2Vec2& p2Vec2::operator-=(const p2Vec2& v)
@@ -117,6 +137,13 @@ p2Vec2 p2Vec2::Rotate(float angle) const
 	return p2Mat22(p2Vec2(cos(angle), sin(angle)), p2Vec2(-sin(angle), cos(angle))) *p2Vec2(x, y);
 }
 
+float p2Vec2::Distance(p2Vec2 v1, p2Vec2 v2)
+{
+	return sqrt((v1.x - v2.x)*(v1.x - v2.x) + (v1.y - v2.y)*(v1.y - v2.y));
+
+
+}
+
 /**
  * \brief Lerp
  * \param v1 start vector
@@ -158,6 +185,19 @@ bool p2Vec2::operator<(const p2Vec2& v) const
 bool p2Vec2::operator>(const p2Vec2& v) const
 {
 	return (x > v.x && y > v.y);
+}
+
+bool p2Vec2::operator<=(const p2Vec2& v) const
+{
+	return  (x <= v.x && y <= v.y);
+}
+
+/**
+ * \brief if x AND y superior
+ */
+bool p2Vec2::operator>=(const p2Vec2& v) const
+{
+	return (x >= v.x && y >= v.y);
 }
 
 p2Vec3::p2Vec3()

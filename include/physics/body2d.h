@@ -43,8 +43,6 @@ public:
 	void SetLinearVelocity(p2Vec2 velocity);
 	void ApplyForce(p2Vec2 force);
 	p2BodyType GetType();
-	p2Vec2 GetAABBTopRight();
-	p2Vec2 GetAABBBottomLeft();
 	float GetMass();
 	void SetBody(p2Body* body);
 	p2Body* GetBody() const;

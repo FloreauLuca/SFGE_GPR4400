@@ -31,12 +31,15 @@ SOFTWARE.
 #include <p2aabb.h>
 #include <p2body.h>
 
+class p2ContactManager;
+
 /**
 * \brief Representation of a tree with 4 branches containing p2Body defined by their p2AABB
 */
 class p2QuadTree
 {
 public:
+	p2QuadTree();
 	p2QuadTree(int nodeLevel, p2AABB bounds);
 	~p2QuadTree();
 
@@ -48,29 +51,30 @@ public:
 	* Called when node have too much objects and split the current node into four
 	*/
 	void Split();
-
-	/**
-	* Get the index of the child trees of the p2Body
-	*/
-	int GetIndex(p2Body* rect);
+	int GetLevel();
+	p2AABB GetBounds();
+	p2QuadTree** GetChild();
 	/**
 	* Insert a new p2Body in the tree
 	*/
 	void Insert(p2Body* obj);
+	std::vector<p2Body*> GetObjects();
+	std::vector<p2Body*> GetChildObjects();
 	/**
-	* Return a list of all the p2Body that might collide
+	* Check the contact between all the nodeObjects
 	*/
-	void Retrieve();
-	
+	void Retrieve(p2ContactManager* contact_manager);
+
 private:
 
-
-	static const int MAX_OBJECTS = 10;
+	static const int TOTAL_MAX_OBJECTS = 1000;
+	static const int MAX_OBJECTS = 2;
 	static const int MAX_LEVELS = 5;
 	static const int CHILD_TREE_NMB = 4;
 	int m_NodeLevel = 0;
 	p2QuadTree* nodes[CHILD_TREE_NMB] = { nullptr };
-	std::list<p2Body*> m_Objects;
+	std::vector<p2Body*> m_Objects;
+	int m_ObjectIndex = 0;
 	p2AABB m_Bounds;
 };
 

@@ -62,32 +62,37 @@ struct p2ColliderDef
 /**
 * \brief Representation of a Collider attached to a p2Body
 */
-
 class p2Collider
 {
 public:
+	/**
+	 * \brief Save the colliderDef information
+	 * \param colliderDef p2Collider definition of the collider
+	 */
 	void Init(const p2ColliderDef* colliderDef);
 
 	/**
 	* \brief Check if the p2Collider is a sensor
 	*/
 	bool IsSensor();
-	/**
-	* \brief Return the userData
-	*/
 	void* GetUserData();
-	p2Shape* GetShape();
-	p2ColliderType GetColliderType();
-	void DisplayShape();
-	p2AABB GetAABB(p2Vec2 position, float angle);
 	void SetUserData(void* colliderData);
+	p2Shape* GetShape();
+	float GetRestitution();
+	p2ColliderType GetColliderType();
+	/**
+	 * \brief Rotate the shape and calculate the collider AABB from his shape
+	 * \param position Body position //TODO set offset
+	 * \param angle Body angle //TODO set angleOffset
+	 */
+	p2AABB GetAABB(p2Vec2 position, float angle);
 private:
 	void* m_UserData;
 	p2Shape* m_Shape;
-	float m_Restitution;
+	float m_Restitution; //Energy restitution
 	bool m_IsSensor;
 	p2ColliderType m_ColliderType;
-	p2AABB aabb;
+	p2AABB m_Aabb;
 
 
 };

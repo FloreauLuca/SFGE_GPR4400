@@ -31,6 +31,12 @@ SOFTWARE.
 #include <extensions/python_extensions.h>
 #include <extensions/planet_system.h>
 #include "extensions/aabb_test.h"
+#include "extensions/quad_tree_test.h"
+#include "extensions/sat_test.h"
+#include "extensions/quad_tree_test.h"
+#include "extensions/contact_debug.h"
+#include "extensions/stay_on_screen.h"
+#include "extensions/mouse_controller.h"
 
 #include <tools/tools_pch.h>
 
@@ -46,6 +52,21 @@ void ExtendPython(py::module& m)
 		.def(py::init<Engine&>());
 	py::class_<AabbTest, System> aabbTest(m, "AabbTest");
 	aabbTest
+		.def(py::init<Engine&>());
+	py::class_<QuadTreeTest, System> quadTreeTest(m, "QuadTreeTest");
+	quadTreeTest
+		.def(py::init<Engine&>());
+	py::class_<SatTest, System> satTest(m, "SatTest");
+	satTest
+		.def(py::init<Engine&>());
+	py::class_<ContactDebug, System> contactDebug(m, "ContactDebug");
+	contactDebug
+		.def(py::init<Engine&>());
+	py::class_<StayOnScreen, System> stayOnScreen(m, "StayOnScreen");
+	stayOnScreen
+		.def(py::init<Engine&>());
+	py::class_<MouseController, System> mouseController(m, "MouseController");
+	mouseController
 		.def(py::init<Engine&>());
 
 	tools::ExtendPythonTools(m);

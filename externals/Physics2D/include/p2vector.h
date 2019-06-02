@@ -36,12 +36,14 @@ struct p2Vec2
 	p2Vec2();
 
 	p2Vec2(float x, float y);
-	bool operator==(const p2Vec2 &rhs) const;
-	bool operator!=(const p2Vec2 &rhs) const;
+	bool operator==(const p2Vec2 &v) const;
+	bool operator!=(const p2Vec2 &v) const;
 
 	p2Vec2 operator+(const p2Vec2& v)const;
+	p2Vec2 operator+(const float& v) const;
 	p2Vec2& operator+=(const p2Vec2& v);
 	p2Vec2 operator-(const p2Vec2& v) const;
+	p2Vec2 operator-(const float& v) const;
 	p2Vec2& operator-=(const p2Vec2& v);
 	p2Vec2& operator*=(float f);
 	p2Vec2 operator /(float f) const;
@@ -68,6 +70,7 @@ struct p2Vec2
 	void NormalizeSelf();
 
 	p2Vec2 Rotate(float angle) const;
+	static float Distance(p2Vec2 v1, p2Vec2 v2);
 	static p2Vec2 Lerp(const p2Vec2& v1, const p2Vec2& v2, float t);
 	static float AngleBetween(const p2Vec2& v1, const p2Vec2& v2);
 
@@ -77,6 +80,8 @@ struct p2Vec2
 	p2Vec3 to3();
 	bool operator<(const p2Vec2& v) const;
 	bool operator>(const p2Vec2& v) const;
+	bool operator<=(const p2Vec2& v) const;
+	bool operator>=(const p2Vec2& v) const;
 
 	float x = 0.0f;
 	float y = 0.0f;

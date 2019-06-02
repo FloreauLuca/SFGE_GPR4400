@@ -42,26 +42,35 @@ struct p2AABB
 	* \brief Calculate the extends and return it
 	*/
 	p2Vec2 GetExtends();
-
-	float GetBottom();
-	float GetTop();
-	float GetRight();
-	float GetLeft();
-
-	void SetSide(float top, float bottom, float right, float left);
+	/**
+	 * \brief Calculate the topRight and bottomLeft thanks to a shape and this center
+	 */
 	void SetShape(p2Shape* shape);
+	/**
+	 * \brief Calculate the topRight and bottomLeft thanks to an extend and this center
+	 */
 	void SetExtends(p2Vec2 extends);
-	void SetCenterExtend(p2Vec2 center, p2Vec2 extends);
-	void Rotate(float angle);
+	/**
+	 * \brief Calculate the topRight and bottomLeft thanks to a center and this extend
+	 */
 	void SetCenter(p2Vec2 center);
+	/**
+	 * \brief test if a point is in the AABB
+	 * \param point p2Vec2 to test
+	 */
+	bool ContainsPoint(p2Vec2 point);
+	/**
+	 * \brief test if a AABB is in contact with this AABB
+	 * \param aabb p2AABB to test
+	 */
+	bool ContainsAABB(p2AABB aabb);
+	/**
+	 * \brief Display the top, bottom, right and left of the AABB
+	 */
+	void Write();
+	
+	p2Vec2 topRight;
+	p2Vec2 bottomLeft;
 
-private:
-	float Bottom;
-	float Top;
-	float Left;
-	float Right;
-
-	p2Vec2 Extends;
-	p2Vec2 Center;
 };
 #endif // !SFGE_P2AABB:H
