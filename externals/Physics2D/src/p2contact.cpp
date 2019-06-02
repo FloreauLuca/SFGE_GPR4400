@@ -28,6 +28,7 @@ SOFTWARE.
 #include "../../Remotery/Remotery.h"
 #include <corecrt_math_defines.h>
 #include "p2matrix.h"
+#include "SFML/Window/Keyboard.hpp"
 
 void p2Contact::Init(p2Collider* colliderA, p2Collider* colliderB)
 {
@@ -65,17 +66,11 @@ p2Contact* p2ContactManager::CreateContact(p2Collider* colliderA, p2Collider* co
 	return &contact;
 }
 
-void p2ContactManager::RemoveContact(p2Collider* colliderA, p2Collider* colliderB)
+void p2ContactManager::RemoveContact(int contactIndex)
 {
-	for (int i = 0; i < m_ContactIndex; i++)
-	{
-		if (m_Contacts[i].CheckSameCollider(colliderA, colliderB))
-		{
-			m_Contacts.erase(m_Contacts.begin() + i);
-			m_ContactIndex--;
-			m_Contacts.resize(MAX_CONTACT_LEN);
-		}
-	}
+	m_Contacts.erase(m_Contacts.begin() + contactIndex);
+	m_ContactIndex--;
+	m_Contacts.resize(MAX_CONTACT_LEN);
 }
 
 void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
@@ -93,7 +88,20 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 		}
 	}
 	rmt_ScopedCPUSample(Retrieve, 0);
+	for (int i = 0; i < m_ContactIndex; i++)
+	{
+		m_Contacts[i].updated = false;
+	}
 	m_RootQuadTree.Retrieve(this);
+	rmt_ScopedCPUSample(EndCheckContact, 0);
+	for (int i = 0; i < m_ContactIndex; i++)
+	{
+		if (!m_Contacts[i].updated)
+		{
+			m_ContactListener->EndContact(&m_Contacts[i]);
+			RemoveContact(i);
+		}
+	}
 }
 
 void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
@@ -133,78 +141,103 @@ void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std
 
 void p2ContactManager::CheckNewContactBetweenBodies(p2Body* body1, p2Body* body2)
 {
-	rmt_ScopedCPUSample(ContainContact, 0);
-
-	if (!CheckAABBContact(body1, body2))
-	{
-		p2Contact* containedContact = ContainContact(body1, body2);
-		if (containedContact)
-		{
-			m_ContactListener->EndContact(containedContact);
-			RemoveContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
-		}
-	}
+	rmt_ScopedCPUSample(EndContact, 0);
+	int contactIndex = -1;
 	if (CheckAABBContact(body1, body2))
 	{
 		p2Mat22 mtv = CheckSATContact(body1, body2);
-		if (mtv == p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0)))
+		if (mtv != p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0)))
 		{
-			p2Contact* containedContact = ContainContact(body1, body2);
-			if (containedContact)
-			{
-				m_ContactListener->EndContact(containedContact);
-				RemoveContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
-			}
-		}
-		else
-		{
-			p2Contact* containedContact = ContainContact(body1, body2);
-			if (!containedContact)
+			contactIndex = ContainContact(body1, body2);
+			if (contactIndex == -1)
 			{
 				p2Contact* contact = CreateContact(&body1->GetCollider()->at(0), &body2->GetCollider()->at(0));
 				m_ContactListener->BeginContact(contact);
+			} else
+			{
+				m_Contacts[contactIndex].updated = true;
 			}
 			
-			
+			rmt_ScopedCPUSample(CorrectContact, 0);
 			
 			p2Vec2 newBody1Velocity;
 			p2Vec2 newBody2Velocity;
 			
 			if ((body1->GetPosition() - mtv.rows[0]).GetMagnitude() < (body1->GetPosition() - mtv.rows[0] + mtv.rows[1]).GetMagnitude())
 			{
-				if(body1->GetType() != p2BodyType::STATIC)
+				if(body1->GetType() == p2BodyType::DYNAMIC)
 				{
 					body1->SetPosition(body1->GetPosition() + (mtv.rows[1]));
 					newBody1Velocity = (body1->GetLinearVelocity() - (mtv.rows[1].Normalized() * p2Vec2::Dot(body1->GetLinearVelocity(), mtv.rows[1].Normalized())) * 2) * body1->GetCollider()->at(0).GetRestitution() + body2->GetLinearVelocity() * body2->GetCollider()->at(0).GetRestitution();
+					float inertia = 0;
+					if (p2CircleShape* circleshape = dynamic_cast<p2CircleShape*>(body1->GetCollider()->at(0).GetShape()))
+					{
+						inertia = 0;
+					}
+					else if (p2RectShape* rectshape = dynamic_cast<p2RectShape*>(body1->GetCollider()->at(0).GetShape()))
+					{
+						inertia = (rectshape->GetSize().x * pow(rectshape->GetSize().y, 3)) / 12;
+					}
+					body1->ApplyForceToCorner(inertia,body1->GetLinearVelocity() * -1, mtv.rows[0] - body1->GetPosition());
 				}
-				if (body2->GetType() != p2BodyType::STATIC)
+				if (body2->GetType() == p2BodyType::DYNAMIC)
 				{
 					body2->SetPosition(body2->GetPosition() - (mtv.rows[1]));
 					newBody2Velocity = (body2->GetLinearVelocity() - (mtv.rows[1].Normalized() * p2Vec2::Dot(body2->GetLinearVelocity(), mtv.rows[1].Normalized())) * 2) * body2->GetCollider()->at(0).GetRestitution() + body1->GetLinearVelocity() * body1->GetCollider()->at(0).GetRestitution();
+					float inertia = 0;
+					if (p2CircleShape* circleshape = dynamic_cast<p2CircleShape*>(body2->GetCollider()->at(0).GetShape()))
+					{
+						inertia = 0;
+					}
+					else if (p2RectShape* rectshape = dynamic_cast<p2RectShape*>(body2->GetCollider()->at(0).GetShape()))
+					{
+						inertia = (rectshape->GetSize().x * pow(rectshape->GetSize().y, 3)) / 12;
+					}
+					body2->ApplyForceToCorner(inertia, body2->GetLinearVelocity() * -1, mtv.rows[0] - body2->GetPosition());
 				}
-				//body1->ApplyForceToCenter(mtv.rows[1]);
-				//body2->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
 			}
 			else
 			{
-				if (body1->GetType() != p2BodyType::STATIC)
+				if (body1->GetType() == p2BodyType::DYNAMIC)
 				{
 					body1->SetPosition(body1->GetPosition() - (mtv.rows[1]));
 					newBody1Velocity = (body1->GetLinearVelocity() - (mtv.rows[1].Normalized() * p2Vec2::Dot(body1->GetLinearVelocity(), mtv.rows[1].Normalized())) * 2) * body1->GetCollider()->at(0).GetRestitution() + body2->GetLinearVelocity() * body2->GetCollider()->at(0).GetRestitution();
+					float inertia = 0;
+					if (p2CircleShape* circleshape = dynamic_cast<p2CircleShape*>(body1->GetCollider()->at(0).GetShape()))
+					{
+						inertia = 0;
+					}
+					else if (p2RectShape* rectshape = dynamic_cast<p2RectShape*>(body1->GetCollider()->at(0).GetShape()))
+					{
+						inertia = (rectshape->GetSize().x * pow(rectshape->GetSize().y, 3)) / 12;
+					}
+					body1->ApplyForceToCorner(inertia, body1->GetLinearVelocity() * -1, mtv.rows[0] - body1->GetPosition());
 				}
-				if (body2->GetType() != p2BodyType::STATIC)
+				if (body2->GetType() == p2BodyType::DYNAMIC)
 				{
 					body2->SetPosition(body2->GetPosition() + (mtv.rows[1]));
 					newBody2Velocity = (body2->GetLinearVelocity() - (mtv.rows[1].Normalized() * p2Vec2::Dot(body2->GetLinearVelocity(), mtv.rows[1].Normalized())) * 2) * body2->GetCollider()->at(0).GetRestitution() + body1->GetLinearVelocity() * body1->GetCollider()->at(0).GetRestitution();
+					float inertia = 0;
+					if (p2CircleShape* circleshape = dynamic_cast<p2CircleShape*>(body2->GetCollider()->at(0).GetShape()))
+					{
+						inertia = 0;
+					}
+					else if (p2RectShape* rectshape = dynamic_cast<p2RectShape*>(body2->GetCollider()->at(0).GetShape()))
+					{
+						inertia = (rectshape->GetSize().x * pow(rectshape->GetSize().y, 3)) / 12;
+					}
+					body2->ApplyForceToCorner(inertia, body2->GetLinearVelocity() * -1, mtv.rows[0] - body2->GetPosition());
 				}
-				//body2->ApplyForceToCenter(mtv.rows[1]);
-				//body1->ApplyForceToCenter(p2Vec2() - mtv.rows[1]);
 			}
+			if (body1->GetType() == p2BodyType::DYNAMIC)
+			{
+				body1->SetLinearVelocity(newBody1Velocity);
 
-			body1->SetLinearVelocity(newBody1Velocity);
-			body2->SetLinearVelocity(newBody2Velocity);
-			
-			
+			}
+			if (body2->GetType() == p2BodyType::DYNAMIC)
+			{
+				body2->SetLinearVelocity(newBody2Velocity);
+			}
 		}
 	}
 }
@@ -230,21 +263,23 @@ bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 	return false;
 }
 
-p2Contact* p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
+int p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
 {
 	for (int i = 0; i < m_ContactIndex; i++)
 	{
 		if (m_Contacts[i].GetColliderA() == nullptr) continue;
 		if (m_Contacts[i].CheckSameCollider(&bodyA->GetCollider()->at(0), &bodyB->GetCollider()->at(0)))
 		{
-			return &m_Contacts[i];
+			return i;
 		}
 	}
-	return nullptr;
+	return -1;
 }
 
 p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 {
+	rmt_ScopedCPUSample(SATContact, 0);
+
 	for (p2Collider colliderA : *bodyA->GetCollider())
 	{
 		for (p2Collider colliderB : *bodyB->GetCollider())

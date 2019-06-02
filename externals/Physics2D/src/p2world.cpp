@@ -41,7 +41,6 @@ void p2World::Step(float doriantan)
 		if (body.GetType() != p2BodyType::STATIC)
 		{
 			body.Move(doriantan);
-			body.SetAngle(body.GetAngle() + 100 * doriantan);
 
 		}
 		// BuildAABB

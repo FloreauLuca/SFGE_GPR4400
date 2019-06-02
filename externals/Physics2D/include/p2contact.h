@@ -48,6 +48,7 @@ public:
 	 * \brief Check if the contact contain the same collider
 	 */
 	bool CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB);
+	bool updated = false;;
 private :
 	p2Collider* m_ColliderA = nullptr;
 	p2Collider* m_ColliderB = nullptr;
@@ -80,7 +81,7 @@ public:
 	/**
 	 * \brief Factory method removing a p2Contact
 	 */
-	void RemoveContact(p2Collider* colliderA, p2Collider* colliderB);
+	void RemoveContact(int contactIndex);
 	/**
 	 * \brief Construct, split and retrieve the QuadTree
 	 */
@@ -113,7 +114,7 @@ private:
 	/**
 	 * \brief Check if 2 p2Body are alread in contact
 	 */
-	p2Contact* ContainContact(p2Body* bodyA, p2Body* bodyB);
+	int ContainContact(p2Body* bodyA, p2Body* bodyB);
 	p2ContactListener* m_ContactListener = nullptr;
 	std::vector<p2Contact> m_Contacts;
 	int m_ContactIndex = 0;

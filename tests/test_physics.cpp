@@ -527,7 +527,7 @@ TEST(Physics, TestQuadTree)
 		{
 			{"name", "Rigidbody"},
 			{"type", sfge::ComponentType::BODY2D},
-			{"body_type", p2BodyType::DYNAMIC},
+			{"body_type", p2BodyType::KINEMATIC},
 			{"velocity", {rand() % 400, rand() % 400}}
 		};
 
