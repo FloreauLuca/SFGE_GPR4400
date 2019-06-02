@@ -40,14 +40,15 @@ void p2World::Step(float doriantan)
 		// Move
 		if (body.GetType() != p2BodyType::STATIC)
 		{
-			//body.Move(doriantan);
+			body.Move(doriantan);
+			body.SetAngle(body.GetAngle() + 100 * doriantan);
+
 		}
 		// BuildAABB
 		if (!body.GetCollider()[0].empty())
 		{
 			body.BuildAABB();
 		}
-		//body.SetAngle(body.GetAngle() + 100 * doriantan);
 	}
 	// CheckContact
 	m_ContactManager.CheckContact(m_Bodies);

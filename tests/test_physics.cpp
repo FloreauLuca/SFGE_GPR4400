@@ -614,7 +614,7 @@ TEST(Physics, TestSATDetect)
 
 	json transformJson4;
 	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson4["position"] = { 1000, 200 };
+	transformJson4["position"] = { 500, 200 };
 	transformJson4["scale"] = { 1.0, 1.0 };
 	transformJson4["angle"] = 0.0;
 
@@ -667,7 +667,7 @@ TEST(Physics, TestSATDetect)
 	rectColliderJson2["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson2["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson2["size"] = { 100, 100 };
-	rectColliderJson2["bouncing"] = 0;
+	rectColliderJson2["bouncing"] = 1;
 	rectColliderJson2["sensor"] = false;
 
 	entityBody3["components"] = { transformJson3, rectShapeJson2, rigidBodyJson3, rectColliderJson2 };
@@ -678,15 +678,15 @@ TEST(Physics, TestSATDetect)
 
 	json transformJson2;
 	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson2["position"] = { 500, 750 };
+	transformJson2["position"] = { 200, 500 };
 	transformJson2["scale"] = { 1.0, 1.0 };
-	transformJson2["angle"] = 0.0;
+	transformJson2["angle"] = 45.0;
 
 	json rectShapeJson;
 	rectShapeJson["name"] = "Rect Shape Component";
 	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
 	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson["size"] = { 1500, 200 };
+	rectShapeJson["size"] = { 500, 200 };
 
 	json rigidBodyJson2;
 	rigidBodyJson2["name"] = "Rigidbody";
@@ -697,7 +697,7 @@ TEST(Physics, TestSATDetect)
 	rectColliderJson["name"] = "Rect Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = { 1500, 200 };
+	rectColliderJson["size"] = { 500, 200 };
 	rectColliderJson["sensor"] = false;
 
 	entityBody2["components"] = { transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson };

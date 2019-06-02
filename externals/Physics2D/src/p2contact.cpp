@@ -166,7 +166,7 @@ void p2ContactManager::CheckNewContactBetweenBodies(p2Body* body1, p2Body* body2
 			}
 			
 			
-			/*
+			
 			p2Vec2 newBody1Velocity;
 			p2Vec2 newBody2Velocity;
 			
@@ -203,7 +203,7 @@ void p2ContactManager::CheckNewContactBetweenBodies(p2Body* body1, p2Body* body2
 
 			body1->SetLinearVelocity(newBody1Velocity);
 			body2->SetLinearVelocity(newBody2Velocity);
-			*/
+			
 			
 		}
 	}
@@ -437,7 +437,8 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 					{
 						if (p2RectShape* rectShapeB = dynamic_cast<p2RectShape*>(colliderB.GetShape()))
 						{
-							p2Mat22 mtv = p2Mat22();
+							p2Mat22 mtvAX;
+							p2Mat22 mtvAY;
 							float projXSup = 0;
 							float projXInf = 0;
 							float projYInf = 0;
@@ -445,13 +446,18 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 							float newAngle = bodyB->GetAngle() / 180 * M_PI;
 							p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
 							p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
-							mtv = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize());
+							mtvAX = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
+							mtvAY = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
 							for (p2Vec2 cornerA : rectShapeA->GetCorner())
 							{
 								p2Vec2 u = bodyA->GetPosition() + cornerA - (bodyB->GetPosition());
 
+								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
 								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
 
 								if (kx > 1)
 								{
@@ -469,62 +475,109 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 								{
 									projYInf++;
 								}
-
-								if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								if ((kx <= 1 && kx >= -1) && (ky <= 1 && ky >= -1))
 								{
-									if (kx < 1)
+									p2Mat22 tmpMtvAX;
+									if (mtvAX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										if (mtvAX.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (x * (1 - kx));
-											mtv.rows[0] = cornerA + bodyA->GetPosition();
+											tmpMtvAX.rows[1] = (x * -(1 + kx));
+											tmpMtvAX.rows[0] = cornerA + bodyA->GetPosition();
+										}
+										else
+										{
+											tmpMtvAX.rows[0] = p2Vec2::Lerp(cornerA + bodyA->GetPosition(), mtvAX.rows[0], 0.5);
+											tmpMtvAX.rows[1] = (mtvAX.rows[1] + (x * -(1 + kx))) / 2;
 										}
 									}
-									if (kx > -1)
+									if (mtvAX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
+										if (mtvAX.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (x * (-1 - kx));
-											mtv.rows[0] = cornerA + bodyA->GetPosition();
+											tmpMtvAX.rows[1] = (x * (1 - kx));
+											tmpMtvAX.rows[0] = cornerA + bodyA->GetPosition();
+										}
+										else
+										{
+											tmpMtvAX.rows[0] = p2Vec2::Lerp(cornerA + bodyA->GetPosition(), mtvAX.rows[0], 0.5);
+											tmpMtvAX.rows[1] = (mtvAX.rows[1] + (x * (1 - kx))) / 2;
 										}
 									}
-									if (ky < 1)
+									p2Mat22 tmpMtvAY;
+
+									if (mtvAY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (y * (1 - ky)).GetMagnitude())
+										if (mtvAY.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (y * (1 - ky));
-											mtv.rows[0] = cornerA + bodyA->GetPosition();
+											tmpMtvAY.rows[1] = (y * -(1 + ky));
+											tmpMtvAY.rows[0] = cornerA + bodyA->GetPosition();
+										}
+										else
+										{
+											tmpMtvAY.rows[0] = p2Vec2::Lerp(cornerA + bodyA->GetPosition(), mtvAY.rows[0], 0.5);
+											tmpMtvAY.rows[1] = (mtvAY.rows[1] + (y * -(1 + ky))) / 2;
 										}
 									}
-									if (ky > -1)
+									if (mtvAY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (y * (-1 - ky)).GetMagnitude())
+										if (mtvAY.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (y * (-1 - ky));
-											mtv.rows[0] = cornerA + bodyA->GetPosition();
+											tmpMtvAY.rows[1] = (y * (1 - ky));
+											tmpMtvAY.rows[0] = cornerA + bodyA->GetPosition();
 										}
+										else
+										{
+											tmpMtvAY.rows[0] = p2Vec2::Lerp(cornerA + bodyA->GetPosition(), mtvAY.rows[0], 0.5);
+											tmpMtvAY.rows[1] = (mtvAY.rows[1] + (y * (1 - ky))) / 2;
+										}
+									}
+									if (tmpMtvAX != p2Mat22())
+									{
+										mtvAX = tmpMtvAX;
+									}
+									if (tmpMtvAY != p2Mat22())
+									{
+										mtvAY = tmpMtvAY;
 									}
 								}
 							}
-
-							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4)
+							if ((projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4))
 							{
-								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
+								continue;
 							}
+
+							if (projXInf + projXSup == 0)
+							{
+								mtvAX = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
+							}
+							if (projYInf + projYSup == 0)
+							{
+								mtvAY = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
+							}
+
+							p2Mat22 mtvBX;
+							p2Mat22 mtvBY;
 
 							projXSup = 0;
 							projXInf = 0;
 							projYInf = 0;
-							projYSup = 0;
+							projYSup = true;
 							newAngle = bodyA->GetAngle() / 180 * M_PI;
 							x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
 							y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
+							mtvBX = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
+							mtvBY = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
 							for (p2Vec2 cornerB : rectShapeB->GetCorner())
 							{
 								p2Vec2 u = bodyB->GetPosition() + cornerB - (bodyA->GetPosition());
 
+								p2Vec2 resultX = x * (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
+								p2Vec2 resultY = y * (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
 								float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 								float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+
 
 								if (kx > 1)
 								{
@@ -542,48 +595,104 @@ p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 								{
 									projYInf++;
 								}
-								if ((kx < 1 && kx > -1) && (ky < 1 && ky > -1))
+								if ((kx <= 1 && kx >= -1) && (ky <= 1 && ky >= -1))
 								{
-									if (kx < 1)
+									p2Mat22 tmpMtvBX;
+
+									if (mtvBX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (x * (1 - kx)).GetMagnitude())
+										if (mtvBX.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (x * (1 - kx));
-											mtv.rows[0] = cornerB + bodyB->GetPosition();
+											tmpMtvBX.rows[1] = (x * -(1 + kx));
+											tmpMtvBX.rows[0] = cornerB + bodyB->GetPosition();
+										}
+										else
+										{
+											tmpMtvBX.rows[0] = p2Vec2::Lerp(cornerB + bodyB->GetPosition(), mtvBX.rows[0], 0.5);
+											tmpMtvBX.rows[1] = (mtvBX.rows[1] + (x * -(1 + kx))) / 2;
 										}
 									}
-									if (kx > -1)
+									if (mtvBX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (x * (-1 - kx)).GetMagnitude())
+										if (mtvBX.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (x * (-1 - kx));
-											mtv.rows[0] = cornerB + bodyB->GetPosition();
+											tmpMtvBX.rows[1] = (x * (1 - kx));
+											tmpMtvBX.rows[0] = cornerB + bodyB->GetPosition();
+										}
+										else
+										{
+											tmpMtvBX.rows[0] = p2Vec2::Lerp(cornerB + bodyB->GetPosition(), mtvBX.rows[0], 0.5);
+											tmpMtvBX.rows[1] = (mtvBX.rows[1] + (x * (1 - kx))) / 2;
 										}
 									}
-									if (ky < 1)
+									p2Mat22 tmpMtvBY;
+
+									if (mtvBY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (y * (1 - kx)).GetMagnitude())
+										if (mtvBY.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (y * (1 - kx));
-											mtv.rows[0] = cornerB + bodyB->GetPosition();
+											tmpMtvBY.rows[1] = (y * -(1 + ky));
+											tmpMtvBY.rows[0] = cornerB + bodyB->GetPosition();
+										}
+										else
+										{
+											tmpMtvBY.rows[0] = p2Vec2::Lerp(cornerB + bodyB->GetPosition(), mtvBY.rows[0], 0.5);
+											tmpMtvBY.rows[1] = (mtvBY.rows[1] + (y * -(1 + ky))) / 2;
 										}
 									}
-									if (ky > -1)
+									if (mtvBY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
 									{
-										if (mtv.rows[1].GetMagnitude() > (y * (-1 - kx)).GetMagnitude())
+										if (mtvBY.rows[0] == p2Vec2())
 										{
-											mtv.rows[1] = (y * (-1 - kx));
-											mtv.rows[0] = cornerB + bodyB->GetPosition();
+											tmpMtvBY.rows[1] = (y * (1 - ky));
+											tmpMtvBY.rows[0] = cornerB + bodyB->GetPosition();
 										}
+										else
+										{
+											tmpMtvBY.rows[0] = p2Vec2::Lerp(cornerB + bodyB->GetPosition(), mtvBY.rows[0], 0.5);
+											tmpMtvBY.rows[1] = (mtvBY.rows[1] + (y * (1 - ky))) / 2;
+										}
+									}
+									if (tmpMtvBX != p2Mat22())
+									{
+										mtvBX = tmpMtvBX;
+									}
+									if (tmpMtvBY != p2Mat22())
+									{
+										mtvBY = tmpMtvBY;
 									}
 								}
 							}
 
-							if (projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4)
+							if ((projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4))
 							{
-								return p2Mat22(p2Vec2(0, 0), p2Vec2(0, 0));
+								continue;
 							}
-							return mtv;
+							if (projXInf + projXSup == 0)
+							{
+								mtvBX = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
+							}
+							if (projYInf + projYSup == 0)
+							{
+								mtvBY = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
+							}
+
+							if (mtvAX.rows[1].GetMagnitude() > mtvAY.rows[1].GetMagnitude())
+							{
+								mtvAX = mtvAY;
+							}
+							if (mtvBX.rows[1].GetMagnitude() > mtvBY.rows[1].GetMagnitude())
+							{
+								mtvBX = mtvBY;
+							}
+							if (mtvAX.rows[1].GetMagnitude() > mtvBX.rows[1].GetMagnitude())
+							{
+								return mtvBX;
+							}
+							else
+							{
+								return mtvAX;
+							}
 						}
 					}
 				}
