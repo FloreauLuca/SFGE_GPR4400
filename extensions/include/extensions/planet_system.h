@@ -31,72 +31,69 @@ SOFTWARE.
 
 namespace sfge
 {
-struct Transform2d;
-class Transform2dManager;
-class Body2dManager;
-class TextureManager;
-class SpriteManager;
+	struct Transform2d;
+	class Transform2dManager;
+	class Body2dManager;
+	class TextureManager;
+	class SpriteManager;
 }
+
 namespace sfge::ext
 {
-
-
 #define WITH_PHYSICS
 #define WITH_VERTEXARRAY
-//#define MULTI_THREAD
 
-class PlanetSystem : public System
-{
-public:
-	PlanetSystem(Engine& engine);
+	//#define MULTI_THREAD
 
-	void OnEngineInit() override;
+	class PlanetSystem : public System
+	{
+	public:
+		PlanetSystem(Engine& engine);
 
-	void OnUpdate(float dt) override;
+		void OnEngineInit() override;
 
-	void OnFixedUpdate() override;
+		void OnUpdate(float dt) override;
 
-	void OnDraw() override;
+		void OnFixedUpdate() override;
 
-private:
+		void OnDraw() override;
 
-  	void UpdateRange(int startIndex, int endIndex);
-	p2Vec2 CalculateInitSpeed(sf::Vector2f position) const;
-	p2Vec2 CalculateNewForce(sf::Vector2f position) const;
-	static float Magnitude(sf::Vector2f v);
-	static float Magnitude(p2Vec2 v);
+	private:
 
-	Transform2dManager* m_Transform2DManager;
-	Body2dManager* m_Body2DManager;
-	TextureManager* m_TextureManager;
-	SpriteManager* m_SpriteManager;
+		void UpdateRange(int startIndex, int endIndex);
+		p2Vec2 CalculateInitSpeed(sf::Vector2f position) const;
+		p2Vec2 CalculateNewForce(sf::Vector2f position) const;
+		static float Magnitude(sf::Vector2f v);
+		static float Magnitude(p2Vec2 v);
 
-	float fixedDeltaTime = 0.0f;
-	const float gravityConst = 1000.0f;
-	const float centerMass = 1000.0f;
-	const float planetMass = 1.0f;
-	const size_t entitiesNmb = 10'000;
+		Transform2dManager* m_Transform2DManager;
+		Body2dManager* m_Body2DManager;
+		TextureManager* m_TextureManager;
+		SpriteManager* m_SpriteManager;
+
+		float fixedDeltaTime = 0.0f;
+		const float gravityConst = 1000.0f;
+		const float centerMass = 1000.0f;
+		const float planetMass = 1.0f;
+		const size_t entitiesNmb = 250;
 
 #ifndef WITH_PHYSICS
 	std::vector<Vec2f> m_Velocities{entitiesNmb};
 #endif
 
-	sf::Vector2f screenSize;
+		sf::Vector2f screenSize;
 #ifdef WITH_VERTEXARRAY
-	sf::VertexArray m_VertexArray{sf::Quads, 4 * entitiesNmb};
-	Graphics2dManager* m_Graphics2DManager;
-	sf::Texture* texture = nullptr;
-	sf::Vector2f textureSize;
+		sf::VertexArray m_VertexArray{sf::Quads, 4 * entitiesNmb};
+		Graphics2dManager* m_Graphics2DManager;
+		sf::Texture* texture = nullptr;
+		sf::Vector2f textureSize;
 #endif
 #ifdef MULTI_THREAD
 
 	  std::vector<Vec2f> m_Positions{entitiesNmb};
 
 #endif
-
-};
-
-
+	};
 }
 
 #endif

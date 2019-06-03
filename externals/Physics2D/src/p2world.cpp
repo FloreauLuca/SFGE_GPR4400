@@ -30,12 +30,14 @@ p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 
 void p2World::Step(float doriantan)
 {
+	int i = 0;;
 	for (p2Body &body : m_Bodies)
 	{
+		i++;
 		// ApplyForce
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.ApplyForceToCenter(m_Gravity*doriantan);
+			body.ApplyForceToCenter(m_Gravity*doriantan / body.GetMass());
 		}
 		// Move
 		if (body.GetType() != p2BodyType::STATIC)

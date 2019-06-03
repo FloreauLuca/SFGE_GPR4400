@@ -99,7 +99,10 @@ void p2Body::ApplyForceToCenter(const p2Vec2& force)
 
 void p2Body::ApplyForceToCorner(float inertia, const p2Vec2& force, p2Vec2 distCenter)
 {
-	m_AngularVelocity += p2Vec2::Cross(distCenter, force).z/inertia;
+	if (inertia != 0)
+	{
+		m_AngularVelocity += p2Vec2::Cross(force, distCenter).z / inertia;
+	}
 }
 
 p2BodyType p2Body::GetType() const
@@ -115,7 +118,7 @@ float p2Body::GetMass() const
 
 void p2Body::Move(float dt)
 {
-	m_Position += m_LinearVelocity * dt * 1 / 2;
+	m_Position += m_LinearVelocity * dt;
 	m_Angle += m_AngularVelocity * dt;
 	//std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }

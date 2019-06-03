@@ -48,7 +48,7 @@ public:
 	 * \brief Check if the contact contain the same collider
 	 */
 	bool CheckSameCollider(p2Collider* colliderA, p2Collider* colliderB);
-	bool updated = false;;
+	bool updated = true;
 private :
 	p2Collider* m_ColliderA = nullptr;
 	p2Collider* m_ColliderB = nullptr;
