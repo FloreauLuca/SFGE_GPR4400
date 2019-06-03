@@ -65,7 +65,6 @@ TEST(Physics, TestBallFallingToGround)
 	circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 	circleColliderJson["radius"] = 50;
 	circleColliderJson["bouncing"] = 0.5;
-	circleColliderJson["sensor"] = false;
 
 	entityBody1["components"] = {transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson};
 
@@ -94,7 +93,6 @@ TEST(Physics, TestBallFallingToGround)
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson["size"] = {800, 200};
-	rectColliderJson["sensor"] = false;
 
 	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson};
 
@@ -176,14 +174,12 @@ TEST(Physics, TestAABB)
 				{"type", sfge::ComponentType::COLLIDER2D},
 				{"collider_type", sfge::ColliderType::BOX},
 				{"size", {sizeX, sizeY}},
-				{"sensor", true}
 			},
 			{
 				{"name", "Circle Collider"},
 				{"type", sfge::ComponentType::COLLIDER2D},
 				{"collider_type", sfge::ColliderType::CIRCLE},
 				{"radius", radius},
-				{"sensor", true}
 			}
 		};
 
@@ -281,7 +277,6 @@ TEST(Physics, TestAABBRotation)
 	rectColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 	rectColliderJson["radius"] = 100;
 	rectColliderJson["bouncing"] = 0.5;
-	rectColliderJson["sensor"] = false;
 
 	entityBody1["components"] = {transformJson1, rectShapeJson, rigidBodyJson1, rectColliderJson};
 
@@ -310,7 +305,6 @@ TEST(Physics, TestAABBRotation)
 	circleColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 	circleColliderJson["radius"] = 250;
-	circleColliderJson["sensor"] = false;
 
 	entityBody2["components"] = {transformJson2, circleShapeJson, rigidBodyJson2, circleColliderJson};
 
@@ -405,14 +399,12 @@ TEST(Physics, TestQuadTree)
 				{"type", sfge::ComponentType::COLLIDER2D},
 				{"collider_type", sfge::ColliderType::BOX},
 				{"size", {sizeX, sizeY}},
-				{"sensor", true}
 			},
 			{
 				{"name", "Circle Collider"},
 				{"type", sfge::ComponentType::COLLIDER2D},
 				{"collider_type", sfge::ColliderType::CIRCLE},
 				{"radius", radius},
-				{"sensor", true}
 			}
 		};
 
@@ -506,7 +498,6 @@ TEST(Physics, TestSATDetect)
 	circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 	circleColliderJson["radius"] = 50;
 	circleColliderJson["bouncing"] = 0.5;
-	circleColliderJson["sensor"] = true;
 
 	entityBody1["components"] = {transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson};
 
@@ -531,7 +522,6 @@ TEST(Physics, TestSATDetect)
 	circleColliderJson2["collider_type"] = sfge::ColliderType::CIRCLE;
 	circleColliderJson2["radius"] = 50;
 	circleColliderJson2["bouncing"] = 1;
-	circleColliderJson2["sensor"] = true;
 
 	json circleShapeJson2;
 	circleShapeJson2["name"] = "Circle Shape Component";
@@ -568,8 +558,7 @@ TEST(Physics, TestSATDetect)
 	rectColliderJson2["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson2["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson2["size"] = {100, 100};
-	rectColliderJson2["bouncing"] = 0;
-	rectColliderJson2["sensor"] = false;
+	rectColliderJson2["bouncing"] = 1;
 
 	entityBody3["components"] = {transformJson3, rectShapeJson2, rigidBodyJson3, rectColliderJson2};
 
@@ -599,11 +588,10 @@ TEST(Physics, TestSATDetect)
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson["size"] = {500, 200};
-	rectColliderJson["sensor"] = false;
 
 	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson};
 
-	sceneJson["entities"] = {entityBody1, entityBody4}; // , entityBody1};
+	sceneJson["entities"] = {entityBody2, entityBody3}; // , entityBody1};
 	json contactDebugSystem = {
 
 		{"systemClassName", "ContactDebug"}
@@ -692,8 +680,7 @@ TEST(Physics, TestFlipper)
 	circleColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 	circleColliderJson["radius"] = 50;
-	circleColliderJson["bouncing"] = 0.5;
-	circleColliderJson["sensor"] = true;
+	circleColliderJson["bouncing"] = 1;
 
 	entityBody1["components"] = {transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson};
 
@@ -723,7 +710,6 @@ TEST(Physics, TestFlipper)
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson["size"] = {200, 50};
-	rectColliderJson["sensor"] = false;
 
 	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson};
 
@@ -752,7 +738,6 @@ TEST(Physics, TestFlipper)
 	rectColliderJson2["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson2["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson2["size"] = {200, 50};
-	rectColliderJson2["sensor"] = false;
 
 	entityBody3["components"] = {transformJson3, rectShapeJson2, rigidBodyJson3, rectColliderJson2};
 
@@ -844,14 +829,12 @@ TEST(Presentation, TestShapeContact)
 			{"type", sfge::ComponentType::COLLIDER2D},
 			{"collider_type", sfge::ColliderType::BOX},
 			{"size", {100, 100}},
-			{"sensor", true}
 		},
 		{
 			{"name", "Circle Collider"},
 			{"type", sfge::ComponentType::COLLIDER2D},
 			{"collider_type", sfge::ColliderType::CIRCLE},
 			{"radius", 100},
-			{"sensor", true}
 		}
 	};
 
@@ -975,7 +958,6 @@ TEST(Presentation, TestBouciness)
 	rectColliderJson2["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson2["size"] = {100, 100};
 	rectColliderJson2["bouncing"] = 1;
-	rectColliderJson2["sensor"] = false;
 
 	entityBody3["components"] = {transformJson3, rectShapeJson2, rigidBodyJson3, rectColliderJson2};
 	entities[0] = entityBody3;
@@ -1000,13 +982,14 @@ TEST(Presentation, TestBouciness)
 	rigidBodyJson2["name"] = "Rigidbody";
 	rigidBodyJson2["type"] = sfge::ComponentType::BODY2D;
 	rigidBodyJson2["body_type"] = p2BodyType::STATIC;
+	rigidBodyJson2["mass"] = 1000;
 
 	json rectColliderJson;
 	rectColliderJson["name"] = "Rect Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = {2000, 200};
-	rectColliderJson["sensor"] = false;
+	rectColliderJson["size"] = { 2000, 200 };
+	rectColliderJson["bouncing"] = 1.0;
 
 	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson};
 
@@ -1029,7 +1012,6 @@ TEST(Presentation, TestBouciness)
 		circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 		circleColliderJson["radius"] = 50;
 		circleColliderJson["bouncing"] = bouncing;
-		circleColliderJson["sensor"] = true;
 
 		json transformJson1;
 		transformJson1["type"] = sfge::ComponentType::TRANSFORM2D;
@@ -1085,7 +1067,7 @@ TEST(Presentation, TestPendule)
 	sceneJson["name"] = "Ball Falling To Ground";
 
 
-	const int entitiesNmb = 9;
+	const int entitiesNmb = 5;
 	json entities[entitiesNmb * 2 + 4];
 
 
@@ -1109,6 +1091,7 @@ TEST(Presentation, TestPendule)
 	rigidBodyJson1["type"] = sfge::ComponentType::BODY2D;
 	rigidBodyJson1["body_type"] = p2BodyType::STATIC;
 	rigidBodyJson1["gravity_scale"] = 1;
+	rigidBodyJson1["mass"] = 1000;
 
 	json rectColliderJson1;
 	rectColliderJson1["name"] = "Rect Collider";
@@ -1116,7 +1099,6 @@ TEST(Presentation, TestPendule)
 	rectColliderJson1["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson1["size"] = { 200, 2000 };
 	rectColliderJson1["bouncing"] = 1;
-	rectColliderJson1["sensor"] = false;
 
 	entityBody1["components"] = { transformJson1, rectShapeJson1, rigidBodyJson1, rectColliderJson1 };
 	entities[0] = entityBody1;
@@ -1150,11 +1132,10 @@ TEST(Presentation, TestPendule)
 		circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 		circleColliderJson["radius"] = 50;
 		circleColliderJson["bouncing"] = 1;
-		circleColliderJson["sensor"] = true;
 
 		json transformJson3;
 		transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
-		transformJson3["position"] = { 110 * i + 150, 200 };
+		transformJson3["position"] = { 110 * i + 300, 200 };
 		transformJson3["scale"] = { 1.0, 1.0 };
 		transformJson3["angle"] = 0.0;
 
@@ -1183,7 +1164,6 @@ TEST(Presentation, TestPendule)
 	circleColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
 	circleColliderJson["radius"] = 50;
 	circleColliderJson["bouncing"] = 1;
-	circleColliderJson["sensor"] = true;
 
 	json transformJson3;
 	transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
@@ -1216,14 +1196,13 @@ TEST(Presentation, TestPendule)
 		json rectColliderJson;
 		rectColliderJson["name"] = "Circle Collider";
 		rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
-		rectColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
+		rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
 		rectColliderJson["size"] = { 100, 100 };
 		rectColliderJson["bouncing"] = 1;
-		rectColliderJson["sensor"] = true;
 
 		json transformJson4;
 		transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
-		transformJson4["position"] = { 110 * i + 150, 200 };
+		transformJson4["position"] = { 110 * i + 300, 500 };
 		transformJson4["scale"] = { 1.0, 1.0 };
 		transformJson4["angle"] = 0.0;
 
@@ -1233,12 +1212,12 @@ TEST(Presentation, TestPendule)
 		rigidBodyJson4["body_type"] = p2BodyType::DYNAMIC;
 		rigidBodyJson4["gravity_scale"] = 1;
 
-		entityJson["components"] = { transformJson3, rectShapeJson, rigidBodyJson3, rectColliderJson };
+		entityJson["components"] = { transformJson4, rectShapeJson, rigidBodyJson4, rectColliderJson };
 	}
 
 
-	json entityBody3;
-	entityBody3["name"] = "Starting Ball";
+	json entityBody4;
+	entityBody4["name"] = "Starting Ball";
 
 	json rectShapeJson;
 	rectShapeJson["name"] = "Rect Shape Component";
@@ -1249,14 +1228,13 @@ TEST(Presentation, TestPendule)
 	json rectColliderJson;
 	rectColliderJson["name"] = "Circle Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
-	rectColliderJson["collider_type"] = sfge::ColliderType::CIRCLE;
+	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
 	rectColliderJson["size"] = { 100, 100 };
 	rectColliderJson["bouncing"] = 1;
-	rectColliderJson["sensor"] = true;
 
 	json transformJson4;
 	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
-	transformJson4["position"] = { 110 * i + 150, 200 };
+	transformJson4["position"] = { 1000, 500 };
 	transformJson4["scale"] = { 1.0, 1.0 };
 	transformJson4["angle"] = 0.0;
 
@@ -1265,9 +1243,10 @@ TEST(Presentation, TestPendule)
 	rigidBodyJson4["type"] = sfge::ComponentType::BODY2D;
 	rigidBodyJson4["body_type"] = p2BodyType::DYNAMIC;
 	rigidBodyJson4["gravity_scale"] = 1;
+	rigidBodyJson4["velocity"] = { 200, 0 };
 
-	entityBody3["components"] = { transformJson3, rectShapeJson1, rigidBodyJson3, rectColliderJson1 };
-	entities[3] = entityBody3;
+	entityBody4["components"] = { transformJson4, rectShapeJson, rigidBodyJson4, rectColliderJson };
+	entities[3] = entityBody4;
 
 	sceneJson["entities"] = entities;
 	json contactDebugSystem = {

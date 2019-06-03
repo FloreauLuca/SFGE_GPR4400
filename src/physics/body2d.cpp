@@ -230,7 +230,14 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		}
 		else
 		{
-			bodyDef.mass = 1;
+			if (bodyDef.type == p2BodyType::STATIC)
+			{
+				bodyDef.mass = 1000;
+			}
+			else
+			{
+				bodyDef.mass = 1;
+			}
 		}
 
 		const auto offset = GetVectorFromJson(componentJson, "offset");

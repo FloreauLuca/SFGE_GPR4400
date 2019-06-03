@@ -131,6 +131,9 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		if(CheckJsonNumber(componentJson, "bouncing"))
 		{
 			fixtureDef.restitution = componentJson["bouncing"];
+		} else
+		{
+			fixtureDef.restitution = 1;
 		}
 		if (shape)
 		{

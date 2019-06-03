@@ -75,7 +75,7 @@ namespace sfge::ext
 		const float gravityConst = 1000.0f;
 		const float centerMass = 1000.0f;
 		const float planetMass = 1.0f;
-		const size_t entitiesNmb = 250;
+		const size_t entitiesNmb = 1000;
 
 #ifndef WITH_PHYSICS
 	std::vector<Vec2f> m_Velocities{entitiesNmb};
