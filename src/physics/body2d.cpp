@@ -242,6 +242,7 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 
 		const auto offset = GetVectorFromJson(componentJson, "offset");
 		const auto velocity = GetVectorFromJson(componentJson, "velocity");
+		const auto angularVelocity = CheckJsonNumber(componentJson, "angular_velocity");
 
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position + offset;
@@ -250,6 +251,7 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		
 		auto* body = world->CreateBody(&bodyDef);
 		body->SetLinearVelocity(pixel2meter(velocity));
+		body->SetAngularVelocity(angularVelocity);
 		m_Components[entity - 1] = Body2d(transform, offset);
 		m_Components[entity - 1].SetBody(body);
 

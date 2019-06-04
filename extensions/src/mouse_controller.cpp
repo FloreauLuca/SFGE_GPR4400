@@ -43,6 +43,7 @@ namespace sfge::ext
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
+		m_ColliderManager = m_Engine.GetPhysicsManager()->GetColliderManager();
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
 		m_ShapeManager = m_Engine.GetGraphics2dManager()->GetShapeManager();
@@ -68,13 +69,45 @@ namespace sfge::ext
 		(void)dt;
 		MouseManager& mouseManager = m_InputManager->GetMouseManager();
 		p2Vec2 mousePosition = pixel2meter(mouseManager.GetPosition());
-		for (p2Body* body : bodies)
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
-			if ((body->GetPosition() - mousePosition).GetMagnitude() < 0.5f && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			if (currentBody == nullptr)
 			{
-				body->SetPosition(mousePosition);
-				body->SetLinearVelocity(p2Vec2());
+				for (p2Body* body : bodies)
+				{
+					if ((body->GetPosition() - mousePosition).GetMagnitude() < 0.5f)
+					{
+						currentBody = body;
+						break;
+					}
+				}
 			}
+			if (currentBody != nullptr)
+			{
+				currentBody->SetPosition(mousePosition);
+				currentBody->SetLinearVelocity(p2Vec2());
+				currentBody->SetAngularVelocity(0);
+			}
+		} else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && currentBody == nullptr)
+		{
+			if (MAX_NEW_ENTITY > bodies.size())
+			{
+				auto* entityManager = m_Engine.GetEntityManager();
+				const auto newEntity = entityManager->CreateEntity(0);
+
+				auto transformPtr = m_Transform2DManager->AddComponent(newEntity);
+				transformPtr->Position = sf::Vector2f(meter2pixel(mousePosition));
+				auto body = m_Body2DManager->AddComponent(newEntity);
+				body->GetBody()->ChangeType(p2BodyType::DYNAMIC);
+				currentBody = body->GetBody();
+				bodies.push_back(currentBody);
+				auto collider = m_ColliderManager->AddComponent(newEntity);
+				auto shape = m_ShapeManager->AddComponent(newEntity);
+			}
+
+		} else if (!sf::Mouse::isButtonPressed(sf::Mouse::Right))
+		{
+		currentBody = nullptr;
 		}
 		if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::V))
 		{

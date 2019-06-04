@@ -39,6 +39,7 @@ namespace sfge
 	class TextureManager;
 	class SpriteManager;
 	class ShapeManager;
+	class ColliderManager;
 }
 
 namespace sfge::ext
@@ -62,6 +63,7 @@ namespace sfge::ext
 
 		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
+		ColliderManager* m_ColliderManager;
 		TextureManager* m_TextureManager;
 		SpriteManager* m_SpriteManager;
 		ShapeManager* m_ShapeManager;
@@ -72,12 +74,13 @@ namespace sfge::ext
 		void DrawVector(p2Body* body);
 
 		float fixedDeltaTime = 0.0f;
-		const size_t entitiesNmb = 10'000;
+		const float MAX_NEW_ENTITY = 10;
 
 		sf::Vector2f screenSize;
 		std::vector<p2Body*> bodies;
 		std::vector<Entity> entities;
 		std::vector<int> count;
+		p2Body* currentBody;
 	};
 
 

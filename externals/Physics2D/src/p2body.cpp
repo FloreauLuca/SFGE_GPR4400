@@ -50,6 +50,10 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 {
 	m_LinearVelocity = velocity;
 }
+void p2Body::SetAngularVelocity(float angularVelocity)
+{
+	m_AngularVelocity = angularVelocity;
+}
 
 /**
  * \brief 
@@ -58,6 +62,11 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 void p2Body::SetAngle(float angle)
 {
 	m_Angle = angle;
+}
+
+void p2Body::ChangeType(p2BodyType bodyType)
+{
+	m_BodyType = bodyType;
 }
 
 float p2Body::GetAngle()

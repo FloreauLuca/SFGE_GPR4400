@@ -96,7 +96,9 @@ public:
 	
 	p2Vec2 GetLinearVelocity() const;
 	void SetLinearVelocity(p2Vec2 velocity);
+	void SetAngularVelocity(float angularVelocity);
 	void SetAngle(float angle);
+	void ChangeType(p2BodyType bodyType);
 	float GetAngle();
 	float GetAngularVelocity();
 	p2Vec2 GetPosition();
