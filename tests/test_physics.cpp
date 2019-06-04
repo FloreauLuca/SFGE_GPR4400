@@ -27,6 +27,8 @@ SOFTWARE.
 #include "graphics/shape2d.h"
 #include "physics/collider2d.h"
 
+#pragma region Test
+
 TEST(Physics, TestBallFallingToGround)
 {
 	sfge::Engine engine;
@@ -792,7 +794,37 @@ TEST(Physics, TestFlipper)
 	engine.Start();
 }
 
+#pragma endregion Test
 
+#pragma region Presentation
+
+TEST(Presentation, TestPlanet)
+{
+	sfge::Engine engine;
+	std::unique_ptr<sfge::Configuration> initConfig = std::make_unique<sfge::Configuration>();
+	initConfig->gravity = p2Vec2();
+	initConfig->devMode = false;
+	initConfig->maxFramerate = 0;
+	engine.Init(std::move(initConfig));
+	json sceneJson = {
+		{"name", "Test Planet Component"}
+	};
+	json systemJson = {
+		{"systemClassName", "PlanetSystem"}
+	};
+	json quadTest =
+	{
+
+		{"systemClassName", "QuadTreeTest"}
+
+	};
+
+	sceneJson["systems"] = json::array({ systemJson, quadTest });
+	auto* sceneManager = engine.GetSceneManager();
+	sceneManager->LoadSceneFromJson(sceneJson);
+
+	engine.Start();
+}
 
 TEST(Presentation, TestSatDetect)
 {
@@ -977,7 +1009,6 @@ TEST(Presentation, TestSatDetect)
 	engine.Start();
 }
 
-
 TEST(Presentation, TestShapesContact)
 {
 	sfge::Engine engine;
@@ -1043,7 +1074,7 @@ TEST(Presentation, TestShapesContact)
 		};
 
 		int randShapeIndex = rand() % 2;
-		entityJson["components"] = {transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex]};
+		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
 	}
 	sceneJson["entities"] = entities;
 	sceneJson["systems"] = json::array({
@@ -1070,37 +1101,110 @@ TEST(Presentation, TestShapesContact)
 	engine.Start();
 }
 
-
-TEST(Presentation, TestPlanet)
+TEST(Presentation, TestQuadTree)
 {
 	sfge::Engine engine;
-	std::unique_ptr<sfge::Configuration> initConfig = std::make_unique<sfge::Configuration>();
-	initConfig->gravity = p2Vec2();
-	initConfig->devMode = false;
-	initConfig->maxFramerate = 0;
-	engine.Init(std::move(initConfig));
-	json sceneJson = {
-		{"name", "Test Planet Component"}
-	};
-	json systemJson = {
-		{"systemClassName", "PlanetSystem"}
-	};
-	json quadTest =
-	{
+	auto config = std::make_unique<sfge::Configuration>();
+	config->gravity = p2Vec2(0.0f, 0.0f);
+	config->devMode = false;
 
-		{"systemClassName", "QuadTreeTest"}
+	engine.Init(std::move(config));
 
-	};
-
-	sceneJson["systems"] = json::array({systemJson, quadTest});
 	auto* sceneManager = engine.GetSceneManager();
-	sceneManager->LoadSceneFromJson(sceneJson);
 
+	json sceneJson;
+	sceneJson["name"] = "Contacts";
+
+	const int entitiesNmb = 1000;
+	json entities[entitiesNmb];
+
+	for (int i = 0; i < entitiesNmb; i++)
+	{
+		int sizeX = (rand() % 10) + 5;
+		int sizeY = (rand() % 10) + 5;
+		int radius = (rand() % 10) + 5;
+		json shapes[] =
+		{
+			{
+				{"name", "Rect Shape Component"},
+				{"type", sfge::ComponentType::SHAPE2D},
+				{"shape_type", sfge::ShapeType::RECTANGLE},
+				{"size", {sizeX, sizeY}}
+			},
+			{
+				{"name", "Rect Shape Component"},
+				{"type", sfge::ComponentType::SHAPE2D},
+				{"shape_type", sfge::ShapeType::CIRCLE},
+				{"radius", radius}
+			}
+		};
+		json colliders[] =
+		{
+			{
+				{"name", "Rect Collider"},
+				{"type", sfge::ComponentType::COLLIDER2D},
+				{"collider_type", sfge::ColliderType::BOX},
+				{"size", {sizeX, sizeY}},
+			},
+			{
+				{"name", "Circle Collider"},
+				{"type", sfge::ComponentType::COLLIDER2D},
+				{"collider_type", sfge::ColliderType::CIRCLE},
+				{"radius", radius},
+			}
+		};
+
+		json& entityJson = entities[i];
+
+		json transformJson =
+		{
+			{"position", {rand() % 1200, rand() % 700}},
+			{"type", sfge::ComponentType::TRANSFORM2D}
+		};
+
+		json rigidbody =
+		{
+			{"name", "Rigidbody"},
+			{"type", sfge::ComponentType::BODY2D},
+			{"body_type", p2BodyType::KINEMATIC},
+			{"velocity", {rand() % 100, rand() % 100}}
+		};
+
+		int randShapeIndex = rand() % 2;
+		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
+	}
+	sceneJson["entities"] = entities;
+	sceneJson["systems"] = json::array({
+			{
+				{"systemClassName", "ContactDebug"}
+			},
+			{
+				{"systemClassName", "StayOnScreen"}
+			},
+			{
+				{
+					"script_path",
+					//"scripts/mouse_raycast_system.py" 
+					"nothing"
+				}
+			},
+			{
+
+				{"systemClassName", "AabbTest"}
+
+			},
+			{
+
+				{"systemClassName", "QuadTreeTest"}
+
+			}
+		}
+	);
+	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
 
-
-TEST(Presentation, TestBouciness)
+TEST(Presentation, TestBounciness)
 {
 	sfge::Engine engine;
 	auto config = std::make_unique<sfge::Configuration>();
@@ -1221,10 +1325,10 @@ TEST(Presentation, TestBouciness)
 		{"systemClassName", "ContactDebug"}
 
 	};
-	json aabbTest =
+	json sat =
 	{
 
-		{"systemClassName", "AabbTest"}
+		{"systemClassName", "SatTest"}
 
 	};
 	json mouseController =
@@ -1233,11 +1337,235 @@ TEST(Presentation, TestBouciness)
 		{"systemClassName", "MouseController"}
 
 	};
-	sceneJson["systems"] = json::array({contactDebugSystem, aabbTest, mouseController});
+	sceneJson["systems"] = json::array({contactDebugSystem, sat, mouseController});
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
 
+TEST(Presentation, TestRestitution)
+{
+	sfge::Engine engine;
+	auto config = std::make_unique<sfge::Configuration>();
+	config->devMode = false;
+	config->gravity = p2Vec2(0, 0);
+	engine.Init(std::move(config));
+
+	auto* sceneManager = engine.GetSceneManager();
+
+	json sceneJson;
+	sceneJson["name"] = "Ball Falling To Ground";
+
+
+	json entities[8];
+
+
+	json entityBody1;
+	entityBody1["name"] = "Wall1";
+
+	json transformJson1;
+	transformJson1["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson1["position"] = { 100, 400 };
+	transformJson1["scale"] = { 1.0, 1.0 };
+	transformJson1["angle"] = 0;
+
+	json rectShapeJson1;
+	rectShapeJson1["name"] = "Rect Shape Component";
+	rectShapeJson1["type"] = sfge::ComponentType::SHAPE2D;
+	rectShapeJson1["shape_type"] = sfge::ShapeType::RECTANGLE;
+	rectShapeJson1["size"] = { 200, 2000 };
+
+	json rigidBodyJson1;
+	rigidBodyJson1["name"] = "Rigidbody";
+	rigidBodyJson1["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson1["body_type"] = p2BodyType::STATIC;
+	rigidBodyJson1["gravity_scale"] = 1;
+	rigidBodyJson1["mass"] = 1000;
+
+	json rectColliderJson1;
+	rectColliderJson1["name"] = "Rect Collider";
+	rectColliderJson1["type"] = sfge::ComponentType::COLLIDER2D;
+	rectColliderJson1["collider_type"] = sfge::ColliderType::BOX;
+	rectColliderJson1["size"] = { 200, 2000 };
+	rectColliderJson1["bouncing"] = 1;
+
+	entityBody1["components"] = { transformJson1};
+	entities[0] = entityBody1;
+
+	json transformJson2;
+	transformJson2["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson2["position"] = { 1250, 400 };
+	transformJson2["scale"] = { 1.0, 1.0 };
+	transformJson2["angle"] = 0;
+
+	json entityBody2;
+	entityBody2["name"] = "Wall2";
+
+	entityBody2["components"] = { transformJson2};
+	entities[1] = entityBody2;
+
+	   
+	json entityBody3;
+	entityBody3["name"] = "Starting Rect1";
+
+	json rectShapeJson;
+	rectShapeJson["name"] = "Rect Shape Component";
+	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
+	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
+	rectShapeJson["size"] = { 100, 100 };
+
+	json rectColliderJson;
+	rectColliderJson["name"] = "Rect Collider";
+	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
+	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
+	rectColliderJson["size"] = { 100, 100 };
+	rectColliderJson["bouncing"] = 1;
+
+	json transformJson3;
+	transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson3["position"] = { 300, 200 };
+	transformJson3["scale"] = { 1.0, 1.0 };
+	transformJson3["angle"] = 0.0;
+
+	json rigidBodyJson3;
+	rigidBodyJson3["name"] = "Rigidbody";
+	rigidBodyJson3["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson3["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson3["gravity_scale"] = 1;
+	rigidBodyJson3["velocity"] = { 200, 0 };
+
+	entityBody3["components"] = { transformJson3, rectShapeJson, rigidBodyJson3, rectColliderJson };
+	entities[2] = entityBody3;
+
+
+	json entityBody4;
+	entityBody4["name"] = "Rect1";
+
+	
+	json transformJson4;
+	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson4["position"] = { 600, 200 };
+	transformJson4["scale"] = { 1.0, 1.0 };
+	transformJson4["angle"] = 0.0;
+
+	json rigidBodyJson4;
+	rigidBodyJson4["name"] = "Rigidbody";
+	rigidBodyJson4["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson4["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson4["gravity_scale"] = 1;
+
+	entityBody4["components"] = { transformJson4, rectShapeJson, rigidBodyJson4, rectColliderJson };
+	entities[3] = entityBody4;
+
+	entityBody3["name"] = "Starting Rect0.5";
+
+	rectShapeJson["name"] = "Rect Shape Component";
+	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
+	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
+	rectShapeJson["size"] = { 100, 100 };
+
+	rectColliderJson["name"] = "Rect Collider";
+	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
+	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
+	rectColliderJson["size"] = { 100, 100 };
+	rectColliderJson["bouncing"] = 0.5;
+
+	transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson3["position"] = { 300, 400 };
+	transformJson3["scale"] = { 1.0, 1.0 };
+	transformJson3["angle"] = 0.0;
+
+	rigidBodyJson3["name"] = "Rigidbody";
+	rigidBodyJson3["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson3["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson3["gravity_scale"] = 1;
+	rigidBodyJson3["velocity"] = { 200, 0 };
+
+	entityBody3["components"] = { transformJson3, rectShapeJson, rigidBodyJson3, rectColliderJson };
+	entities[4] = entityBody3;
+
+
+	entityBody4["name"] = "Rect1";
+
+
+	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson4["position"] = { 600, 400 };
+	transformJson4["scale"] = { 1.0, 1.0 };
+	transformJson4["angle"] = 0.0;
+
+	rigidBodyJson4["name"] = "Rigidbody";
+	rigidBodyJson4["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson4["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson4["gravity_scale"] = 1;
+	
+	entityBody4["components"] = { transformJson4, rectShapeJson, rigidBodyJson4, rectColliderJson };
+	entities[5] = entityBody4;
+
+	entityBody3["name"] = "Starting Rect0";
+
+	rectShapeJson["name"] = "Rect Shape Component";
+	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
+	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
+	rectShapeJson["size"] = { 100, 100 };
+
+	rectColliderJson["name"] = "Circle Collider";
+	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
+	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
+	rectColliderJson["size"] = { 100, 100 };
+	rectColliderJson["bouncing"] = 0;
+
+	transformJson3["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson3["position"] = { 300, 600 };
+	transformJson3["scale"] = { 1.0, 1.0 };
+	transformJson3["angle"] = 0.0;
+
+	rigidBodyJson3["name"] = "Rigidbody";
+	rigidBodyJson3["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson3["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson3["gravity_scale"] = 1;
+	rigidBodyJson3["velocity"] = { 200, 0 };
+
+	entityBody3["components"] = { transformJson3, rectShapeJson, rigidBodyJson3, rectColliderJson };
+	entities[6] = entityBody3;
+
+
+	entityBody4["name"] = "Rect0";
+
+
+	transformJson4["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson4["position"] = { 600, 600 };
+	transformJson4["scale"] = { 1.0, 1.0 };
+	transformJson4["angle"] = 0.0;
+
+	rigidBodyJson4["name"] = "Rigidbody";
+	rigidBodyJson4["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson4["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson4["gravity_scale"] = 1;
+
+	entityBody4["components"] = { transformJson4, rectShapeJson, rigidBodyJson4, rectColliderJson };
+	entities[7] = entityBody4;
+
+	sceneJson["entities"] = entities;
+	json contactDebugSystem = {
+
+		{"systemClassName", "ContactDebug"}
+
+	};
+	json mouseController =
+	{
+
+		{"systemClassName", "MouseController"}
+
+	};
+	json satTest =
+	{
+
+		{"systemClassName", "SatTest"}
+
+	};
+	sceneJson["systems"] = json::array({mouseController, satTest });
+	sceneManager->LoadSceneFromJson(sceneJson);
+	engine.Start();
+}
 
 TEST(Presentation, TestPendule)
 {
@@ -1440,23 +1768,22 @@ TEST(Presentation, TestPendule)
 		{"systemClassName", "ContactDebug"}
 
 	};
-	json aabbTest =
-	{
-
-		{"systemClassName", "AabbTest"}
-
-	};
 	json mouseController =
 	{
 
 		{"systemClassName", "MouseController"}
 
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, aabbTest, mouseController });
+	json satTest =
+	{
+
+		{"systemClassName", "SatTest"}
+
+	};
+	sceneJson["systems"] = json::array({ contactDebugSystem, mouseController, satTest });
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
-
 
 TEST(Presentation, TestFlipper)
 {
@@ -1681,10 +2008,10 @@ TEST(Presentation, TestFlipper)
 		{"systemClassName", "ContactDebug"}
 
 	};
-	json aabbTest =
+	json satTest =
 	{
 
-		{"systemClassName", "AabbTest"}
+		{"systemClassName", "SatTest"}
 
 	};
 	json flipper =
@@ -1699,7 +2026,7 @@ TEST(Presentation, TestFlipper)
 		{"systemClassName", "MouseController"}
 
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, flipper, mouseController });
+	sceneJson["systems"] = json::array({ contactDebugSystem, flipper, mouseController, satTest });
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
@@ -1787,111 +2114,6 @@ TEST(Presentation, TestGaz)
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
-
-
-TEST(Presentation, TestQuadTree)
-{
-	sfge::Engine engine;
-	auto config = std::make_unique<sfge::Configuration>();
-	config->gravity = p2Vec2(0.0f, 0.0f);
-	config->devMode = false;
-
-	engine.Init(std::move(config));
-
-	auto* sceneManager = engine.GetSceneManager();
-
-	json sceneJson;
-	sceneJson["name"] = "Contacts";
-
-	const int entitiesNmb = 1000;
-	json entities[entitiesNmb];
-
-	for (int i = 0; i < entitiesNmb; i++)
-	{
-		int sizeX = (rand() % 10) + 5;
-		int sizeY = (rand() % 10) + 5;
-		int radius = (rand() % 10) + 5;
-		json shapes[] =
-		{
-			{
-				{"name", "Rect Shape Component"},
-				{"type", sfge::ComponentType::SHAPE2D},
-				{"shape_type", sfge::ShapeType::RECTANGLE},
-				{"size", {sizeX, sizeY}}
-			},
-			{
-				{"name", "Rect Shape Component"},
-				{"type", sfge::ComponentType::SHAPE2D},
-				{"shape_type", sfge::ShapeType::CIRCLE},
-				{"radius", radius}
-			}
-		};
-		json colliders[] =
-		{
-			{
-				{"name", "Rect Collider"},
-				{"type", sfge::ComponentType::COLLIDER2D},
-				{"collider_type", sfge::ColliderType::BOX},
-				{"size", {sizeX, sizeY}},
-			},
-			{
-				{"name", "Circle Collider"},
-				{"type", sfge::ComponentType::COLLIDER2D},
-				{"collider_type", sfge::ColliderType::CIRCLE},
-				{"radius", radius},
-			}
-		};
-
-		json& entityJson = entities[i];
-
-		json transformJson =
-		{
-			{"position", {rand() % 1200, rand() % 700}},
-			{"type", sfge::ComponentType::TRANSFORM2D}
-		};
-
-		json rigidbody =
-		{
-			{"name", "Rigidbody"},
-			{"type", sfge::ComponentType::BODY2D},
-			{"body_type", p2BodyType::KINEMATIC},
-			{"velocity", {rand() % 100, rand() % 100}}
-		};
-
-		int randShapeIndex = rand() % 2;
-		entityJson["components"] = { transformJson, shapes[randShapeIndex], rigidbody, colliders[randShapeIndex] };
-	}
-	sceneJson["entities"] = entities;
-	sceneJson["systems"] = json::array({
-			{
-				{"systemClassName", "ContactDebug"}
-			},
-			{
-				{"systemClassName", "StayOnScreen"}
-			},
-			{
-				{
-					"script_path",
-					//"scripts/mouse_raycast_system.py" 
-					"nothing"
-				}
-			},
-			{
-
-				{"systemClassName", "AabbTest"}
-
-			},
-			{
-
-				{"systemClassName", "QuadTreeTest"}
-
-			}
-		}
-	);
-	sceneManager->LoadSceneFromJson(sceneJson);
-	engine.Start();
-}
-
 
 TEST(Presentation, TestExplo)
 {
@@ -2031,4 +2253,5 @@ TEST(Presentation, TestExplo)
 	engine.Start();
 }
 
+#pragma endregion Presentation
 

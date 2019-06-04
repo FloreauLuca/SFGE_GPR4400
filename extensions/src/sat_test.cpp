@@ -89,7 +89,10 @@ namespace sfge::ext
 				if (bodies[i] == bodies[j]) continue;
 				DrawSAT(bodies[i], bodies[j]);
 			}
-			//m_Graphics2DManager->DrawVector(meter2pixel(bodies[i]->GetLinearVelocity()), meter2pixel(bodies[i]->GetPosition()), sf::Color::White);
+			if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::V))
+			{
+				m_Graphics2DManager->DrawVector(meter2pixel(bodies[i]->GetLinearVelocity()), meter2pixel(bodies[i]->GetPosition()), sf::Color::White);
+			}
 		}
 	}
 
