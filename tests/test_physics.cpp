@@ -1337,7 +1337,7 @@ TEST(Presentation, TestBounciness)
 		{"systemClassName", "MouseController"}
 
 	};
-	sceneJson["systems"] = json::array({contactDebugSystem, sat, mouseController});
+	sceneJson["systems"] = json::array({contactDebugSystem, mouseController});
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
@@ -1562,7 +1562,7 @@ TEST(Presentation, TestRestitution)
 		{"systemClassName", "SatTest"}
 
 	};
-	sceneJson["systems"] = json::array({mouseController, satTest });
+	sceneJson["systems"] = json::array({mouseController, contactDebugSystem });
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
@@ -1780,7 +1780,7 @@ TEST(Presentation, TestPendule)
 		{"systemClassName", "SatTest"}
 
 	};
-	sceneJson["systems"] = json::array({ contactDebugSystem, mouseController, satTest });
+	sceneJson["systems"] = json::array({ contactDebugSystem, mouseController});
 	sceneManager->LoadSceneFromJson(sceneJson);
 	engine.Start();
 }
