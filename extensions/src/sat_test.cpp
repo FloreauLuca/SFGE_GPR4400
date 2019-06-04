@@ -372,27 +372,27 @@ namespace sfge::ext
 										p2Mat22 tmpMtvAX;
 										if (mtvAX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
 										{
-											if (vorox < -1 || vorox > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvAX.rows[1] = (x * -(1 + kx));
 												tmpMtvAX.rows[0] = cornerA + bodyA->GetPosition();
 											}
-											else
+											else if(vorox >= -1 && vorox <= 1)
 											{
-												tmpMtvAX.rows[0] = bodyA->GetPosition() + p2Vec2(rectShapeA->GetSize().x, 0);
+												tmpMtvAX.rows[0] = bodyA->GetPosition() + p2Vec2(rectShapeA->GetSize().x, 0).Rotate(bodyA->GetAngle() / 180 * M_PI);
 												tmpMtvAX.rows[1] = (x * -(1 + kx));
 											}
 										}
 										if (mtvAX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
 										{
-											if (vorox < -1 || vorox > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvAX.rows[1] = (x * (1 - kx));
 												tmpMtvAX.rows[0] = cornerA + bodyA->GetPosition();
 											}
-											else
+											else if (vorox >= -1 && vorox <= 1)
 											{
-												tmpMtvAX.rows[0] = bodyA->GetPosition() - p2Vec2(rectShapeA->GetSize().x, 0);
+												tmpMtvAX.rows[0] = bodyA->GetPosition() - p2Vec2(rectShapeA->GetSize().x, 0).Rotate(bodyA->GetAngle() / 180 * M_PI);
 												tmpMtvAX.rows[1] = (x * (1 - kx));
 											}
 										}
@@ -400,27 +400,27 @@ namespace sfge::ext
 
 										if (mtvAY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
 										{
-											if (voroy < -1 || voroy > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvAY.rows[1] = (y * -(1 + ky));
 												tmpMtvAY.rows[0] = cornerA + bodyA->GetPosition();
 											}
-											else
+											else if (voroy >= -1 && voroy <= 1)
 											{
-												tmpMtvAY.rows[0] = bodyA->GetPosition() + p2Vec2(0, rectShapeA->GetSize().y);
+												tmpMtvAY.rows[0] = bodyA->GetPosition() + p2Vec2(0, rectShapeA->GetSize().y).Rotate(bodyA->GetAngle() / 180 * M_PI);
 												tmpMtvAY.rows[1] = (y * -(1 + ky));
 											}
 										}
 										if (mtvAY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
 										{
-											if (voroy < -1 || voroy > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvAY.rows[1] = (y * (1 - ky));
 												tmpMtvAY.rows[0] = cornerA + bodyA->GetPosition();
 											}
-											else
+											else if (voroy >= -1 && voroy <= 1)
 											{
-												tmpMtvAY.rows[0] = bodyA->GetPosition() - p2Vec2(0, rectShapeA->GetSize().y);
+												tmpMtvAY.rows[0] = bodyA->GetPosition() - p2Vec2(0, rectShapeA->GetSize().y).Rotate(bodyA->GetAngle() / 180 * M_PI);
 												tmpMtvAY.rows[1] = (y * (1 - ky));
 											}
 										}
@@ -517,27 +517,27 @@ namespace sfge::ext
 										p2Mat22 tmpMtvBX;
 										if (mtvBX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
 										{
-											if (vorox < -1 || vorox > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvBX.rows[1] = (x * -(1 + kx));
 												tmpMtvBX.rows[0] = cornerB + bodyB->GetPosition();
 											}
-											else
+											else if (vorox >= -1 && vorox <= 1)
 											{
-												tmpMtvBX.rows[0] = bodyB->GetPosition() + p2Vec2(rectShapeB->GetSize().x, 0);
+												tmpMtvBX.rows[0] = bodyB->GetPosition() + p2Vec2(rectShapeB->GetSize().x, 0).Rotate(bodyB->GetAngle() / 180 * M_PI);
 												tmpMtvBX.rows[1] = (x * -(1 + kx));
 											}
 										}
 										if (mtvBX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
 										{
-											if (vorox < -1 || vorox > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvBX.rows[1] = (x * (1 - kx));
 												tmpMtvBX.rows[0] = cornerB + bodyB->GetPosition();
 											}
-											else
+											else if (vorox >= -1 && vorox <= 1)
 											{
-												tmpMtvBX.rows[0] = bodyB->GetPosition() - p2Vec2(rectShapeB->GetSize().x, 0);
+												tmpMtvBX.rows[0] = bodyB->GetPosition() - p2Vec2(rectShapeB->GetSize().x, 0).Rotate(bodyB->GetAngle() / 180 * M_PI);
 												tmpMtvBX.rows[1] = (x * (1 - kx));
 											}
 										}
@@ -545,27 +545,27 @@ namespace sfge::ext
 
 										if (mtvBY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
 										{
-											if (voroy < -1 || voroy > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvBY.rows[1] = (y * -(1 + ky));
 												tmpMtvBY.rows[0] = cornerB + bodyB->GetPosition();
 											}
-											else
+											else if (voroy >= -1 && voroy <= 1)
 											{
-												tmpMtvBY.rows[0] = bodyB->GetPosition() + p2Vec2(0, rectShapeB->GetSize().y);
+												tmpMtvBY.rows[0] = bodyB->GetPosition() + p2Vec2(0, rectShapeB->GetSize().y).Rotate(bodyB->GetAngle() / 180 * M_PI);
 												tmpMtvBY.rows[1] = (y * -(1 + ky));
 											}
 										}
 										if (mtvBY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
 										{
-											if (voroy < -1 || voroy > 1)
+											if ((vorox < -1 || vorox > 1) && (voroy < -1 || voroy > 1))
 											{
 												tmpMtvBY.rows[1] = (y * (1 - ky));
 												tmpMtvBY.rows[0] = cornerB + bodyB->GetPosition();
 											}
-											else
+											else if (voroy >= -1 && voroy <= 1)
 											{
-												tmpMtvBY.rows[0] = bodyB->GetPosition() - p2Vec2(0,rectShapeB->GetSize().y);
+												tmpMtvBY.rows[0] = bodyB->GetPosition() - p2Vec2(0,rectShapeB->GetSize().y).Rotate(bodyB->GetAngle() / 180 * M_PI);
 												tmpMtvBY.rows[1] = (y * (1 - ky));
 											}
 										}

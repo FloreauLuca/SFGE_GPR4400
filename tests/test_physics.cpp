@@ -576,7 +576,7 @@ TEST(Physics, TestSATDetect)
 	rectShapeJson["name"] = "Rect Shape Component";
 	rectShapeJson["type"] = sfge::ComponentType::SHAPE2D;
 	rectShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
-	rectShapeJson["size"] = {500, 200};
+	rectShapeJson["size"] = {100, 100};
 
 	json rigidBodyJson2;
 	rigidBodyJson2["name"] = "Rigidbody";
@@ -587,7 +587,7 @@ TEST(Physics, TestSATDetect)
 	rectColliderJson["name"] = "Rect Collider";
 	rectColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
 	rectColliderJson["collider_type"] = sfge::ColliderType::BOX;
-	rectColliderJson["size"] = {500, 200};
+	rectColliderJson["size"] = {100, 100};
 
 	entityBody2["components"] = {transformJson2, rectShapeJson, rigidBodyJson2, rectColliderJson};
 

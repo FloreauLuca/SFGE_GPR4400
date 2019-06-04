@@ -232,7 +232,7 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		{
 			if (bodyDef.type == p2BodyType::STATIC)
 			{
-				bodyDef.mass = 1000;
+				bodyDef.mass = 1000; // Grand nombre pour avoir un rebond correct
 			}
 			else
 			{
