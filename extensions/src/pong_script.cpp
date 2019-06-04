@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <extensions/flipper_script.h>
+#include <extensions/pong_script.h>
 #include <engine/engine.h>
 #include <engine/config.h>
 #include <graphics/graphics2d.h>
@@ -32,12 +32,12 @@ SOFTWARE.
 
 namespace sfge::ext
 {
-	FlipperScript::FlipperScript(Engine& engine) :
+	PongScript::PongScript(Engine& engine) :
 		System(engine)
 	{
 	}
 
-	void FlipperScript::OnEngineInit()
+	void PongScript::OnEngineInit()
 	{
 		m_Transform2DManager = m_Engine.GetTransform2dManager();
 		m_Body2DManager = m_Engine.GetPhysicsManager()->GetBodyManager();
@@ -57,10 +57,9 @@ namespace sfge::ext
 			auto body = m_Body2DManager->GetComponentPtr(entities[i]);
 			bodies.push_back(body->GetBody());
 		}
-		ball = entityManager->GetEntityByName("Ball");
 	}
 
-	void FlipperScript::OnUpdate(float dt)
+	void PongScript::OnUpdate(float dt)
 	{
 		(void)dt;
 		/*
@@ -73,13 +72,9 @@ namespace sfge::ext
 	}
 
 
-	void FlipperScript::OnFixedUpdate()
+	void PongScript::OnFixedUpdate()
 	{
-		rmt_ScopedCPUSample(FlipperScriptFixedUpdate, 0);
-		auto body = m_Body2DManager->GetComponentPtr(ball);
-		if (body->GetBody()->GetPosition().y > pixel2meter(screenSize.y))
-		{
-			body->GetBody()->SetPosition(p2Vec2(4 + rand() % 4, 0));
-		}
+		rmt_ScopedCPUSample(PongScriptFixedUpdate, 0);
 	}
 }
+

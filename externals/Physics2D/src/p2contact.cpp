@@ -300,6 +300,10 @@ bool p2ContactManager::CheckAABBContact(p2Body* bodyA, p2Body* bodyB)
 	{
 		return true;
 	}
+	if ((aabbA.bottomLeft.x < aabbB.bottomLeft.x && aabbA.topRight.x > aabbB.topRight.x) && (aabbB.bottomLeft.y < aabbA.bottomLeft.y && aabbB.topRight.y > aabbA.topRight.y) || (aabbB.bottomLeft.x < aabbA.bottomLeft.x && aabbB.topRight.x > aabbA.topRight.x) && (aabbA.bottomLeft.y < aabbB.bottomLeft.y && aabbB.topRight.y > aabbA.topRight.y))
+	{
+		return true;
+	}
 	return false;
 }
 

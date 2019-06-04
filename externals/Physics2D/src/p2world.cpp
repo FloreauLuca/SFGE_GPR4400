@@ -38,6 +38,9 @@ void p2World::Step(float doriantan)
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
 			body.ApplyForceToCenter(m_Gravity*doriantan / body.GetMass());
+		} else if (body.GetType() == p2BodyType::STATIC)
+		{
+			body.SetLinearVelocity(p2Vec2());
 		}
 		// Move
 		if (body.GetType() != p2BodyType::STATIC)

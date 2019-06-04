@@ -90,12 +90,13 @@ namespace sfge::ext
 
 		auto sprite = m_SpriteManager->AddComponent(newEntity);
 		sprite->SetTexture(texture);
-
+		
 		auto& spriteInfo = m_SpriteManager->GetComponentInfo(newEntity);
 		spriteInfo.name = "Sprite";
-		spriteInfo.sprite = sprite;
+		//spriteInfo.sprite = sprite;
 		spriteInfo.textureId = textureId;
 		spriteInfo.texturePath = texturePath;
+
 #else
 			m_VertexArray[4 * i].texCoords = sf::Vector2f(0, 0);
 			m_VertexArray[4 * i + 1].texCoords = sf::Vector2f(textureSize.x, 0);
