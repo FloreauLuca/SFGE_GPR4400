@@ -172,6 +172,14 @@ Shape *ShapeManager::AddComponent (Entity entity)
 	shapeInfo.SetEntity(entity);
 	shapeInfo.shapeManager = this;
 
+	float radius = 50.0f;
+	
+	auto circleShape = std::make_unique <sf::CircleShape>();
+	circleShape->setRadius(radius);
+	circleShape->setOrigin(radius, radius);
+	shapePtr->SetShape(std::move(circleShape));
+	shapePtr->Update();
+
 	m_Engine.GetEntityManager()->AddComponentType(entity, ComponentType::SHAPE2D);
 	return shapePtr;
 }

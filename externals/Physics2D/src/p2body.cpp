@@ -50,6 +50,10 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 {
 	m_LinearVelocity = velocity;
 }
+void p2Body::SetAngularVelocity(float angularVelocity)
+{
+	m_AngularVelocity = angularVelocity;
+}
 
 /**
  * \brief 
@@ -58,6 +62,11 @@ void p2Body::SetLinearVelocity(p2Vec2 velocity)
 void p2Body::SetAngle(float angle)
 {
 	m_Angle = angle;
+}
+
+void p2Body::ChangeType(p2BodyType bodyType)
+{
+	m_BodyType = bodyType;
 }
 
 float p2Body::GetAngle()
@@ -93,7 +102,16 @@ p2Collider * p2Body::CreateCollider(p2ColliderDef * colliderDef)
 
 void p2Body::ApplyForceToCenter(const p2Vec2& force)
 {
-	m_LinearVelocity += force*m_GravityScale/m_Mass;
+	m_LinearVelocity += force*m_GravityScale;
+}
+
+
+void p2Body::ApplyForceToCorner(float inertia, const p2Vec2& force, p2Vec2 distCenter)
+{
+	if (inertia != 0)
+	{
+		m_AngularVelocity += p2Vec2::Cross(force, distCenter).z / inertia;
+	}
 }
 
 p2BodyType p2Body::GetType() const
@@ -109,7 +127,8 @@ float p2Body::GetMass() const
 
 void p2Body::Move(float dt)
 {
-	m_Position += m_LinearVelocity * dt*1/2;
+	m_Position += m_LinearVelocity * dt;
+	m_Angle += m_AngularVelocity * dt;
 	//std::cout << "position : " + std::to_string(position.x) + " , " + std::to_string(position.y) + " dt : " + std::to_string(dt) << std::endl; //Debug
 }
 

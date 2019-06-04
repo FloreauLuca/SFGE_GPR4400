@@ -81,6 +81,10 @@ public:
 	 */
 	void ApplyForceToCenter(const p2Vec2& force);
 	/**
+	 * \brief Calculate the angular velocity with inertia, force and dist from the center
+	 */
+	void ApplyForceToCorner(float inertia, const p2Vec2& force, p2Vec2 distCenter);
+	/**
 	 * \brief Move position and angle according to the velocity and the angular velocity 
 	 * \param dt Time
 	 */
@@ -92,7 +96,9 @@ public:
 	
 	p2Vec2 GetLinearVelocity() const;
 	void SetLinearVelocity(p2Vec2 velocity);
+	void SetAngularVelocity(float angularVelocity);
 	void SetAngle(float angle);
+	void ChangeType(p2BodyType bodyType);
 	float GetAngle();
 	float GetAngularVelocity();
 	p2Vec2 GetPosition();

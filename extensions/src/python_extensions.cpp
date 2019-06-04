@@ -29,6 +29,9 @@ SOFTWARE.
 #include <pybind11/stl.h>
 
 #include <extensions/python_extensions.h>
+#include <extensions/flipper_script.h>
+#include <extensions/pong_script.h>
+#include <extensions/explosion.h>
 #include <extensions/planet_system.h>
 #include "extensions/aabb_test.h"
 #include "extensions/quad_tree_test.h"
@@ -67,6 +70,15 @@ void ExtendPython(py::module& m)
 		.def(py::init<Engine&>());
 	py::class_<MouseController, System> mouseController(m, "MouseController");
 	mouseController
+		.def(py::init<Engine&>());
+	py::class_<Explosion, System> explosion(m, "Explosion");
+	explosion
+		.def(py::init<Engine&>());
+	py::class_<FlipperScript, System> flipperScript(m, "FlipperScript");
+	flipperScript
+		.def(py::init<Engine&>());
+	py::class_<PongScript, System> pongScript(m, "PongScript");
+	pongScript
 		.def(py::init<Engine&>());
 
 	tools::ExtendPythonTools(m);

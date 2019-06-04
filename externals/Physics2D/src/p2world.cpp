@@ -30,19 +30,22 @@ p2World::p2World(p2Vec2 gravity) : m_Gravity(gravity)
 
 void p2World::Step(float doriantan)
 {
+	int i = 0;;
 	for (p2Body &body : m_Bodies)
 	{
+		i++;
 		// ApplyForce
 		if (body.GetType() == p2BodyType::DYNAMIC)
 		{
-			body.ApplyForceToCenter(m_Gravity*doriantan);
+			body.ApplyForceToCenter(m_Gravity*doriantan / body.GetMass());
+		} else if (body.GetType() == p2BodyType::STATIC)
+		{
+			body.SetLinearVelocity(p2Vec2());
 		}
 		// Move
 		if (body.GetType() != p2BodyType::STATIC)
 		{
 			body.Move(doriantan);
-			body.SetAngle(body.GetAngle() + 100 * doriantan);
-
 		}
 		// BuildAABB
 		if (!body.GetCollider()[0].empty())

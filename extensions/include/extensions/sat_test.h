@@ -37,6 +37,7 @@ namespace sfge
 	class Body2dManager;
 	class TextureManager;
 	class SpriteManager;
+	class InputManager;
 }
 
 namespace sfge::ext
@@ -62,6 +63,7 @@ namespace sfge::ext
 		TextureManager* m_TextureManager;
 		SpriteManager* m_SpriteManager;
 		Graphics2dManager* m_Graphics2DManager;
+		InputManager* m_InputManager;
 
 
 		void DrawSAT(p2Body* bodyA, p2Body* bodyB);

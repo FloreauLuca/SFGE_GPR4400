@@ -29,6 +29,7 @@ SOFTWARE.
 #include <physics/body2d.h>
 #include <physics/physics2d.h>
 #include <corecrt_math_defines.h>
+#include "input/input.h"
 
 namespace sfge::ext
 {
@@ -44,6 +45,7 @@ namespace sfge::ext
 		m_TextureManager = m_Engine.GetGraphics2dManager()->GetTextureManager();
 		m_SpriteManager = m_Engine.GetGraphics2dManager()->GetSpriteManager();
 		m_Graphics2DManager = m_Engine.GetGraphics2dManager();
+		m_InputManager = m_Engine.GetInputManager();
 
 
 		auto config = m_Engine.GetConfig();
@@ -87,7 +89,10 @@ namespace sfge::ext
 				if (bodies[i] == bodies[j]) continue;
 				DrawSAT(bodies[i], bodies[j]);
 			}
-			//m_Graphics2DManager->DrawVector(meter2pixel(bodies[i]->GetLinearVelocity()), meter2pixel(bodies[i]->GetPosition()), sf::Color::White);
+			if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::V))
+			{
+				m_Graphics2DManager->DrawVector(meter2pixel(bodies[i]->GetLinearVelocity()), meter2pixel(bodies[i]->GetPosition()), sf::Color::White);
+			}
 		}
 	}
 
@@ -106,10 +111,16 @@ namespace sfge::ext
 						{
 							if (p2CircleShape* circleshapeB = dynamic_cast<p2CircleShape*>(colliderB.GetShape()))
 							{
+								if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::Num1))
+								{
+									m_Graphics2DManager->DrawVector(meter2pixel(bodyA->GetPosition() - bodyB->GetPosition()) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+									m_Graphics2DManager->DrawVector(meter2pixel((bodyB->GetPosition() - bodyA->GetPosition()).Normalized() * circleshapeA->GetRadius()) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+									m_Graphics2DManager->DrawVector(meter2pixel((bodyA->GetPosition() - bodyB->GetPosition()).Normalized() * circleshapeB->GetRadius()) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+								}
 								if (p2Vec2::Distance(bodyA->GetPosition(), bodyB->GetPosition()) < circleshapeA->GetRadius() + circleshapeB->GetRadius())
 								{
 									p2Mat22 mtv = p2Mat22(bodyA->GetPosition() - (bodyA->GetPosition() - bodyB->GetPosition()).Normalized() * circleshapeA->GetRadius(), (bodyA->GetPosition() - bodyB->GetPosition()).Normalized() * ((circleshapeB->GetRadius() + circleshapeA->GetRadius() - (bodyA->GetPosition() - bodyB->GetPosition()).GetMagnitude())));
-									m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Red);
+									m_Graphics2DManager->DrawVector(meter2pixel(mtv.rows[1]) * resize, meter2pixel(mtv.rows[0]) * resize, sf::Color::Black);
 								}
 							}
 						}
@@ -170,18 +181,20 @@ namespace sfge::ext
 									{
 										projInf++;
 									}
-									/*
-									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
-									m_Graphics2DManager->DrawVector(meter2pixel(axe) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
-									if (k > 1 || k < -1)
+									if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::Num2))
 									{
-										m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+
+										m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
+										m_Graphics2DManager->DrawVector(meter2pixel(axe) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
+										if (k > 1 || k < -1)
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+										}
+										else
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+										}
 									}
-									else
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
-									}
-									*/
 									if (k < 1 && k > -1)
 									{
 										if (mtv.rows[1].GetMagnitude() > (axe * -(1 - k)).GetMagnitude())
@@ -264,19 +277,19 @@ namespace sfge::ext
 									{
 										projInf++;
 									}
-									/*
-									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
-									m_Graphics2DManager->DrawVector(meter2pixel(axe) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-									m_Graphics2DManager->DrawVector(meter2pixel(bodyA->GetPosition()- (bodyB->GetPosition())) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::White);
-									if (k > 1 || k < -1)
+									if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::Num3))
 									{
-										m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+										m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
+										m_Graphics2DManager->DrawVector(meter2pixel(axe) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+										if (k > 1 || k < -1)
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+										}
+										else
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+										}
 									}
-									else
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(result) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
-									}
-									*/
 									if (k < 1 && k > -1)
 									{
 										if (mtv.rows[1].GetMagnitude() > (axe * -(1 - k)).GetMagnitude())
@@ -315,8 +328,8 @@ namespace sfge::ext
 								float newAngle = bodyB->GetAngle() / 180 * M_PI;
 								p2Vec2 x = p2Vec2(rectShapeB->GetSize().x, 0).Rotate(newAngle);
 								p2Vec2 y = p2Vec2(0, rectShapeB->GetSize().y).Rotate(newAngle);
-								mtvAX = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize()*2);
-								mtvAY = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize()*2);
+								mtvAX = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
+								mtvAY = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
 								for (p2Vec2 cornerA : rectShapeA->GetCorner())
 								{
 									p2Vec2 u = bodyA->GetPosition() + cornerA - (bodyB->GetPosition());
@@ -326,27 +339,28 @@ namespace sfge::ext
 
 									float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 									float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
-
-									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
-									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
-									if (kx > 1 || kx < -1)
+									if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::Num4))
 									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+										m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Green);
+										m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+										m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Red);
+										if (kx > 1 || kx < -1)
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+										}
+										else
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+										}
+										if (ky > 1 || ky < -1)
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
+										}
+										else
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
+										}
 									}
-									else
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
-									}
-									if (ky > 1 || ky < -1)
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Blue);
-									}
-									else
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::Yellow);
-									}
-
 
 									if (kx > 1)
 									{
@@ -366,8 +380,8 @@ namespace sfge::ext
 									}
 									if ((kx <= 1 && kx >= -1) && (ky <= 1 && ky >= -1))
 									{
-										p2Mat22 tmpMtvAX;
-										if (mtvAX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
+										p2Mat22 tmpMtvAX = mtvAX;
+										if (tmpMtvAX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
 										{
 											if (mtvAX.rows[0] == p2Vec2())
 											{
@@ -380,7 +394,7 @@ namespace sfge::ext
 												tmpMtvAX.rows[1] = (mtvAX.rows[1] + (x * -(1 + kx))) / 2;
 											}
 										}
-										if (mtvAX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
+										if (tmpMtvAX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
 										{
 											if (mtvAX.rows[0] == p2Vec2())
 											{
@@ -393,9 +407,9 @@ namespace sfge::ext
 												tmpMtvAX.rows[1] = (mtvAX.rows[1] + (x * (1 - kx))) / 2;
 											}
 										}
-										p2Mat22 tmpMtvAY;
+										p2Mat22 tmpMtvAY = mtvAY;
 
-										if (mtvAY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
+										if (tmpMtvAY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
 										{
 											if (mtvAY.rows[0] == p2Vec2())
 											{
@@ -408,7 +422,7 @@ namespace sfge::ext
 												tmpMtvAY.rows[1] = (mtvAY.rows[1] + (y * -(1 + ky))) / 2;
 											}
 										}
-										if (mtvAY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
+										if (tmpMtvAY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
 										{
 											if (mtvAY.rows[0] == p2Vec2())
 											{
@@ -421,11 +435,12 @@ namespace sfge::ext
 												tmpMtvAY.rows[1] = (mtvAY.rows[1] + (y * (1 - ky))) / 2;
 											}
 										}
-										if (tmpMtvAX != p2Mat22())
+										
+										if (tmpMtvAX != p2Mat22() && (tmpMtvAX.rows[0] - bodyA->GetPosition()).GetMagnitude() > (tmpMtvAX.rows[0] + tmpMtvAX.rows[1] - bodyA->GetPosition()).GetMagnitude())
 										{
 											mtvAX = tmpMtvAX;
 										}
-										if (tmpMtvAY != p2Mat22())
+										if (tmpMtvAY != p2Mat22() && (tmpMtvAY.rows[0] - bodyA->GetPosition()).GetMagnitude() > (tmpMtvAY.rows[0] + tmpMtvAY.rows[1] - bodyA->GetPosition()).GetMagnitude())
 										{
 											mtvAY = tmpMtvAY;
 										}
@@ -433,10 +448,10 @@ namespace sfge::ext
 								}
 								if ((projXSup == 4 || projXInf == 4 || projYSup == 4 || projYInf == 4))
 								{
-									continue;
+									//continue;
 								}
 
-								if (projXInf+projXSup == 0)
+								if (projXInf + projXSup == 0)
 								{
 									mtvAX = p2Mat22(p2Vec2(0, 0), rectShapeA->GetSize() * 2);
 								}
@@ -451,12 +466,12 @@ namespace sfge::ext
 								projXSup = 0;
 								projXInf = 0;
 								projYInf = 0;
-								projYSup = true;
+								projYSup = 0;
 								newAngle = bodyA->GetAngle() / 180 * M_PI;
 								x = p2Vec2(rectShapeA->GetSize().x, 0).Rotate(newAngle);
 								y = p2Vec2(0, rectShapeA->GetSize().y).Rotate(newAngle);
-								mtvBX = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize()*2);
-								mtvBY = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize()*2);
+								mtvBX = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
+								mtvBY = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
 								for (p2Vec2 cornerB : rectShapeB->GetCorner())
 								{
 									p2Vec2 u = bodyB->GetPosition() + cornerB - (bodyA->GetPosition());
@@ -466,26 +481,28 @@ namespace sfge::ext
 
 									float kx = (p2Vec2::Dot(u, x) / p2Vec2::Dot(x, x));
 									float ky = (p2Vec2::Dot(u, y) / p2Vec2::Dot(y, y));
+									if (m_InputManager->GetKeyboardManager().IsKeyHeld(sf::Keyboard::Num5))
+									{
+										m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
+										m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
+										m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
 
-									m_Graphics2DManager->DrawVector(meter2pixel(u) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Green);
-									m_Graphics2DManager->DrawVector(meter2pixel(x) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
-									m_Graphics2DManager->DrawVector(meter2pixel(y) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Red);
-
-									if (kx > 1 || kx < -1)
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
-									}
-									else
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
-									}
-									if (ky > 1 || ky < -1)
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
-									}
-									else
-									{
-										m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+										if (kx > 1 || kx < -1)
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+										}
+										else
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultX) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+										}
+										if (ky > 1 || ky < -1)
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Blue);
+										}
+										else
+										{
+											m_Graphics2DManager->DrawVector(meter2pixel(resultY) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::Yellow);
+										}
 									}
 
 
@@ -507,9 +524,9 @@ namespace sfge::ext
 									}
 									if ((kx <= 1 && kx >= -1) && (ky <= 1 && ky >= -1))
 									{
-										p2Mat22 tmpMtvBX;
-										
-										if (mtvBX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
+										p2Mat22 tmpMtvBX = mtvBX;
+
+										if (tmpMtvBX.rows[1].GetMagnitude() >= (x * -(1 + kx)).GetMagnitude())
 										{
 											if (mtvBX.rows[0] == p2Vec2())
 											{
@@ -522,7 +539,7 @@ namespace sfge::ext
 												tmpMtvBX.rows[1] = (mtvBX.rows[1] + (x * -(1 + kx))) / 2;
 											}
 										}
-										if (mtvBX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
+										if (tmpMtvBX.rows[1].GetMagnitude() >= (x * (1 - kx)).GetMagnitude())
 										{
 											if (mtvBX.rows[0] == p2Vec2())
 											{
@@ -535,9 +552,9 @@ namespace sfge::ext
 												tmpMtvBX.rows[1] = (mtvBX.rows[1] + (x * (1 - kx))) / 2;
 											}
 										}
-										p2Mat22 tmpMtvBY;
+										p2Mat22 tmpMtvBY = mtvBY;
 
-										if (mtvBY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
+										if (tmpMtvBY.rows[1].GetMagnitude() >= (y * -(1 + ky)).GetMagnitude())
 										{
 											if (mtvBY.rows[0] == p2Vec2())
 											{
@@ -550,7 +567,7 @@ namespace sfge::ext
 												tmpMtvBY.rows[1] = (mtvBY.rows[1] + (y * -(1 + ky))) / 2;
 											}
 										}
-										if (mtvBY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
+										if (tmpMtvBY.rows[1].GetMagnitude() >= (y * (1 - ky)).GetMagnitude())
 										{
 											if (mtvBY.rows[0] == p2Vec2())
 											{
@@ -563,11 +580,11 @@ namespace sfge::ext
 												tmpMtvBY.rows[1] = (mtvBY.rows[1] + (y * (1 - ky))) / 2;
 											}
 										}
-										if (tmpMtvBX != p2Mat22())
+										if (tmpMtvBX != p2Mat22() && (tmpMtvBX.rows[0] - bodyB->GetPosition()).GetMagnitude() > (tmpMtvBX.rows[0] + tmpMtvBX.rows[1] - bodyB->GetPosition()).GetMagnitude())
 										{
 											mtvBX = tmpMtvBX;
 										}
-										if (tmpMtvBY != p2Mat22())
+										if (tmpMtvBY != p2Mat22() && (tmpMtvBY.rows[0] - bodyB->GetPosition()).GetMagnitude() > (tmpMtvBY.rows[0] + tmpMtvBY.rows[1] - bodyB->GetPosition()).GetMagnitude())
 										{
 											mtvBY = tmpMtvBY;
 										}
@@ -586,7 +603,7 @@ namespace sfge::ext
 								{
 									mtvBY = p2Mat22(p2Vec2(0, 0), rectShapeB->GetSize() * 2);
 								}
-
+								
 								if (mtvAX.rows[1].GetMagnitude() > mtvAY.rows[1].GetMagnitude())
 								{
 									mtvAX = mtvAY;
@@ -597,10 +614,14 @@ namespace sfge::ext
 								}
 								if (mtvAX.rows[1].GetMagnitude() > mtvBX.rows[1].GetMagnitude())
 								{
+									/*m_Graphics2DManager->DrawVector(meter2pixel(mtvBX.rows[0] - bodyB->GetPosition()) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::White);
+									m_Graphics2DManager->DrawVector(meter2pixel(mtvBX.rows[0] + mtvBX.rows[1] - bodyB->GetPosition()) * resize, meter2pixel(bodyB->GetPosition()) * resize, sf::Color::White);*/
 									m_Graphics2DManager->DrawVector(meter2pixel(mtvBX.rows[1]) * resize, meter2pixel(mtvBX.rows[0]) * resize, sf::Color::Black);
 								}
 								else
 								{
+									/*m_Graphics2DManager->DrawVector(meter2pixel(mtvAX.rows[0] - bodyA->GetPosition()) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::White);
+									m_Graphics2DManager->DrawVector(meter2pixel(mtvAX.rows[0] + mtvAX.rows[1] - bodyA->GetPosition()) * resize, meter2pixel(bodyA->GetPosition()) * resize, sf::Color::White);*/
 									m_Graphics2DManager->DrawVector(meter2pixel(mtvAX.rows[1]) * resize, meter2pixel(mtvAX.rows[0]) * resize, sf::Color::Black);
 								}
 							}

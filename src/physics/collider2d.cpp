@@ -131,6 +131,9 @@ void ColliderManager::CreateComponent(json& componentJson, Entity entity)
 		if(CheckJsonNumber(componentJson, "bouncing"))
 		{
 			fixtureDef.restitution = componentJson["bouncing"];
+		} else
+		{
+			fixtureDef.restitution = 1;
 		}
 		if (shape)
 		{
@@ -163,7 +166,41 @@ int ColliderManager::GetFreeComponentIndex()
 }
 ColliderData *ColliderManager::AddComponent(Entity entity)
 {
-	(void) entity;
+	Log::GetInstance()->Msg("Create component Collider");
+	if (m_EntityManager->HasComponent(entity, ComponentType::BODY2D))
+	{
+		auto & body = m_BodyManager->GetComponentRef(entity);
+
+		p2ColliderDef fixtureDef;
+
+		std::unique_ptr<p2Shape> shape = nullptr;
+		fixtureDef.colliderType = p2ColliderType::CIRCLE;
+		auto circleShape = std::make_unique<p2CircleShape>();
+		circleShape->SetRadius(pixel2meter(50));
+		shape = std::move(circleShape);
+		fixtureDef.restitution = 1;
+		if (shape)
+		{
+			fixtureDef.shape = shape.release();
+			auto index = GetFreeComponentIndex();
+			if (index != -1)
+			{
+				auto* fixture = body.GetBody()->CreateCollider(&fixtureDef);
+
+
+				ColliderData& colliderData = m_Components[index];
+				colliderData.entity = entity;
+				colliderData.fixture = fixture;
+				colliderData.body = body.GetBody();
+				m_ComponentsInfo[index].data = &colliderData;
+				m_ComponentsInfo[index].SetEntity(entity);
+				fixture->SetUserData(&colliderData);
+				
+				m_EntityManager->AddComponentType(entity, ComponentType::COLLIDER2D);
+				return &m_Components[entity - 1];
+			}
+		}
+	}
 	return nullptr;
 }
 void ColliderManager::DestroyComponent(Entity entity)

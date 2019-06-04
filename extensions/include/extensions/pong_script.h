@@ -21,12 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#ifndef SFGE_EXT_PLANET_SYSTEM_H
-#define SFGE_EXT_PLANET_SYSTEM_H
+#ifndef SFGE_EXT_PONG_SCRIPT_H
+#define SFGE_EXT_PONG_SCRIPT_H
 
 #include <engine/system.h>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <graphics/graphics2d.h>
+#include "p2body.h"
 
 
 namespace sfge
@@ -40,15 +41,10 @@ namespace sfge
 
 namespace sfge::ext
 {
-#define WITH_PHYSICS
-//#define WITH_VERTEXARRAY
-
-	//#define MULTI_THREAD
-
-	class PlanetSystem : public System
+	class PongScript : public System
 	{
 	public:
-		PlanetSystem(Engine& engine);
+		PongScript(Engine& engine);
 
 		void OnEngineInit() override;
 
@@ -56,43 +52,23 @@ namespace sfge::ext
 
 		void OnFixedUpdate() override;
 
-		void OnDraw() override;
-
 	private:
 
-		void UpdateRange(int startIndex, int endIndex);
-		p2Vec2 CalculateInitSpeed(sf::Vector2f position) const;
-		p2Vec2 CalculateNewForce(sf::Vector2f position) const;
-		static float Magnitude(sf::Vector2f v);
-		static float Magnitude(p2Vec2 v);
 
 		Transform2dManager* m_Transform2DManager;
 		Body2dManager* m_Body2DManager;
 		TextureManager* m_TextureManager;
 		SpriteManager* m_SpriteManager;
+		Graphics2dManager* m_Graphics2DManager;
+
+		Entity ball;
 
 		float fixedDeltaTime = 0.0f;
-		const float gravityConst = 1000.0f;
-		const float centerMass = 1000.0f;
-		const float planetMass = 1.0f;
-		const size_t entitiesNmb = 1000;
-
-#ifndef WITH_PHYSICS
-	std::vector<Vec2f> m_Velocities{entitiesNmb};
-#endif
+		const size_t entitiesNmb = 10'000;
 
 		sf::Vector2f screenSize;
-#ifdef WITH_VERTEXARRAY
-		sf::VertexArray m_VertexArray{sf::Quads, 4 * entitiesNmb};
-		Graphics2dManager* m_Graphics2DManager;
-		sf::Texture* texture = nullptr;
-		sf::Vector2f textureSize;
-#endif
-#ifdef MULTI_THREAD
-
-	  std::vector<Vec2f> m_Positions{entitiesNmb};
-
-#endif
+		std::vector<p2Body*> bodies;
+		std::vector<Entity> entities;
 	};
 }
 

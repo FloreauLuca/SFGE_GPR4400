@@ -177,12 +177,16 @@ Body2d* Body2dManager::AddComponent(Entity entity)
 	if (auto world = m_WorldPtr.lock())
 	{
 		p2BodyDef bodyDef;
-		bodyDef.type = p2BodyType::STATIC;
+		bodyDef.type = p2BodyType::KINEMATIC;
 
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position;
 		bodyDef.position = pixel2meter(pos);
 		bodyDef.mass = 1.0f;
+		bodyDef.gravityScale = 1;
+		bodyDef.angle = transform->EulerAngle;
+
+
 
 		auto* body = world->CreateBody(&bodyDef);
 		m_Components[entity - 1] = Body2d(transform, sf::Vector2f());
@@ -226,11 +230,19 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		}
 		else
 		{
-			bodyDef.mass = 1;
+			if (bodyDef.type == p2BodyType::STATIC)
+			{
+				bodyDef.mass = 1000; // Grand nombre pour avoir un rebond correct
+			}
+			else
+			{
+				bodyDef.mass = 1;
+			}
 		}
 
 		const auto offset = GetVectorFromJson(componentJson, "offset");
 		const auto velocity = GetVectorFromJson(componentJson, "velocity");
+		const auto angularVelocity = CheckJsonNumber(componentJson, "angular_velocity");
 
 		auto* transform = m_Transform2dManager->GetComponentPtr(entity);
 		const auto pos = transform->Position + offset;
@@ -239,6 +251,7 @@ void Body2dManager::CreateComponent(json& componentJson, Entity entity)
 		
 		auto* body = world->CreateBody(&bodyDef);
 		body->SetLinearVelocity(pixel2meter(velocity));
+		body->SetAngularVelocity(angularVelocity);
 		m_Components[entity - 1] = Body2d(transform, offset);
 		m_Components[entity - 1].SetBody(body);
 

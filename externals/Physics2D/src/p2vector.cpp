@@ -106,7 +106,7 @@ float p2Vec2::Dot(p2Vec2 v1, p2Vec2 v2)
 p2Vec3 p2Vec2::Cross(p2Vec2 v1, p2Vec2 v2)
 {
 	// DONE
-	return p2Vec3(0, 0, v1.x*v2.y - v1.y - v2.x);
+	return p2Vec3(0, 0, v1.x*v2.y - v1.y * v2.x);
 }
 float p2Vec2::GetMagnitude() const
 {
@@ -140,8 +140,6 @@ p2Vec2 p2Vec2::Rotate(float angle) const
 float p2Vec2::Distance(p2Vec2 v1, p2Vec2 v2)
 {
 	return sqrt((v1.x - v2.x)*(v1.x - v2.x) + (v1.y - v2.y)*(v1.y - v2.y));
-
-
 }
 
 /**

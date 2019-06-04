@@ -68,7 +68,7 @@ public:
 private:
 
 	static const int TOTAL_MAX_OBJECTS = 1000;
-	static const int MAX_OBJECTS = 2;
+	static const int MAX_OBJECTS = 3;
 	static const int MAX_LEVELS = 5;
 	static const int CHILD_TREE_NMB = 4;
 	int m_NodeLevel = 0;
