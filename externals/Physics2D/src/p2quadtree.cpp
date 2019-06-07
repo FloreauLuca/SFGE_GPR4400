@@ -12,11 +12,6 @@ p2QuadTree::p2QuadTree(int nodeLevel, p2AABB bounds)
 	m_Objects.resize(MAX_OBJECTS+1);
 }
 
-p2QuadTree::~p2QuadTree()
-{
-	Clear();
-}
-
 void p2QuadTree::Clear()
 {
 	m_Objects.clear();

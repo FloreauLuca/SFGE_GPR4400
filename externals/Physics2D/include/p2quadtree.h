@@ -41,7 +41,6 @@ class p2QuadTree
 public:
 	p2QuadTree();
 	p2QuadTree(int nodeLevel, p2AABB bounds);
-	~p2QuadTree();
 
 	/**
 	* Remove all objects leafs and quadtrees children

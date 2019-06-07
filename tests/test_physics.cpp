@@ -655,7 +655,7 @@ TEST(Physics, TestFlipper)
 
 	json sceneJson;
 	sceneJson["name"] = "Ball Falling To Ground";
-
+	/*
 	json entityBody1;
 	entityBody1["name"] = "Body1";
 
@@ -685,6 +685,38 @@ TEST(Physics, TestFlipper)
 	circleColliderJson["bouncing"] = 1;
 
 	entityBody1["components"] = {transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson};
+	*/
+
+
+	json entityBody1;
+	entityBody1["name"] = "Body1";
+
+	json transformJson1;
+	transformJson1["type"] = sfge::ComponentType::TRANSFORM2D;
+	transformJson1["position"] = { 450, 200 };
+	transformJson1["scale"] = { 1.0, 1.0 };
+	transformJson1["angle"] = 0.0;
+
+	json circleShapeJson;
+	circleShapeJson["name"] = "Circle Shape Component";
+	circleShapeJson["type"] = sfge::ComponentType::SHAPE2D;
+	circleShapeJson["shape_type"] = sfge::ShapeType::RECTANGLE;
+	circleShapeJson["size"] = {100,100};
+
+	json rigidBodyJson1;
+	rigidBodyJson1["name"] = "Rigidbody";
+	rigidBodyJson1["type"] = sfge::ComponentType::BODY2D;
+	rigidBodyJson1["body_type"] = p2BodyType::DYNAMIC;
+	rigidBodyJson1["gravity_scale"] = 1;
+
+	json circleColliderJson;
+	circleColliderJson["name"] = "Circle Collider";
+	circleColliderJson["type"] = sfge::ComponentType::COLLIDER2D;
+	circleColliderJson["collider_type"] = sfge::ColliderType::BOX;
+	circleColliderJson["size"] = { 100,100 };
+	circleColliderJson["bouncing"] = 1;
+
+	entityBody1["components"] = { transformJson1, circleShapeJson, rigidBodyJson1, circleColliderJson };
 
 
 	json entityBody2;

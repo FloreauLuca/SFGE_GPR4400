@@ -95,8 +95,9 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 			rootAABB.topRight.x = body.GetAABB().topRight.x;
 		}
 	}
+	m_RootQuadTree.Clear();
 	m_RootQuadTree = p2QuadTree(0, rootAABB);
-	rmt_ScopedCPUSample(Insert, 0);
+	//rmt_ScopedCPUSample(Insert, 0);
 	for (p2Body& body : bodies)
 	{
 		if (body.IsInstantiate() && (body.GetAABB().topRight != p2Vec2()))
@@ -104,13 +105,13 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 			m_RootQuadTree.Insert(&body);
 		}
 	}
-	rmt_ScopedCPUSample(Retrieve, 0);
+	//rmt_ScopedCPUSample(Retrieve, 0);
 	for (int i = 0; i < m_ContactIndex; i++)
 	{
 		m_Contacts[i].updated = false;
 	}
 	m_RootQuadTree.Retrieve(this);
-	rmt_ScopedCPUSample(EndCheckContact, 0);
+	//rmt_ScopedCPUSample(EndCheckContact, 0);
 	for (int i = 0; i < m_ContactIndex; i++)
 	{
 		if (!m_Contacts[i].updated)
@@ -123,7 +124,7 @@ void p2ContactManager::CheckContact(std::vector<p2Body>& bodies)
 
 void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
 {
-	rmt_ScopedCPUSample(CheckContactInsideVector, 0);
+	//rmt_ScopedCPUSample(CheckContactInsideVector, 0);
 	for (int i = 0; i < bodies.size(); i++)
 	{
 		if (bodies[i] == nullptr)continue;
@@ -141,7 +142,7 @@ void p2ContactManager::CheckContactInsideList(std::vector<p2Body*> bodies)
 
 void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std::vector<p2Body*> bodies2)
 {
-	rmt_ScopedCPUSample(CheckContactBetweenList, 0);
+	//rmt_ScopedCPUSample(CheckContactBetweenList, 0);
 
 	for (int i = 0; i < bodies1.size(); i++)
 	{
@@ -158,7 +159,7 @@ void p2ContactManager::CheckContactBetweenList(std::vector<p2Body*> bodies1, std
 
 void p2ContactManager::CheckNewContactBetweenBodies(p2Body* body1, p2Body* body2)
 {
-	rmt_ScopedCPUSample(EndContact, 0);
+	//rmt_ScopedCPUSample(EndContact, 0);
 	int contactIndex = -1;
 	if (CheckAABBContact(body1, body2))
 	{
@@ -175,7 +176,7 @@ void p2ContactManager::CheckNewContactBetweenBodies(p2Body* body1, p2Body* body2
 				m_Contacts[contactIndex].updated = true;
 			}
 			
-			rmt_ScopedCPUSample(CorrectContact, 0);
+			//rmt_ScopedCPUSample(CorrectContact, 0);
 			// Correction de la position et de la vitesse
 			p2Vec2 newBody1Velocity;
 			p2Vec2 newBody2Velocity;
@@ -335,7 +336,7 @@ int p2ContactManager::ContainContact(p2Body* bodyA, p2Body* bodyB)
 
 p2Mat22 p2ContactManager::CheckSATContact(p2Body* bodyA, p2Body* bodyB)
 {
-	rmt_ScopedCPUSample(SATContact, 0);
+	//rmt_ScopedCPUSample(SATContact, 0);
 
 	for (p2Collider colliderA : *bodyA->GetCollider())
 	{
